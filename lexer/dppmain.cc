@@ -5,6 +5,9 @@
  */
 
 #include "errors.h"
+
+#include <algorithm>
+#include <cctype>
 #include <exception>
 #include <iostream>
 #include <limits>
@@ -34,9 +37,9 @@ enum class Preprocessor_error {
 
 void handle_preprocessing(Tokens&, int&);
 
-void handle_creating_token(Tokens&);
+void handle_declarative(Tokens&, int&);
 
-void replace_token(Tokens&, const string&);
+void handle_creating_token(Tokens&);
 
 void read_space();
 
@@ -79,18 +82,11 @@ void handle_preprocessing(Tokens& tokens, int& line) {
             cin.ignore();
             in_multiline = !in_multiline;
         } else if (in_multiline) {
-            if (c == '\n') cout << c;
-            continue;
+            if (c == '\n') { cout << c; ++line; }
         } else if (c == '#') {
-            string str;
-            if ((cin >> str) && str == def_c) {
-                handle_creating_token(tokens);
-            } else {
-                replace_token(tokens, str);
-            }
-            ++line;
+            handle_declarative(tokens, line);
         } else if (c == '"') {
-            // in string literal, cout until next "
+            // in string literal, output until next "
             cout << c;
             while(cin >> noskipws >> c && c != '"') cout << c;
             cout << c;
@@ -99,8 +95,8 @@ void handle_preprocessing(Tokens& tokens, int& line) {
             cout << '\n';
             ++line;
         } else if (c == '\n') {
-            ++line;
             cout << c;
+            ++line;
         } else {
             cout << c;
         }
@@ -113,11 +109,41 @@ void handle_preprocessing(Tokens& tokens, int& line) {
 
 /** function definitions **/
 
+void handle_declarative(Tokens& tokens, int& line) {
+    unsigned char c;
+    string str;
+    while (cin >> c) {
+        // declaratives are delimited by a whitespace
+        // thus if we have not found a valid token or "define" then throw
+        if (isspace(c)) {
+            throw Preprocessor_error::directive;
+        }
+
+        str += c;
+        if (str == def_c) {
+            handle_creating_token(tokens);
+            ++line;
+            break;
+        } else {
+            auto trep = tokens.find(str);
+            if (trep != tokens.end()) {
+                cout << trep->second;
+                break;
+            }
+        }
+    }
+}
+
 void handle_creating_token(Tokens& tokens) {
     read_space(); // expect space after "define"
 
+    // read the token name
     string tname;
     cin >> tname;
+
+    // token names must be all uppercase
+    bool allupper = all_of(tname.begin(), tname.end(), [](char c) { return isupper(c); });
+    if (!allupper) throw Preprocessor_error::directive;
 
     read_space(); // expect space after name of token
 
@@ -125,15 +151,6 @@ void handle_creating_token(Tokens& tokens) {
     getline(cin, trep);
 
     tokens[tname] = trep;
-}
-
-void replace_token(Tokens& tokens, const string& str) {
-    auto trep = tokens.find(str);
-    if (trep != tokens.end()) {
-        cout << trep->second;
-    } else {
-        throw Preprocessor_error::directive;
-    }
 }
 
 void read_space() {

@@ -1,0 +1,14 @@
+#define COUNT 3 + 1
+
+/*
+ * This is the main entry point for the Decaf
+ * programming language.
+ *
+ * It's a function called 'main' which takes nothing and returns void
+*/
+void main() {
+    int five = #COUNT + 1 // using '#COUNT' means that the declarative #COUNT will be replaced with 3 + 1
+
+    // this should also work
+    int eight = #COUNT+#COUNT
+}
