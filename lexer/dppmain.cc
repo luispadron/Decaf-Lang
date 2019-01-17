@@ -1,26 +1,82 @@
 /* File: dppmain.cc
  * ----------------
- * This file defines the main() routine for the preprocessor, 
+ * This file defines the main() routine for the preprocessor,
  * the filtering tool which runs before the compiler.
  */
- 
-#include "scanner.h"
-#include <stdio.h>
 
-/* Function: main()
- * ----------------
- * Entry point to the preprocessor.
- * As given below, this "filter" just copies stdin to stdout unchanged.
- * It will be your job to actually do some filtering, either by hand-coded
- * transformation of the input or by setting up a lex scanner in the dpp.l
- * file and changing the main below to invoke it via yylex. When finished,
- * the preprocessor should echo stdin to stdout making the transformations
- * to strip comments and handle preprocessor directives.
- */
-int main(int argc, char *argv[])
-{
-  int ch;
-  while ((ch = getc(stdin)) != EOF)
-    putc(ch, stdout);
-  return 0;
+#include<algorithm>
+#include <cstdio>
+#include <iostream>
+#include <limits>
+#include <string>
+#include <unordered_map>
+
+using namespace std;
+
+
+/** type-defs **/
+
+using Tokens = unordered_map<string, string>;
+
+
+/** constants **/
+
+const char * const def_c = "define";
+
+
+/** function declarations **/
+
+void handle_creating_token(Tokens&);
+
+void read_space();
+
+/** main **/
+
+int main() {
+    int line = 0;
+    unsigned char c;
+    Tokens tokens;
+
+    while (cin >> c) {
+        if (c == '#') {
+            string str;
+            if ((cin >> str) && str == def_c) {
+                handle_creating_token(tokens);
+            } else {
+                // handle replacing
+            }
+            ++line;
+        } else if (c == '/' && cin.peek() == '/') {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            ++line;
+        } else if (c == '\n') {
+            ++line;
+        } else {
+            cout << c;
+        }
+    }
+}
+
+
+/** function definitions **/
+
+void handle_creating_token(Tokens& tokens) {
+    read_space(); // expect space after "define"
+
+    string tname;
+    cin >> tname;
+
+    read_space(); // expect space after name of token
+
+    string trep;
+    getline(cin, trep);
+
+    tokens[tname] = trep;
+}
+
+void read_space() {
+    if (getchar() != ' ') {
+        cout << "error: expected empty space" << endl;
+        abort();
+    }
 }
