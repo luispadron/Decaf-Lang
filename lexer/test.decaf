@@ -1,0 +1,13 @@
+#define COUNT 3 + 1
+
+// This is a main function
+int main() {
+    int i = #COUNT + 2;
+}
+
+/**/
+
+/*
+ * I expect this comment to be removed
+ * // we can do this too??
+*/
