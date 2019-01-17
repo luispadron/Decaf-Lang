@@ -73,6 +73,14 @@ int main() {
     }
 }
 
+/** function definitions **/
+
+/**
+ * Responsible for processing the input stream.
+ * Handles calling the appropriate functions for parsing tokens and or declaratives/comments.
+ *
+ * @throws Preprocessor_error, if encounters an error with declaratives or comments
+*/
 void handle_preprocessing(Tokens& tokens, int& line) {
     unsigned char c;
     bool in_multiline = false;
@@ -107,8 +115,14 @@ void handle_preprocessing(Tokens& tokens, int& line) {
     }
 }
 
-/** function definitions **/
 
+/*
+ * Parses the input until a valid token is found or space is seen.
+ * If valid token (previously defined with "#define") is found, replaces it with actual value.
+ * If no valid token is found (found a whitespace) throws an error.
+ *
+ * @throws Preprocessor_error, if no valid token is found.
+ */
 void handle_declarative(Tokens& tokens, int& line) {
     unsigned char c;
     string str;
@@ -134,6 +148,11 @@ void handle_declarative(Tokens& tokens, int& line) {
     }
 }
 
+/*
+ * Creates the token and modifies the tokens hash map.
+ *
+ * @throws Preprocessor_error, if expected format is not followed.
+ */
 void handle_creating_token(Tokens& tokens) {
     read_space(); // expect space after "define"
 
@@ -143,7 +162,9 @@ void handle_creating_token(Tokens& tokens) {
 
     // token names must be all uppercase
     bool allupper = all_of(tname.begin(), tname.end(), [](char c) { return isupper(c); });
-    if (!allupper) throw Preprocessor_error::directive;
+    if (!allupper) {
+        throw Preprocessor_error::directive;
+    }
 
     read_space(); // expect space after name of token
 
@@ -153,6 +174,12 @@ void handle_creating_token(Tokens& tokens) {
     tokens[tname] = trep;
 }
 
+
+/*
+ * Attempts to read a space from the input stream, throws error if unable.
+ *
+ * @throws Preprocessor_error, if unable to read space character from stream.
+ */
 void read_space() {
     if (cin.get() != ' ') {
         throw Preprocessor_error::directive;
