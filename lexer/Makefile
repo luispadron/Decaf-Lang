@@ -1,4 +1,4 @@
-## 
+##
 ## Simple makefile for decaf programming projects
 ##
 
@@ -18,11 +18,18 @@ SRCS = errors.cc utility.cc main.cc
 # OBJS can deal with either .cc or .c files listed in SRCS
 OBJS = lex.yy.o $(patsubst %.cc, %.o, $(filter %.cc,$(SRCS))) $(patsubst %.c, %.o, $(filter %.c, $(SRCS)))
 
-JUNK =  *.o lex.yy.c dpp.yy.c y.tab.c y.tab.h *.core core $(COMPILER).purify purify.log 
+JUNK =  *.o lex.yy.c dpp.yy.c y.tab.c y.tab.h *.core core $(COMPILER).purify purify.log
 
 # Define the tools we are going to use
-CC= g++
-LD = g++
+UNAME := $(shell uname -s)
+
+ifeq ($(UNAME), Darwin)
+	CC = g++-8
+	LD = g++-8
+else
+	CC = g++
+	LD = g++
+endif
 LEX = flex
 YACC = bison
 
@@ -51,7 +58,7 @@ LIBS = -lc -lm -ll
 .yy.o: $*.yy.c
 	$(CC) $(CFLAGS) -c -o $@ $*.cc
 
-lex.yy.c: scanner.l 
+lex.yy.c: scanner.l
 	$(LEX) $(LEXFLAGS) scanner.l
 
 .cc.o: $*.cc
@@ -83,7 +90,7 @@ strip : $(PRODUCTS)
 	rm -rf $(JUNK)
 
 
-# make depend will set up the header file dependencies for the 
+# make depend will set up the header file dependencies for the
 # assignment.  You should make depend whenever you add a new header
 # file to the project or move the project between machines
 #
