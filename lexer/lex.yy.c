@@ -529,7 +529,7 @@ int yy_flex_debug = 1;
 
 static yyconst flex_int16_t yy_rule_linenum[2] =
     {   0,
-       66
+       65
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -841,8 +841,7 @@ YY_DECL
 #line 63 "scanner.l"
 
 
-
-#line 846 "lex.yy.c"
+#line 845 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -958,7 +957,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 66 "scanner.l"
+#line 65 "scanner.l"
 {
     yylval.doubleConstant = std::stod(yytext);
     return T_DoubleConstant;
@@ -966,10 +965,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 71 "scanner.l"
+#line 70 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 973 "lex.yy.c"
+#line 972 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2103,7 +2102,7 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 71 "scanner.l"
+#line 70 "scanner.l"
 
 
 
@@ -2128,8 +2127,7 @@ void yyfree (void * ptr )
  * be helpful when debugging your scanner. Please be sure the variable is
  * set to false when submitting your final version.
  */
-void InitScanner()
-{
+void InitScanner() {
     PrintDebug("lex", "Initializing scanner");
     yy_flex_debug = false;
 }
@@ -2140,7 +2138,9 @@ void InitScanner()
  * This function is installed as the YY_USER_ACTION. This is a place
  * to group code common to all actions.
  */
-static void DoBeforeEachAction()
-{
+static void DoBeforeEachAction() {
+    printf("kms");
+    yylloc.first_line = 0;
+    yylloc.last_line = strlen(yytext);
 }
 

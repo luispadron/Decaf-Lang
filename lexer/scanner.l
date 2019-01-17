@@ -90,8 +90,7 @@ static void DoBeforeEachAction();
  * be helpful when debugging your scanner. Please be sure the variable is
  * set to false when submitting your final version.
  */
-void InitScanner()
-{
+void InitScanner() {
     PrintDebug("lex", "Initializing scanner");
     yy_flex_debug = false;
 }
@@ -102,6 +101,5 @@ void InitScanner()
  * This function is installed as the YY_USER_ACTION. This is a place
  * to group code common to all actions.
  */
-static void DoBeforeEachAction()
-{
+static void DoBeforeEachAction() {
 }
