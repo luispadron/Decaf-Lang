@@ -127,10 +127,10 @@ def main():
         name = dir.name
 
         if result:
-            eprint('test {} failed: {}'.format(name, result))
+            eprint('test {} failed: {}\t❗️'.format(name, result))
             failed.append(name)
         else:
-            print('test {} succeeded'.format(name))
+            print('test {} succeeded\t✅'.format(name))
 
     if failed:
         exit("tests failed: {}".format(failed))
