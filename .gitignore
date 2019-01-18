@@ -31,10 +31,12 @@
 *.out
 *.app
 
-# Mac
+# Custom
 
 .DS_Store
 dppmain
 dcc
 dpp
 *.out.*
+*.yy.*
+env/
