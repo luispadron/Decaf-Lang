@@ -2139,8 +2139,5 @@ void InitScanner() {
  * to group code common to all actions.
  */
 static void DoBeforeEachAction() {
-    printf("kms");
-    yylloc.first_line = 0;
-    yylloc.last_line = strlen(yytext);
 }
 

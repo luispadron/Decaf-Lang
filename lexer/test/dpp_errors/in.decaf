@@ -1,0 +1,20 @@
+#define
+#define
+#define COUNT
+#define COUNT #
+#define beep 3
+
+//
+
+int main() {
+    return 0
+}
+
+/*
+ * this comment should be valid
+ /
+ */
+
+/*
+ * this comment is invalid, it doesnt end
+int test() { }
