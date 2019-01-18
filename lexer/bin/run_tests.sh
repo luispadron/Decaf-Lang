@@ -28,4 +28,18 @@ rm dcc_tests/dcc_loc/bad.txt
 echo "test dcc_loc succeeded\t\t✅"
 # end location handling tests
 
+# run operator lexing tests
+./dcc < dcc_tests/dcc_operators/in.txt > dcc_tests/dcc_operators/bad.txt
+diff dcc_tests/dcc_operators/out.txt dcc_tests/dcc_operators/bad.txt
+rm dcc_tests/dcc_operators/bad.txt
+echo "test dcc_operators succeeded\t✅"
+# end operator tests
+
+# run complete lexing tests
+./dcc < dcc_tests/dcc_complete/in.decaf > dcc_tests/dcc_complete/bad.txt
+diff dcc_tests/dcc_complete/out.txt dcc_tests/dcc_complete/bad.txt
+rm dcc_tests/dcc_complete/bad.txt
+echo "test dcc_complete succeeded\t✅"
+# end complete tests
+
 echo "------------------------------"

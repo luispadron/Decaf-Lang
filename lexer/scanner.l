@@ -15,8 +15,7 @@
 #include "utility.h" // for PrintDebug()
 #include "errors.h"
 
-#include <stdexcept>
-#include <string>
+#include <cstring>
 
 /* Global variable: yylval
  * -----------------------
@@ -95,8 +94,32 @@ break { return T_Break; }
 return { return T_Return; }
 
 
-= { return T_Equal; }
+\=\= { return T_Equal; }
+\!\= { return T_NotEqual; }
+\<\= { return T_LessEqual; }
+\>\= { return T_GreaterEqual; }
+&& { return T_And; }
+\|\| { return T_Or; }
 
+[\+\-\*/%\<\>\=\!;\,\.\[\]\(\)\{\}] { return yytext[0]; }
+
+
+true {
+    yylval.boolConstant = true;
+    return T_BoolConstant;
+}
+
+false {
+    yylval.boolConstant = false;
+    return T_BoolConstant;
+}
+
+\".*\" {
+    // need space for size of string and null terminator
+    yylval.stringConstant = new char[yyleng + 1];
+    strcpy(yylval.stringConstant, yytext);
+    return T_StringConstant;
+}
 
 [0-9]+ {
     yylval.integerConstant = std::stoi(yytext, nullptr, 10);
