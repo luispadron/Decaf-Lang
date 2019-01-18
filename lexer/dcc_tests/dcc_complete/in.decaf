@@ -1,0 +1,81 @@
+/*
+ * This test file is intended to test the
+ * entire capability of the Decaf lexer.
+ *
+ * No undefined tokens should be produced
+ */
+
+class Base {
+    int x = 0
+}
+
+class Sub extends Base {
+    int y = 10
+}
+
+interface Animal { }
+
+class Dog implements Animal { }
+
+void main() {
+    int i = 10
+    int hex = 0x1F
+
+    double d = 100.2
+    double d2 = 100.
+    double sci = 100.E2
+    double neg_sci = 100.E-2
+
+    class base = New(Base)
+    base.x = 2
+
+    class sub = New(Sub)
+
+    class fido = New(Dog)
+
+    string s = "this is a string"
+
+    bool t = true
+    bool f = false
+
+    class empty = null
+
+    if (i == 3) {
+        return
+    } else {
+        return
+    }
+}
+
+int other_tokens() {
+    // these tokens should be read correctly,
+    // even though syntax is wrong
+
+    for
+    while
+    break
+    this
+    NewArray
+
+    +
+    -*
+    /
+    %
+    <
+    <=
+    >
+    >=
+    =
+    ==
+    !=
+    &&
+    ||
+    !
+    ;
+    ,
+    .
+    [
+    ]
+
+    return 10
+}
