@@ -137,12 +137,13 @@ false {
 }
 
 [a-zA-Z]+[0-9a-zA-Z_]* {
-    if (strlen(yytext) > MaxIdentLen) {
+    if (yyleng > MaxIdentLen) {
         ReportError::LongIdentifier(&yylloc, yytext);
     }
 
     // truncate identifier name if needed
     strncpy(yylval.identifier, yytext, MaxIdentLen);
+    yylval.identifier[MaxIdentLen] = '\0'; // add null terminator
     return T_Identifier;
 }
 
