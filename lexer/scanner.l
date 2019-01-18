@@ -62,6 +62,16 @@ static void DoBeforeEachAction();
 
 %%
 
+[0-9]+ {
+    yylval.integerConstant = std::stoi(yytext, nullptr, 10);
+    return T_IntConstant;
+}
+
+0[X|x][0-9a-fA-F]+ {
+    yylval.integerConstant = std::stoi(yytext, nullptr, 16);
+    return T_IntConstant;
+}
+
 [0-9]+\.[0-9]*([e|E][\+|-]?[0-9]+)? {
     yylval.doubleConstant = std::stod(yytext);
     return T_DoubleConstant;
