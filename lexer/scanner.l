@@ -15,6 +15,7 @@
 #include "utility.h" // for PrintDebug()
 #include "errors.h"
 
+#include <stdexcept>
 #include <string>
 
 /* Global variable: yylval
@@ -62,9 +63,47 @@ static void DoBeforeEachAction();
 
 %%
 
+[ \t\n] { }
+
+
+void { return T_Void; }
+int { return T_Int; }
+double { return T_Double; }
+bool { return T_Bool; }
+string { return T_String; }
+class { return T_Class; }
+interface { return T_Interface; }
+null { return T_Null; }
+this { return T_This; }
+extends { return T_Extends; }
+implements { return T_Implements; }
+for { return T_For; }
+while { return T_While; }
+if { return T_If; }
+else { return T_Else; }
+New { return T_New; }
+NewArray { return T_NewArray; }
+break { return T_Break; }
+return { return T_Return; }
+
+
+= { return T_Equal; }
+
+
 [0-9]+\.[0-9]*([e|E][\+|-]?[0-9]+)? {
     yylval.doubleConstant = std::stod(yytext);
     return T_DoubleConstant;
+}
+
+
+[a-zA-Z]+[0-9a-zA-Z_]* {
+    if (strlen(yytext) > MaxIdentLen) {
+        ReportError::LongIdentifier(&yylloc, yytext);
+    }
+
+    // truncate identifier name if needed
+    strncpy(yylval.identifier, yytext, MaxIdentLen);
+    return T_Identifier;
 }
 
 %%
@@ -102,4 +141,5 @@ void InitScanner() {
  * to group code common to all actions.
  */
 static void DoBeforeEachAction() {
+
 }
