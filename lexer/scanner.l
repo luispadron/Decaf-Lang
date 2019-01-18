@@ -63,7 +63,15 @@ static void DoBeforeEachAction();
 
 %%
 
-[ \t\n] { }
+[\n] {
+    yylloc.first_line += 1;
+    yylloc.first_column = 1;
+    yylloc.last_column = 0;
+}
+
+[ ] {
+    yylloc.first_column = yylloc.last_column + 1;
+}
 
 
 void { return T_Void; }
@@ -90,11 +98,20 @@ return { return T_Return; }
 = { return T_Equal; }
 
 
+[0-9]+ {
+    yylval.integerConstant = std::stoi(yytext, nullptr, 10);
+    return T_IntConstant;
+}
+
+0[X|x][0-9a-fA-F]+ {
+    yylval.integerConstant = std::stoi(yytext, nullptr, 16);
+    return T_IntConstant;
+}
+
 [0-9]+\.[0-9]*([e|E][\+|-]?[0-9]+)? {
     yylval.doubleConstant = std::stod(yytext);
     return T_DoubleConstant;
 }
-
 
 [a-zA-Z]+[0-9a-zA-Z_]* {
     if (strlen(yytext) > MaxIdentLen) {
@@ -141,5 +158,5 @@ void InitScanner() {
  * to group code common to all actions.
  */
 static void DoBeforeEachAction() {
-
+    yylloc.last_column += yyleng;
 }
