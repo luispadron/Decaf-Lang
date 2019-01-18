@@ -115,12 +115,13 @@ def main():
     if len(argv) < 2:
         exit('missing executable argument!')
 
-    args = split(argv[1])
-    ext = argv[2]
+    test_dir = argv[1]
+    args = split(argv[2])
+    ext = argv[3]
     args[-1] = Path(args[-1]).resolve()
 
     failed = []
-    root = Path('test')
+    root = Path(test_dir)
     for dir in filter(lambda p: p.is_dir(), root.iterdir()):
         result = run_test(args, dir, ext)
         name = dir.name

@@ -11,5 +11,10 @@ echo ""
 
 echo "Running pre-processor tests"
 echo "------------------------------"
-./bin/run_test.py dpp decaf
+./bin/run_test.py dpp_tests dpp decaf
+echo "------------------------------"
+
+echo "Running lexer tests"
+echo "------------------------------"
+./bin/run_test.py dcc_tests dcc txt
 echo "------------------------------"

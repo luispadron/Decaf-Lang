@@ -62,6 +62,16 @@ static void DoBeforeEachAction();
 
 %%
 
+[\n] {
+    yylloc.first_line += 1;
+    yylloc.first_column = 1;
+    yylloc.last_column = 0;
+}
+
+[ ] {
+    yylloc.first_column = yylloc.last_column + 1;
+}
+
 [0-9]+ {
     yylval.integerConstant = std::stoi(yytext, nullptr, 10);
     return T_IntConstant;
@@ -112,4 +122,5 @@ void InitScanner() {
  * to group code common to all actions.
  */
 static void DoBeforeEachAction() {
+    yylloc.last_column += yyleng;
 }
