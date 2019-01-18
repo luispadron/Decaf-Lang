@@ -1,0 +1,146 @@
+class        line 8 cols 1-5 is T_Class 
+Base         line 8 cols 7-10 is T_Identifier 
+{            line 8 cols 12-12 is '{' 
+int          line 9 cols 5-7 is T_Int 
+x            line 9 cols 9-9 is T_Identifier 
+=            line 9 cols 11-11 is '=' 
+0            line 9 cols 13-13 is T_IntConstant (value = 0)
+}            line 10 cols 1-1 is '}' 
+class        line 12 cols 1-5 is T_Class 
+Sub          line 12 cols 7-9 is T_Identifier 
+extends      line 12 cols 11-17 is T_Extends 
+Base         line 12 cols 19-22 is T_Identifier 
+{            line 12 cols 24-24 is '{' 
+int          line 13 cols 5-7 is T_Int 
+y            line 13 cols 9-9 is T_Identifier 
+=            line 13 cols 11-11 is '=' 
+10           line 13 cols 13-14 is T_IntConstant (value = 10)
+}            line 14 cols 1-1 is '}' 
+interface    line 16 cols 1-9 is T_Interface 
+Animal       line 16 cols 11-16 is T_Identifier 
+{            line 16 cols 18-18 is '{' 
+}            line 16 cols 20-20 is '}' 
+class        line 18 cols 1-5 is T_Class 
+Dog          line 18 cols 7-9 is T_Identifier 
+implements   line 18 cols 11-20 is T_Implements 
+Animal       line 18 cols 22-27 is T_Identifier 
+{            line 18 cols 29-29 is '{' 
+}            line 18 cols 31-31 is '}' 
+void         line 20 cols 1-4 is T_Void 
+main         line 20 cols 6-9 is T_Identifier 
+(            line 20 cols 10-10 is '(' 
+)            line 20 cols 11-11 is ')' 
+{            line 20 cols 13-13 is '{' 
+int          line 21 cols 5-7 is T_Int 
+i            line 21 cols 9-9 is T_Identifier 
+=            line 21 cols 11-11 is '=' 
+10           line 21 cols 13-14 is T_IntConstant (value = 10)
+int          line 22 cols 5-7 is T_Int 
+hex          line 22 cols 9-11 is T_Identifier 
+=            line 22 cols 13-13 is '=' 
+0x1F         line 22 cols 15-18 is T_IntConstant (value = 31)
+double       line 24 cols 5-10 is T_Double 
+d            line 24 cols 12-12 is T_Identifier 
+=            line 24 cols 14-14 is '=' 
+100.2        line 24 cols 16-20 is T_DoubleConstant (value = 100.2)
+double       line 25 cols 5-10 is T_Double 
+d2           line 25 cols 12-13 is T_Identifier 
+=            line 25 cols 15-15 is '=' 
+100.         line 25 cols 17-20 is T_DoubleConstant (value = 100)
+double       line 26 cols 5-10 is T_Double 
+sci          line 26 cols 12-14 is T_Identifier 
+=            line 26 cols 16-16 is '=' 
+100.E2       line 26 cols 18-23 is T_DoubleConstant (value = 10000)
+double       line 27 cols 5-10 is T_Double 
+neg_sci      line 27 cols 12-18 is T_Identifier 
+=            line 27 cols 20-20 is '=' 
+100.E-2      line 27 cols 22-28 is T_DoubleConstant (value = 1)
+class        line 29 cols 5-9 is T_Class 
+base         line 29 cols 11-14 is T_Identifier 
+=            line 29 cols 16-16 is '=' 
+New          line 29 cols 18-20 is T_New 
+(            line 29 cols 21-21 is '(' 
+Base         line 29 cols 22-25 is T_Identifier 
+)            line 29 cols 26-26 is ')' 
+base         line 30 cols 5-8 is T_Identifier 
+.            line 30 cols 9-9 is '.' 
+x            line 30 cols 10-10 is T_Identifier 
+=            line 30 cols 12-12 is '=' 
+2            line 30 cols 14-14 is T_IntConstant (value = 2)
+class        line 32 cols 5-9 is T_Class 
+sub          line 32 cols 11-13 is T_Identifier 
+=            line 32 cols 15-15 is '=' 
+New          line 32 cols 17-19 is T_New 
+(            line 32 cols 20-20 is '(' 
+Sub          line 32 cols 21-23 is T_Identifier 
+)            line 32 cols 24-24 is ')' 
+class        line 34 cols 5-9 is T_Class 
+fido         line 34 cols 11-14 is T_Identifier 
+=            line 34 cols 16-16 is '=' 
+New          line 34 cols 18-20 is T_New 
+(            line 34 cols 21-21 is '(' 
+Dog          line 34 cols 22-24 is T_Identifier 
+)            line 34 cols 25-25 is ')' 
+string       line 36 cols 5-10 is T_String 
+s            line 36 cols 12-12 is T_Identifier 
+=            line 36 cols 14-14 is '=' 
+"this is a string" line 36 cols 16-33 is T_StringConstant (value = "this is a string")
+bool         line 38 cols 5-8 is T_Bool 
+t            line 38 cols 10-10 is T_Identifier 
+=            line 38 cols 12-12 is '=' 
+true         line 38 cols 14-17 is T_BoolConstant (value = true)
+bool         line 39 cols 5-8 is T_Bool 
+f            line 39 cols 10-10 is T_Identifier 
+=            line 39 cols 12-12 is '=' 
+false        line 39 cols 14-18 is T_BoolConstant (value = false)
+class        line 41 cols 5-9 is T_Class 
+empty        line 41 cols 11-15 is T_Identifier 
+=            line 41 cols 17-17 is '=' 
+null         line 41 cols 19-22 is T_Null 
+if           line 43 cols 5-6 is T_If 
+(            line 43 cols 8-8 is '(' 
+i            line 43 cols 9-9 is T_Identifier 
+==           line 43 cols 11-12 is T_Equal 
+3            line 43 cols 14-14 is T_IntConstant (value = 3)
+)            line 43 cols 15-15 is ')' 
+{            line 43 cols 17-17 is '{' 
+return       line 44 cols 9-14 is T_Return 
+}            line 45 cols 5-5 is '}' 
+else         line 45 cols 7-10 is T_Else 
+{            line 45 cols 12-12 is '{' 
+return       line 46 cols 9-14 is T_Return 
+}            line 47 cols 5-5 is '}' 
+}            line 48 cols 1-1 is '}' 
+int          line 50 cols 1-3 is T_Int 
+other_tokens line 50 cols 5-16 is T_Identifier 
+(            line 50 cols 17-17 is '(' 
+)            line 50 cols 18-18 is ')' 
+{            line 50 cols 20-20 is '{' 
+for          line 54 cols 5-7 is T_For 
+while        line 55 cols 5-9 is T_While 
+break        line 56 cols 5-9 is T_Break 
+this         line 57 cols 5-8 is T_This 
+NewArray     line 58 cols 5-12 is T_NewArray 
++            line 60 cols 5-5 is '+' 
+-            line 61 cols 5-5 is '-' 
+*            line 61 cols 6-6 is '*' 
+/            line 62 cols 5-5 is '/' 
+%            line 63 cols 5-5 is '%' 
+<            line 64 cols 5-5 is '<' 
+<=           line 65 cols 5-6 is T_LessEqual 
+>            line 66 cols 5-5 is '>' 
+>=           line 67 cols 5-6 is T_GreaterEqual 
+=            line 68 cols 5-5 is '=' 
+==           line 69 cols 5-6 is T_Equal 
+!=           line 70 cols 5-6 is T_NotEqual 
+&&           line 71 cols 5-6 is T_And 
+||           line 72 cols 5-6 is T_Or 
+!            line 73 cols 5-5 is '!' 
+;            line 74 cols 5-5 is ';' 
+,            line 75 cols 5-5 is ',' 
+.            line 76 cols 5-5 is '.' 
+[            line 77 cols 5-5 is '[' 
+]            line 78 cols 5-5 is ']' 
+return       line 80 cols 5-10 is T_Return 
+10           line 80 cols 12-13 is T_IntConstant (value = 10)
+}            line 81 cols 1-1 is '}' 
