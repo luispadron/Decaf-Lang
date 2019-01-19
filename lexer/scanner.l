@@ -69,6 +69,7 @@ static void DoBeforeEachAction();
 }
 
 [ ] {
+    PrintDebug("lex", "first_column = %i, last_column = %i", yylloc.first_column, yylloc.last_column);
     yylloc.first_column = yylloc.last_column + 1;
 }
 
@@ -182,5 +183,7 @@ void InitScanner() {
  * to group code common to all actions.
  */
 static void DoBeforeEachAction() {
+    PrintDebug("lex", "yyleng = %i", yyleng);
+    yylloc.first_column = yylloc.last_column + 1;
     yylloc.last_column += yyleng;
 }
