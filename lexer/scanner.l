@@ -69,10 +69,8 @@ static void DoBeforeEachAction();
 }
 
 [ ] {
-    PrintDebug("lex", "first_column = %i, last_column = %i", yylloc.first_column, yylloc.last_column);
     yylloc.first_column = yylloc.last_column + 1;
 }
-
 
 void { return T_Void; }
 int { return T_Int; }
@@ -122,6 +120,11 @@ false {
     return T_StringConstant;
 }
 
+\".* {
+    // Unterminated string
+    ReportError::UntermString(&yylloc, yytext)
+}
+
 [0-9]+ {
     yylval.integerConstant = std::stoi(yytext, nullptr, 10);
     return T_IntConstant;
@@ -148,6 +151,11 @@ false {
     return T_Identifier;
 }
 
+. {
+    // Unrecognized character
+    ReportError::UnrecogChar(&yylloc, yytext)
+}
+
 %%
 
 /* END RULES SECTION */
@@ -172,7 +180,6 @@ false {
  * set to false when submitting your final version.
  */
 void InitScanner() {
-    PrintDebug("lex", "Initializing scanner");
     yy_flex_debug = false;
 }
 
@@ -183,7 +190,6 @@ void InitScanner() {
  * to group code common to all actions.
  */
 static void DoBeforeEachAction() {
-    PrintDebug("lex", "yyleng = %i", yyleng);
     yylloc.first_column = yylloc.last_column + 1;
     yylloc.last_column += yyleng;
 }
