@@ -1,0 +1,4 @@
+Another      line 7 cols 1-7 is T_Identifier 
+unterminated line 7 cols 9-20 is T_Identifier 
+string       line 7 cols 22-27 is T_String 
+&&           line 9 cols 1-2 is T_And 

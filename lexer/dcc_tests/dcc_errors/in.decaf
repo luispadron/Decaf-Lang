@@ -1,0 +1,15 @@
+/*
+ * This file tests error handling of the lexer
+*/
+
+"Unterminated string
+
+Another unterminated string"
+
+&&&
+
+^^^
+
+?\
+
+`~
