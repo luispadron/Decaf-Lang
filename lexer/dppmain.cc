@@ -61,6 +61,8 @@ int main() {
                     break;
                 case Preprocessor_error::directive:
                     ReportError::InvalidDirective(line);
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cin.putback('\n');
                     break;
                 default:
                     cout << "error: unknown preprocessor error thrown" << endl;
@@ -68,7 +70,6 @@ int main() {
             }
 
             cin.clear();
-            ++line;
         }
     }
 }
@@ -87,24 +88,23 @@ void handle_preprocessing(Tokens& tokens, int& line) {
 
     while (cin >> noskipws >> c) {
         if ((c == '/' && cin.peek() == '*') || (c == '*' && cin.peek() == '/')) {
+            if (cin.peek() == '*') { in_multiline = true; }
+            else  { in_multiline = false; }
             cin.ignore();
-            in_multiline = !in_multiline;
         } else if (in_multiline) {
             if (c == '\n') { cout << c; ++line; }
-        } else if (c == '#') {
-            handle_declarative(tokens, line);
         } else if (c == '"') {
             // in string literal, output until next "
             cout << c;
             while(cin >> noskipws >> c && c != '"') cout << c;
             cout << c;
-        } else if (c == '/' && cin.peek() == '/') {
+        } else if (c == '#') {
+            handle_declarative(tokens, line);
+        }  else if (c == '/' && cin.peek() == '/') {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << '\n';
-            ++line;
+            cin.putback('\n');
         } else if (c == '\n') {
-            cout << c;
-            ++line;
+            cout << c; ++line;
         } else {
             cout << c;
         }
@@ -136,7 +136,6 @@ void handle_declarative(Tokens& tokens, int& line) {
         str += c;
         if (str == def_c) {
             handle_creating_token(tokens);
-            ++line;
             break;
         } else {
             auto trep = tokens.find(str);
@@ -170,6 +169,7 @@ void handle_creating_token(Tokens& tokens) {
 
     string trep;
     getline(cin, trep);
+    cin.putback('\n');
 
     tokens[tname] = trep;
 }
@@ -181,7 +181,9 @@ void handle_creating_token(Tokens& tokens) {
  * @throws Preprocessor_error, if unable to read space character from stream.
  */
 void read_space() {
-    if (cin.get() != ' ') {
+    if (cin.peek() != ' ') {
         throw Preprocessor_error::directive;
     }
+    
+    cin.ignore();
 }
