@@ -1,0 +1,2 @@
+*            line 8 cols 1-1 is '*' 
+/            line 8 cols 2-2 is '/' 
