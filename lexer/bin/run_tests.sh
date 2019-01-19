@@ -42,4 +42,11 @@ rm dcc_tests/dcc_complete/bad.txt
 echo "test dcc_complete succeeded\t✅"
 # end complete tests
 
+# run tab lexing tests
+./dcc < dcc_tests/dcc_tabs/in.decaf > dcc_tests/dcc_tabs/bad.txt
+diff dcc_tests/dcc_tabs/out.txt dcc_tests/dcc_tabs/bad.txt
+rm dcc_tests/dcc_tabs/bad.txt
+echo "test dcc_tabs succeeded\t\t✅"
+# end tab tests
+
 echo "------------------------------"

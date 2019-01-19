@@ -17,6 +17,8 @@
 
 #include <cstring>
 
+#define TAB_SIZE 8
+
 /* Global variable: yylval
  * -----------------------
  * This global variable is how we get attribute information about the token
@@ -66,6 +68,11 @@ static void DoBeforeEachAction();
     yylloc.first_line += 1;
     yylloc.first_column = 1;
     yylloc.last_column = 0;
+}
+
+[\t] {
+    int offset = (yylloc.last_column - 1) % TAB_SIZE;
+    yylloc.last_column = (yylloc.last_column - 1) + TAB_SIZE - offset;
 }
 
 [ ] {
