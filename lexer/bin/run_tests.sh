@@ -49,4 +49,19 @@ rm dcc_tests/dcc_tabs/bad.txt
 echo "test dcc_tabs succeeded\t\t✅"
 # end tab tests
 
+# run sample tests
+for file in sample_tests/correct/*
+do  
+    filename="${file##*/}"
+    filename="${filename%.*}"
+    {
+        diff $file sample_tests/ours/$filename.txt > sample_tests/diffs/$filename.diff    
+    } || {
+        echo "test sample_tests failed\t❗️"
+        exit
+    }
+done
+echo "test sample_tests succeeded\t\t✅"
+#end run sample tests
+
 echo "------------------------------"
