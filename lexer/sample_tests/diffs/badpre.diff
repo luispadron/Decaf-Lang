@@ -1,3 +1,6 @@
-1,2d0
+1,2c1,2
 < *            line 8 cols 1-1 is '*' 
 < /            line 8 cols 2-2 is '/' 
+---
+> *            line 7 cols 1-1 is '*' 
+> /            line 7 cols 2-2 is '/' 

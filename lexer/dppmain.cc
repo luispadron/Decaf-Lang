@@ -87,12 +87,17 @@ void handle_preprocessing(Tokens& tokens, int& line) {
     bool in_multiline = false;
 
     while (cin >> noskipws >> c) {
-        if ((c == '/' && cin.peek() == '*') || (c == '*' && cin.peek() == '/')) {
-            if (cin.peek() == '*') { in_multiline = true; }
-            else  { in_multiline = false; }
+        if (!in_multiline && c == '/' && cin.peek() == '*') {
+            in_multiline = true;
             cin.ignore();
         } else if (in_multiline) {
-            if (c == '\n') { cout << c; ++line; }
+            if (c == '*' && cin.peek() == '/') {
+                in_multiline = false;
+                cin.ignore();
+            } else if (c == '\n') { 
+                cout << c; 
+                ++line; 
+            }
         } else if (c == '"') {
             // in string literal, output until next "
             cout << c;

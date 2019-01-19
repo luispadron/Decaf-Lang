@@ -50,6 +50,9 @@ echo "test dcc_tabs succeeded\t\t✅"
 # end tab tests
 
 # run sample tests
+
+printf 'samples\nsample_tests/ours\ndcc' | ./bin/gen_tests.sh > /dev/null
+
 for file in sample_tests/correct/*
 do  
     filename="${file##*/}"
