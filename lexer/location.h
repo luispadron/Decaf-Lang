@@ -14,10 +14,16 @@
  * Defines the struct type that is used by the scanner to store
  * position information about each lexeme scanned.
  */
-typedef struct yyltype
-{
+typedef struct yyltype {
+
+    yyltype(int ts, int fl, int fc, int ll, int lc) : 
+        timestamp{ts}, first_line{fl}, first_column{fc}, last_line{ll}, last_column{lc} { }
+
+    yyltype() :
+        timestamp{0}, first_line{1}, first_column{0}, last_line{0}, last_column{0} { }
+
     int timestamp;                 // you can ignore this field
-    int first_line = 1, first_column = 0;
+    int first_line, first_column;
     int last_line, last_column;
     char *text;                    // you can also ignore this field
 } yyltype;
