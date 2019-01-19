@@ -122,7 +122,7 @@ false {
 
 \".* {
     // Unterminated string
-    ReportError::UntermString(&yylloc, yytext)
+    ReportError::UntermString(&yylloc, yytext);
 }
 
 [0-9]+ {
@@ -153,7 +153,7 @@ false {
 
 . {
     // Unrecognized character
-    ReportError::UnrecogChar(&yylloc, yytext)
+    ReportError::UnrecogChar(&yylloc, yytext[0]);
 }
 
 %%
