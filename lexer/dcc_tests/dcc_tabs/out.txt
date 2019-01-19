@@ -1,0 +1,19 @@
+void         line 5 cols 1-4 is T_Void 
+main         line 5 cols 6-9 is T_Identifier 
+(            line 5 cols 10-10 is '(' 
+)            line 5 cols 11-11 is ')' 
+{            line 5 cols 13-13 is '{' 
+int          line 6 cols 9-11 is T_Int 
+x            line 6 cols 13-13 is T_Identifier 
+=            line 6 cols 15-15 is '=' 
+3            line 6 cols 17-17 is T_IntConstant (value = 3)
+int          line 7 cols 9-11 is T_Int 
+y            line 7 cols 17-17 is T_Identifier 
+=            line 7 cols 19-19 is '=' 
+8            line 7 cols 21-21 is T_IntConstant (value = 8)
+this         line 8 cols 1-4 is T_This 
+.            line 8 cols 5-5 is '.' 
+be           line 8 cols 6-7 is T_Identifier 
+=            line 8 cols 9-9 is '=' 
+2            line 8 cols 17-17 is T_IntConstant (value = 2)
+}            line 9 cols 1-1 is '}' 
