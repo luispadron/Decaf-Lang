@@ -40,3 +40,4 @@ lexer/dpp
 *.out.*
 *.yy.*
 env/
+*.diff

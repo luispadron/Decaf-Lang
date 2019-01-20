@@ -135,6 +135,7 @@ void handle_declarative(Tokens& tokens, int& line) {
         // declaratives are delimited by a whitespace
         // thus if we have not found a valid token or "define" then throw
         if (isspace(c)) {
+            cin.putback(c);
             throw Preprocessor_error::directive;
         }
 

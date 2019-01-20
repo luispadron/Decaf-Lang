@@ -12,6 +12,25 @@ echo ""
 echo "Running pre-processor tests"
 echo "------------------------------"
 ./bin/run_test.py dpp_tests dpp decaf
+
+# run dpp sample tests
+printf 'samples\ndpp_sample_tests/ours\ndpp' | ./bin/gen_tests.sh > /dev/null
+
+for file in dpp_sample_tests/correct/*
+do  
+    filename="${file##*/}"
+    filename="${filename%.*}"
+    {
+        diff $file dpp_sample_tests/ours/$filename.txt > dpp_sample_tests/diffs/$filename.diff    
+    } || {
+        echo "test dpp_sample_tests failed\t❗️"
+        exit
+    }
+done
+echo "test dpp_sample_tests succeeded\t✅"
+# end dpp sample tests
+
+
 echo "------------------------------"
 
 

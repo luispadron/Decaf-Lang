@@ -79,6 +79,20 @@ static void DoBeforeEachAction();
     yylloc.first_column = yylloc.last_column + 1;
 }
 
+
+\"[^\"\n]*\" {
+    // need space for size of string and null terminator
+    yylval.stringConstant = new char[yyleng + 1];
+    strcpy(yylval.stringConstant, yytext);
+    return T_StringConstant;
+}
+
+\"[^\"\n]* {
+    // Unterminated string
+    ReportError::UntermString(&yylloc, yytext);
+}
+
+
 void { return T_Void; }
 int { return T_Int; }
 double { return T_Double; }
@@ -118,18 +132,6 @@ true {
 false {
     yylval.boolConstant = false;
     return T_BoolConstant;
-}
-
-\".*\" {
-    // need space for size of string and null terminator
-    yylval.stringConstant = new char[yyleng + 1];
-    strcpy(yylval.stringConstant, yytext);
-    return T_StringConstant;
-}
-
-\".* {
-    // Unterminated string
-    ReportError::UntermString(&yylloc, yytext);
 }
 
 [0-9]+ {

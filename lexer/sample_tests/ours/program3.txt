@@ -67,6 +67,8 @@ besty        line 19 cols 3-7 is T_Identifier
 .            line 19 cols 8-8 is '.' 
 name         line 19 cols 9-12 is T_Identifier 
 =            line 19 cols 14-14 is '=' 
+"Betsy"      line 19 cols 16-22 is T_StringConstant (value = "Betsy")
+;            line 19 cols 23-23 is ';' 
 betsy        line 20 cols 3-7 is T_Identifier 
 .            line 20 cols 8-8 is '.' 
 Moo          line 20 cols 9-11 is T_Identifier 
