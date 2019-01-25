@@ -91,24 +91,24 @@ void yyerror(const char *msg); // standard error-handling routine
  * %% markers which delimit the Rules section.
 	 
  */
-Program   :    DeclList            { 
-                                      @1; 
-                                      /* pp2: The @1 is needed to convince 
-                                       * yacc to set up yylloc. You can remove 
-                                       * it once you have other uses of @n*/
-                                      Program *program = new Program($1);
-                                      // if no errors, advance to next phase
-                                      if (ReportError::NumErrors() == 0) 
-                                          program->Print(0);
-                                    }
-          ;
+Program :   DeclList    { 
+                            @1; 
+                            /* pp2: The @1 is needed to convince 
+                            * yacc to set up yylloc. You can remove 
+                            * it once you have other uses of @n*/
+                            Program *program = new Program($1);
+                            // if no errors, advance to next phase
+                            if (ReportError::NumErrors() == 0) 
+                                program->Print(0);
+                        }
+        ;
 
-DeclList  :    DeclList Decl        { ($$=$1)->Append($2); }
-          |    Decl                 { ($$ = new List<Decl*>)->Append($1); }
-          ;
+DeclList    :   DeclList Decl   { ($$=$1)->Append($2); }
+            |   Decl            { ($$ = new List<Decl*>)->Append($1); }
+            ;
 
-Decl      :    T_Void               { /* pp2: replace with correct rules  */ } 
-          ;
+Decl    :   T_Void    { /* pp2: replace with correct rules  */ } 
+        ;
           
 
 
@@ -133,8 +133,7 @@ Decl      :    T_Void               { /* pp2: replace with correct rules  */ }
  * Please be sure the variable is set to false when submitting your final
  * version.
  */
-void InitParser()
-{
-   PrintDebug("parser", "Initializing parser");
-   yydebug = false;
+void InitParser() {
+    PrintDebug("parser", "Initializing parser");
+    yydebug = false;
 }
