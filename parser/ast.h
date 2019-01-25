@@ -34,22 +34,21 @@
 #include <stdlib.h>   // for NULL
 #include "location.h"
 
-class Node 
-{
-  protected:
+class Node {
+protected:
     yyltype *location;
     Node *parent;
 
-  public:
+public:
     Node(yyltype loc);
     Node();
-    
+
     yyltype *GetLocation()   { return location; }
     void SetParent(Node *p)  { parent = p; }
     Node *GetParent()        { return parent; }
 
     virtual const char *GetPrintNameForNode() = 0;
-    
+
     // Print() is deliberately _not_ virtual
     // subclasses should override PrintChildren() instead
     void Print(int indentLevel, const char *label = NULL); 
@@ -57,12 +56,11 @@ class Node
 };
    
 
-class Identifier : public Node 
-{
-  protected:
+class Identifier : public Node {
+protected:
     char *name;
     
-  public:
+public:
     Identifier(yyltype loc, const char *name);
     const char *GetPrintNameForNode()   { return "Identifier"; }
     void PrintChildren(int indentLevel);
@@ -74,13 +72,11 @@ class Identifier : public Node
 // is discarded along with the states being popped, and an instance of
 // the Error class can stand in as the placeholder in the parse tree
 // when your parser can continue after an error.
-class Error : public Node
-{
-  public:
+class Error : public Node {
+public:
     Error() : Node() {}
     const char *GetPrintNameForNode()   { return "Error"; }
 };
-
 
 
 #endif

@@ -40,33 +40,32 @@ using std::string;
 
 typedef enum {LookingForType, LookingForClass, LookingForInterface, LookingForVariable, LookingForFunction} reasonT;
 
-class ReportError
-{
- public:
+class ReportError {
+public:
 
-  // Errors used by preprocessor
-  static void UntermComment();
-  static void InvalidDirective(int linenum);
-
-
-  // Errors used by scanner
-  static void LongIdentifier(yyltype *loc, const char *ident);
-  static void UntermString(yyltype *loc, const char *str);
-  static void UnrecogChar(yyltype *loc, char ch);
-
-  // Generic method to report a printf-style error message
-  static void Formatted(yyltype *loc, const char *format, ...);
+    // Errors used by preprocessor
+    static void UntermComment();
+    static void InvalidDirective(int linenum);
 
 
-  // Returns number of error messages printed
-  static int NumErrors() { return numErrors; }
-  
- private:
+    // Errors used by scanner
+    static void LongIdentifier(yyltype *loc, const char *ident);
+    static void UntermString(yyltype *loc, const char *str);
+    static void UnrecogChar(yyltype *loc, char ch);
 
-  static void UnderlineErrorInLine(const char *line, const yyltype *pos);
-  static void EmitError(yyltype *loc, string msg);
-  static void OutputError(const yyltype *loc, string msg);
-  static int numErrors;
+    // Generic method to report a printf-style error message
+    static void Formatted(yyltype *loc, const char *format, ...);
+
+
+    // Returns number of error messages printed
+    static int NumErrors() { return numErrors; }
+
+private:
+
+    static void UnderlineErrorInLine(const char *line, const yyltype *pos);
+    static void EmitError(yyltype *loc, string msg);
+    static void OutputError(const yyltype *loc, string msg);
+    static int numErrors;
   
 };
 

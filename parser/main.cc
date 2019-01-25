@@ -20,8 +20,7 @@
  * InitParser() is used to set up the parser. The call to yyparse() will
  * attempt to parse a complete program from the input. 
  */
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     ParseCommandLine(argc, argv);
   
     InitScanner();

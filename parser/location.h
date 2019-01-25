@@ -14,8 +14,7 @@
  * Defines the struct type that is used by the scanner to store
  * position information about each lexeme scanned.
  */
-typedef struct yyltype
-{
+typedef struct yyltype {
     int timestamp;                 // you can ignore this field
     int first_line, first_column;
     int last_line, last_column;      
@@ -46,20 +45,18 @@ extern struct yyltype yylloc;
  * Takes two locations and returns a new location which represents
  * the span from first to last, inclusive.
  */
-inline yyltype Join(yyltype first, yyltype last)
-{
-  yyltype combined;
-  combined.first_column = first.first_column;
-  combined.first_line = first.first_line;
-  combined.last_column = last.last_column;
-  combined.last_line = last.last_line;
-  return combined;
+inline yyltype Join(yyltype first, yyltype last) {
+    yyltype combined;
+    combined.first_column = first.first_column;
+    combined.first_line = first.first_line;
+    combined.last_column = last.last_column;
+    combined.last_line = last.last_line;
+    return combined;
 }
 
 /* Same as above, except operates on pointers as a convenience  */
-inline yyltype Join(yyltype *firstPtr, yyltype *lastPtr)
-{
-  return Join(*firstPtr, *lastPtr);
+inline yyltype Join(yyltype *firstPtr, yyltype *lastPtr) {
+    return Join(*firstPtr, *lastPtr);
 }
 
 
