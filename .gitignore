@@ -41,3 +41,6 @@ lexer/dpp
 *.yy.*
 env/
 *.diff
+y.tab.h
+y.tab.c
+y.output
