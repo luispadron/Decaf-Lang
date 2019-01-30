@@ -8,5 +8,5 @@ RUN apt-get update && apt-get install -y \
     flex
 CMD ["/bin/bash"]
 WORKDIR /src
-COPY . /src
+VOLUME .:/src
 
