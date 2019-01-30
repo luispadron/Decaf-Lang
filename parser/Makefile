@@ -1,4 +1,4 @@
-## 
+##
 ## Simple makefile for decaf programming projects
 ##
 
@@ -6,14 +6,14 @@
 .PHONY: clean strip
 
 # C++11 support on CAEN machines
-PATH := /usr/um/gcc-4.7.0/bin:$(PATH) 
-LD_LIBRARY_PATH := /usr/um/gcc-4.7.0/lib64 
+PATH := /usr/um/gcc-4.7.0/bin:$(PATH)
+LD_LIBRARY_PATH := /usr/um/gcc-4.7.0/lib64
 LD_RUN_PATH := /usr/um/gcc-4.7.0/lib64
 
 # Set the default target. When you make with no arguments,
 # this will be the target built.
 COMPILER = dcc
-PRODUCTS = $(COMPILER) 
+PRODUCTS = $(COMPILER)
 default: $(PRODUCTS)
 
 # Set up the list of source and object files
@@ -23,19 +23,13 @@ SRCS = ast.cc ast_decl.cc ast_expr.cc ast_stmt.cc ast_type.cc errors.cc utility.
 OBJS = y.tab.o $(patsubst %.cc, %.o, $(filter %.cc,$(SRCS))) $(patsubst %.c, %.o, $(filter %.c, $(SRCS)))
 PRECOMPILED = lex.yy.o
 
-JUNK = $(OBJS) lex.yy.c dpp.yy.c y.tab.c y.tab.h *.core core $(COMPILER).purify purify.log 
+JUNK = $(OBJS) lex.yy.c dpp.yy.c y.tab.c y.tab.h *.core core $(COMPILER).purify purify.log
 
 # Define the tools we are going to use
 # Define the tools we are going to use
-UNAME := $(shell uname -s)
 
-ifeq ($(UNAME), Darwin)
-	CC = g++-8
-	LD = g++-8
-else
-	CC = g++
-	LD = g++
-endif
+CC = g++
+LD = g++
 LEX = flex
 YACC = bison
 
@@ -95,7 +89,7 @@ strip : $(PRODUCTS)
 	rm -rf $(JUNK)
 
 
-# make depend will set up the header file dependencies for the 
+# make depend will set up the header file dependencies for the
 # assignment.  You should make depend whenever you add a new header
 # file to the project or move the project between machines
 #
