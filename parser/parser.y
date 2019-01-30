@@ -44,8 +44,12 @@ void yyerror(const char *msg); // standard error-handling routine
     char *stringConstant;
     double doubleConstant;
     char identifier[MaxIdentLen + 1]; // +1 for terminating null
+    
     Decl *decl;
-    List<Decl*> *declList;
+    List<Decl*> *declList; 
+
+    Type *variable;
+    Type *type;
 }
 
 
@@ -81,8 +85,12 @@ void yyerror(const char *msg); // standard error-handling routine
  * of the union named "declList" which is of type List<Decl*>.
  * pp2: You'll need to add many of these of your own.
  */
-%type <declList>  DeclList 
-%type <decl>      Decl
+%type <declList>    DeclList 
+%type <decl>        Decl
+%type <decl>        VariableDecl
+%type <type>        Variable
+%type <type>        Type
+
 
 %%
 /* Rules
@@ -111,8 +119,31 @@ DeclList:
     ;
 
 Decl: 
-    T_Void  { }
+    VariableDecl  { }
     ;
+
+VariableDecl:
+    Variable ';' { }
+    ;
+
+Variable:
+    Type T_Identifier { $$ = new NamedType(new Identifier(@2, $2)); }
+    ;    
+
+Type:
+    T_Int { Type::intType; }
+    |
+    T_Double { Type::doubleType; }
+    |
+    T_Void { Type::voidType; }
+    |
+    T_Bool { Type::boolType; }
+    |
+    T_Null { Type::nullType; }
+    |
+    T_String { Type::stringType; }
+    ;
+
 %%
 
 /* The closing %% above marks the end of the Rules section and the beginning
