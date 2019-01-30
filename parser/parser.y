@@ -43,7 +43,7 @@ void yyerror(const char *msg); // standard error-handling routine
     bool boolConstant;
     char *stringConstant;
     double doubleConstant;
-    char identifier[MaxIdentLen+1]; // +1 for terminating null
+    char identifier[MaxIdentLen + 1]; // +1 for terminating null
     Decl *decl;
     List<Decl*> *declList;
 }
@@ -91,27 +91,28 @@ void yyerror(const char *msg); // standard error-handling routine
  * %% markers which delimit the Rules section.
 	 
  */
-Program :   DeclList    { 
-                            @1; 
-                            /* pp2: The @1 is needed to convince 
-                            * yacc to set up yylloc. You can remove 
-                            * it once you have other uses of @n*/
-                            Program *program = new Program($1);
-                            // if no errors, advance to next phase
-                            if (ReportError::NumErrors() == 0) 
-                                program->Print(0);
-                        }
-        ;
+Program:   
+    DeclList { 
+                @1; 
+                /* pp2: The @1 is needed to convince 
+                * yacc to set up yylloc. You can remove 
+                * it once you have other uses of @n*/
+                Program *program = new Program($1);
+                // if no errors, advance to next phase
+                if (ReportError::NumErrors() == 0) 
+                    program->Print(0);
+            }
+    ;
 
-DeclList    :   DeclList Decl   { ($$=$1)->Append($2); }
-            |   Decl            { ($$ = new List<Decl*>)->Append($1); }
-            ;
+DeclList:   
+    DeclList Decl { ($$=$1)->Append($2); }
+    |   
+    Decl { ($$ = new List<Decl*>)->Append($1); }
+    ;
 
-Decl    :   T_Void    {  } 
-        ;
-          
-
-
+Decl: 
+    T_Void  { }
+    ;
 %%
 
 /* The closing %% above marks the end of the Rules section and the beginning
