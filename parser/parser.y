@@ -103,12 +103,13 @@ void yyerror(const char *msg); // standard error-handling routine
 
  */
 Program:
-    DeclList {
-                Program *program = new Program($1);
-                // if no errors, advance to next phase
-                if (ReportError::NumErrors() == 0)
-                    program->Print(0);
-            }
+    DeclList
+        {
+            Program *program = new Program($1);
+            // if no errors, advance to next phase
+            if (ReportError::NumErrors() == 0)
+                program->Print(0);
+        }
     ;
 
 DeclList:
@@ -143,6 +144,8 @@ Type:
     T_String { $$ = Type::stringType; }
     |
     T_Identifier { $$ = new NamedType(new Identifier(@1, $1)); }
+    |
+    Type T_Dims { $$ = new ArrayType(@1, $1); }
     ;
 
 %%
