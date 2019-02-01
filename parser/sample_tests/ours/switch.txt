@@ -1,6 +1,6 @@
 
-*** Error line 5.
-void small() {
-          ^
+*** Error line 9.
+	Print("What is the rank of the card? (1-13)");
+        ^^^^^
 *** syntax error
 

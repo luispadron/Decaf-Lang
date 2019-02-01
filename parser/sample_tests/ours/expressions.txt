@@ -1,6 +1,6 @@
 
-*** Error line 3.
-int foo(int a, double b, bool c) {
-       ^
+*** Error line 4.
+  return a + 2;
+  ^^^^^^
 *** syntax error
 

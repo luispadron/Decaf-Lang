@@ -1,6 +1,6 @@
 
-*** Error line 4.
-int tester(int d) {
-          ^
+*** Error line 5.
+  return (b[d] + d);
+  ^^^^^^
 *** syntax error
 
