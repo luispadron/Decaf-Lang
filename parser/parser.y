@@ -54,7 +54,12 @@ void yyerror(const char *msg); // standard error-handling routine
     Type *type;
 
     FnDecl *fnDecl;
+
+    Stmt *stmt;
+    List<Stmt*> *stmtList;
     StmtBlock *stmtBlock;
+
+    Expr *expr;
 }
 
 
@@ -99,8 +104,12 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <type>        Type
 
 %type <fnDecl>      FunctionDecl
+
+%type <stmt>        Stmt
+%type <stmtList>    StmtList
 %type <stmtBlock>   StmtBlock
 
+%type <expr>        Expr OptExpr Constant
 
 %%
 /* Rules
@@ -126,9 +135,9 @@ DeclList:
     ;
 
 Decl:
-    VariableDecl { $$=$1; }
+    VariableDecl { $$ = $1; }
     | 
-    FunctionDecl { $$=$1; }
+    FunctionDecl { $$ = $1; }
     ;
 
 VariableDeclList:
@@ -140,7 +149,7 @@ VariableDeclList:
     ;
 
 VariableDecl:
-    Variable ';' { $$=$1; }
+    Variable ';' { $$ = $1; }
     ;
 
 Variable:
@@ -182,7 +191,33 @@ Formals:
     ;
 
 StmtBlock:
-    '{' VariableDeclList '}' { $$ = new StmtBlock($2, new List<Stmt*>); }
+    '{' VariableDeclList StmtList '}' { $$ = new StmtBlock($2, $3); }
+    ;
+
+StmtList:
+    StmtList Stmt { ($$=$1)->Append($2); }
+    |
+    Stmt { ($$ = new List<Stmt*>)->Append($1); }
+    |
+    %empty { $$ = new List<Stmt*>; }
+    ;
+
+Stmt: 
+    OptExpr ';' { $$ = $1; }
+    ;
+
+OptExpr:
+    Expr { $$ = $1; }
+    |
+    %empty { $$ = new EmptyExpr(); }
+    ;
+
+Expr: 
+    Constant
+    ;
+
+Constant:
+    T_IntConstant { $$ = new IntConstant(@1, $1); }
     ;
 
 %%
