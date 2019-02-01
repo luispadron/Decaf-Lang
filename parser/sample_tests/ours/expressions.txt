@@ -1,0 +1,6 @@
+
+*** Error line 3.
+int foo(int a, double b, bool c) {
+       ^
+*** syntax error
+

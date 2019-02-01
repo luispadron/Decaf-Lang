@@ -1,0 +1,6 @@
+
+*** Error line 5.
+void main() {
+         ^
+*** syntax error
+

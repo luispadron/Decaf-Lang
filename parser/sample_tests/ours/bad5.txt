@@ -1,0 +1,6 @@
+
+*** Error line 1.
+class Binky {
+^^^^^
+*** syntax error
+
