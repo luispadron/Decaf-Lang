@@ -49,6 +49,7 @@ void yyerror(const char *msg); // standard error-handling routine
     List<Decl*> *declList;
 
     VarDecl *varDecl;
+    List<VarDecl*> *varDeclList;
 
     Type *type;
 }
@@ -89,8 +90,9 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <declList>    DeclList
 %type <decl>        Decl
 
-%type <varDecl>     VariableDecl
-%type <varDecl>     Variable
+%type <varDecl>     Variable VariableDecl 
+
+%type <varDeclList> Formals
 
 %type <type>        Type
 
@@ -119,7 +121,7 @@ DeclList:
     ;
 
 Decl:
-    VariableDecl  { }
+    VariableDecl
     ;
 
 VariableDecl:
@@ -146,6 +148,14 @@ Type:
     T_Identifier { $$ = new NamedType(new Identifier(@1, $1)); }
     |
     Type T_Dims { $$ = new ArrayType(@1, $1); }
+    ;
+
+Formals: 
+    Formals ',' Variable { ($$=$1)->Append($3); }
+    |
+    Variable { ($$ = new List<VarDecl*>)->Append($1); }
+    |
+    %empty { $$ = new List<VarDecl*>; }
     ;
 
 %%
