@@ -3,8 +3,8 @@
  * Yacc input file to generate the parser for the compiler.
  *
  * pp2: your job is to write a parser that will construct the parse tree
- *      and if no parse errors were found, print it.  The parser should 
- *      accept the language as described in specification, and as augmented 
+ *      and if no parse errors were found, print it.  The parser should
+ *      accept the language as described in specification, and as augmented
  *      in the pp2 handout.
  */
 
@@ -28,14 +28,14 @@ void yyerror(const char *msg); // standard error-handling routine
  * input file. Here is where you declare tokens and types, add precedence
  * and associativity options, and so on.
  */
- 
-/* yylval 
+
+/* yylval
  * ------
  * Here we define the type of the yylval global variable that is used by
  * the scanner to store attibute information about the token just scanned
- * and thus communicate that information to the parser. 
+ * and thus communicate that information to the parser.
  *
- * pp2: You will need to add new fields to this union as you add different 
+ * pp2: You will need to add new fields to this union as you add different
  *      attributes to your non-terminal symbols.
  */
 %union {
@@ -44,11 +44,12 @@ void yyerror(const char *msg); // standard error-handling routine
     char *stringConstant;
     double doubleConstant;
     char identifier[MaxIdentLen + 1]; // +1 for terminating null
-    
-    Decl *decl;
-    List<Decl*> *declList; 
 
-    Type *variable;
+    Decl *decl;
+    List<Decl*> *declList;
+
+    VarDecl *varDecl;
+
     Type *type;
 }
 
@@ -59,14 +60,14 @@ void yyerror(const char *msg); // standard error-handling routine
  * Yacc will assign unique numbers to these and export the #define
  * in the generated y.tab.h header file.
  */
-%token   T_Void T_Bool T_Int T_Double T_String T_Class 
+%token   T_Void T_Bool T_Int T_Double T_String T_Class
 %token   T_LessEqual T_GreaterEqual T_Equal T_NotEqual T_Dims
 %token   T_And T_Or T_Null T_Extends T_This T_Interface T_Implements
 %token   T_While T_For T_If T_Else T_Return T_Break
 %token   T_New T_NewArray T_Print T_ReadInteger T_ReadLine
 
 %token   <identifier> T_Identifier
-%token   <stringConstant> T_StringConstant 
+%token   <stringConstant> T_StringConstant
 %token   <integerConstant> T_IntConstant
 %token   <doubleConstant> T_DoubleConstant
 %token   <boolConstant> T_BoolConstant
@@ -85,10 +86,12 @@ void yyerror(const char *msg); // standard error-handling routine
  * of the union named "declList" which is of type List<Decl*>.
  * pp2: You'll need to add many of these of your own.
  */
-%type <declList>    DeclList 
+%type <declList>    DeclList
 %type <decl>        Decl
-%type <decl>        VariableDecl
-%type <type>        Variable
+
+%type <varDecl>     VariableDecl
+%type <varDecl>     Variable
+
 %type <type>        Type
 
 
@@ -97,51 +100,49 @@ void yyerror(const char *msg); // standard error-handling routine
  * -----
  * All productions and actions should be placed between the start and stop
  * %% markers which delimit the Rules section.
-	 
+
  */
-Program:   
-    DeclList { 
-                @1; 
-                /* pp2: The @1 is needed to convince 
-                * yacc to set up yylloc. You can remove 
-                * it once you have other uses of @n*/
+Program:
+    DeclList {
                 Program *program = new Program($1);
                 // if no errors, advance to next phase
-                if (ReportError::NumErrors() == 0) 
+                if (ReportError::NumErrors() == 0)
                     program->Print(0);
             }
     ;
 
-DeclList:   
+DeclList:
     DeclList Decl { ($$=$1)->Append($2); }
-    |   
+    |
     Decl { ($$ = new List<Decl*>)->Append($1); }
     ;
 
-Decl: 
+Decl:
     VariableDecl  { }
     ;
 
 VariableDecl:
-    Variable ';' { }
+    Variable ';' { $$=$1; }
     ;
 
 Variable:
-    Type T_Identifier { $$ = new NamedType(new Identifier(@2, $2)); }
-    ;    
+    Type T_Identifier { $$ = new VarDecl(new Identifier(@2, $2), $1); }
+    ;
 
 Type:
-    T_Int { Type::intType; }
+    T_Int { $$ = Type::intType; }
     |
-    T_Double { Type::doubleType; }
+    T_Double { $$ = Type::doubleType; }
     |
-    T_Void { Type::voidType; }
+    T_Void { $$ = Type::voidType; }
     |
-    T_Bool { Type::boolType; }
+    T_Bool { $$ = Type::boolType; }
     |
-    T_Null { Type::nullType; }
+    T_Null { $$ = Type::nullType; }
     |
-    T_String { Type::stringType; }
+    T_String { $$ = Type::stringType; }
+    |
+    T_Identifier { $$ = new NamedType(new Identifier(@1, $1)); }
     ;
 
 %%
