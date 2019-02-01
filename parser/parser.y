@@ -52,6 +52,9 @@ void yyerror(const char *msg); // standard error-handling routine
     List<VarDecl*> *varDeclList;
 
     Type *type;
+
+    FnDecl *fnDecl;
+    StmtBlock *stmtBlock;
 }
 
 
@@ -91,10 +94,12 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <decl>        Decl
 
 %type <varDecl>     Variable VariableDecl 
-
-%type <varDeclList> Formals
+%type <varDeclList> VariableDeclList Formals
 
 %type <type>        Type
+
+%type <fnDecl>      FunctionDecl
+%type <stmtBlock>   StmtBlock
 
 
 %%
@@ -121,7 +126,17 @@ DeclList:
     ;
 
 Decl:
-    VariableDecl
+    VariableDecl { $$=$1; }
+    | 
+    FunctionDecl { $$=$1; }
+    ;
+
+VariableDeclList:
+    VariableDeclList VariableDecl { ($$=$1)->Append($2); }
+    |
+    VariableDecl { ($$ = new List<VarDecl*>)->Append($1); }
+    |
+    %empty  { $$ = new List<VarDecl*>; }
     ;
 
 VariableDecl:
@@ -150,12 +165,24 @@ Type:
     Type T_Dims { $$ = new ArrayType(@1, $1); }
     ;
 
+FunctionDecl:
+    Type T_Identifier '(' Formals ')' StmtBlock 
+        { 
+            $$ = new FnDecl(new Identifier(@2, $2), $1, $4);
+            $$->SetFunctionBody($6);
+        }
+    ;
+
 Formals: 
     Formals ',' Variable { ($$=$1)->Append($3); }
     |
     Variable { ($$ = new List<VarDecl*>)->Append($1); }
     |
     %empty { $$ = new List<VarDecl*>; }
+    ;
+
+StmtBlock:
+    '{' VariableDeclList '}' { $$ = new StmtBlock($2, new List<Stmt*>); }
     ;
 
 %%
