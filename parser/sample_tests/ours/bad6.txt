@@ -1,6 +1,6 @@
 
 *** Error line 4.
   while (xyz) {
-  ^^^^^
+         ^^^
 *** syntax error
 

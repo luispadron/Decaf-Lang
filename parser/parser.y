@@ -51,6 +51,9 @@ void yyerror(const char *msg); // standard error-handling routine
     VarDecl *varDecl;
     List<VarDecl*> *varDeclList;
 
+    ClassDecl *classDecl;
+    List<NamedType*> *namedTypeList;
+
     Type *type;
 
     FnDecl *fnDecl;
@@ -87,31 +90,26 @@ void yyerror(const char *msg); // standard error-handling routine
 
 /* Non-terminal types
  * ------------------
- * In order for yacc to assign/access the correct field of $$, $1, we
- * must to declare which field is appropriate for the non-terminal.
- * As an example, this first type declaration establishes that the DeclList
- * non-terminal uses the field named "declList" in the yylval union. This
- * means that when we are setting $$ for a reduction for DeclList ore reading
- * $n which corresponds to a DeclList nonterminal we are accessing the field
- * of the union named "declList" which is of type List<Decl*>.
- * pp2: You'll need to add many of these of your own.
  */
-%type <declList>    DeclList
-%type <decl>        Decl
+%type <declList>        DeclList FieldList
+%type <decl>            Decl Field
 
-%type <varDecl>     Variable VariableDecl 
-%type <varDeclList> VariableDeclList Formals
+%type <varDecl>         Variable VariableDecl 
+%type <varDeclList>     VariableDeclList Formals
 
-%type <type>        Type
+%type <fnDecl>          FunctionDecl
 
-%type <fnDecl>      FunctionDecl
+%type <classDecl>       ClassDecl
+%type <namedTypeList>   NamedTypeList
 
-%type <stmt>        Stmt IfStmt WhileStmt ForStmt ReturnStmt BreakStmt PrintStmt
-%type <stmtList>    StmtList
-%type <stmtBlock>   StmtBlock
+%type <type>            Type
 
-%type <expr>        Expr Constant
-%type <exprList>    ExprList
+%type <stmt>            Stmt IfStmt WhileStmt ForStmt ReturnStmt BreakStmt PrintStmt
+%type <stmtList>        StmtList
+%type <stmtBlock>       StmtBlock
+
+%type <expr>            Expr Constant
+%type <exprList>        ExprList
 
 %%
 /* Rules
@@ -140,6 +138,8 @@ Decl:
     VariableDecl { $$ = $1; }
     | 
     FunctionDecl { $$ = $1; }
+    |
+    ClassDecl { $$ = $1; }
     ;
 
 VariableDeclList:
@@ -194,6 +194,50 @@ Formals:
     Variable { ($$ = new List<VarDecl*>)->Append($1); }
     |
     %empty { $$ = new List<VarDecl*>; }
+    ;
+
+ClassDecl: 
+    T_Class T_Identifier '{' FieldList '}' 
+        { $$ = new ClassDecl(new Identifier(@2, $2), nullptr, new List<NamedType*>, $4); }
+    |
+    T_Class T_Identifier T_Extends T_Identifier '{' FieldList '}' 
+        { 
+            $$ = new ClassDecl(new Identifier(@2, $2), 
+                               new NamedType(new Identifier(@4, $4)), 
+                               new List<NamedType*>, 
+                               $6); 
+        }
+    |
+    T_Class T_Identifier T_Implements NamedTypeList '{' FieldList '}' 
+        { $$ = new ClassDecl(new Identifier(@2, $2), nullptr, $4, $6); }
+    |
+    T_Class T_Identifier T_Extends T_Identifier T_Implements NamedTypeList '{' FieldList '}'
+        { 
+            $$ = new ClassDecl(new Identifier(@2, $2), 
+                               new NamedType(new Identifier(@4, $4)), 
+                               $6, 
+                               $8); 
+        }
+    ;
+
+NamedTypeList:
+    NamedTypeList T_Identifier { ($$=$1)->Append(new NamedType(new Identifier(@2, $2))); }
+    |
+    T_Identifier { ($$ = new List<NamedType*>)->Append(new NamedType(new Identifier(@1, $1))); }
+    ;
+
+FieldList:
+    FieldList Field { ($$=$1)->Append($2); }
+    |
+    Field { ($$ = new List<Decl*>)->Append($1); }
+    |
+    %empty { $$ = new List<Decl*>; }
+    ;
+
+Field:
+    FunctionDecl { $$ = $1; }
+    | 
+    VariableDecl { $$ = $1; }
     ;
 
 StmtBlock:

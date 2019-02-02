@@ -1,6 +1,6 @@
 
 *** Error line 4.
   return a + 2;
-  ^^^^^^
+         ^
 *** syntax error
 

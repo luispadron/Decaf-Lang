@@ -1,6 +1,6 @@
 
-*** Error line 2.
-class Cow extends Animal {
-^^^^^
+*** Error line 5.
+    return isSpotted;
+           ^^^^^^^^^
 *** syntax error
 

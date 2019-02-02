@@ -1,6 +1,6 @@
 
-*** Error line 1.
-class Cow {
-^^^^^
+*** Error line 5.
+    Print ( this.height, " ", isSpotted, "\n" );
+                ^
 *** syntax error
 
