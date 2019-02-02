@@ -54,6 +54,8 @@ void yyerror(const char *msg); // standard error-handling routine
     ClassDecl *classDecl;
     List<NamedType*> *namedTypeList;
 
+    InterfaceDecl *interfaceDecl;
+
     Type *type;
 
     FnDecl *fnDecl;
@@ -91,16 +93,18 @@ void yyerror(const char *msg); // standard error-handling routine
 /* Non-terminal types
  * ------------------
  */
-%type <declList>        DeclList FieldList
-%type <decl>            Decl Field
+%type <declList>        DeclList FieldList PrototypeList
+%type <decl>            Decl Field Prototype
 
 %type <varDecl>         Variable VariableDecl 
 %type <varDeclList>     VariableDeclList Formals
 
-%type <fnDecl>          FunctionDecl
+%type <fnDecl>          FunctionDecl 
 
 %type <classDecl>       ClassDecl
 %type <namedTypeList>   NamedTypeList
+
+%type <interfaceDecl>   InterfaceDecl       
 
 %type <type>            Type
 
@@ -140,6 +144,8 @@ Decl:
     FunctionDecl { $$ = $1; }
     |
     ClassDecl { $$ = $1; }
+    |
+    InterfaceDecl { $$ = $1; }
     ;
 
 VariableDeclList:
@@ -238,6 +244,27 @@ Field:
     FunctionDecl { $$ = $1; }
     | 
     VariableDecl { $$ = $1; }
+    ;
+
+InterfaceDecl:
+    T_Interface T_Identifier '{' PrototypeList '}' 
+        { $$ = new InterfaceDecl(new Identifier(@2, $2), $4); }
+    ;
+
+PrototypeList:
+    PrototypeList Prototype { ($$=$1)->Append($2); }
+    |
+    Prototype { ($$ = new List<Decl*>)->Append($1); }
+    |
+    %empty { $$ = new List<Decl*>; }
+    ;
+
+Prototype:
+    Type T_Identifier '(' Formals ')' ';' 
+        { $$ = new FnDecl(new Identifier(@2, $2), $1, $4); }
+    |
+    T_Void T_Identifier '(' Formals ')' ';'
+        { $$ = new FnDecl(new Identifier(@2, $2), Type::voidType, $4); }
     ;
 
 StmtBlock:

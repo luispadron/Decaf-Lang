@@ -1,0 +1,5 @@
+interface Animal {
+    void bark();
+    int age();
+    void setAge(int age);
+}
