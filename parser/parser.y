@@ -214,10 +214,20 @@ OptExpr:
 
 Expr: 
     Constant
+    |
+    T_This { $$ = new This(@1); }
     ;
 
 Constant:
     T_IntConstant { $$ = new IntConstant(@1, $1); }
+    |
+    T_DoubleConstant { $$ = new DoubleConstant(@1, $1); }
+    |
+    T_BoolConstant { $$ = new BoolConstant(@1, $1); }
+    |
+    T_StringConstant { $$ = new StringConstant(@1, $1); }
+    |
+    T_Null { $$ = new NullConstant(@1); }                                
     ;
 
 %%
