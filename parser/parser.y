@@ -110,7 +110,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <stmtList>    StmtList
 %type <stmtBlock>   StmtBlock
 
-%type <expr>        Expr OptExpr Constant
+%type <expr>        Expr Constant
 %type <exprList>    ExprList
 
 %%
@@ -209,7 +209,9 @@ StmtList:
     ;
 
 Stmt: 
-    OptExpr ';' { $$ = $1; }
+    ';' { $$ = new EmptyExpr(); }
+    | 
+    Expr ';' { $$ = $1; }
     |
     IfStmt { $$ = $1; }
     |
@@ -262,12 +264,6 @@ ExprList:
     ExprList ',' Expr { ($$=$1)->Append($3); }
     |
     Expr { ($$ = new List<Expr*>)->Append($1); }
-    ;
-
-OptExpr:
-    Expr { $$ = $1; }
-    |
-    %empty { $$ = new EmptyExpr(); }
     ;
 
 Expr: 
