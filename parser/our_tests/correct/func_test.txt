@@ -1,0 +1,23 @@
+
+   Program: 
+  1   FnDecl: 
+         (return type) Type: int
+  1      Identifier: main
+         (body) StmtBlock: 
+  3   FnDecl: 
+         (return type) Type: int
+  3      Identifier: test
+         (body) StmtBlock: 
+            Empty: 
+  5   FnDecl: 
+         (return type) Type: int
+  5      Identifier: add
+  5      (formals) VarDecl: 
+            Type: int
+  5         Identifier: a
+  5      (formals) VarDecl: 
+            Type: int
+  5         Identifier: b
+         (body) StmtBlock: 
+  6         ReturnStmt: 
+               Empty: 

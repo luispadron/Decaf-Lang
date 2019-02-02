@@ -1,0 +1,20 @@
+
+   Program: 
+  1   ClassDecl: 
+  1      Identifier: Test
+  2      VarDecl: 
+            Type: int
+  2         Identifier: b
+  5   ClassDecl: 
+  5      Identifier: Beep
+  5      (extends) NamedType: 
+  5         Identifier: Test
+  6      VarDecl: 
+            Type: int
+  6         Identifier: x
+  9   ClassDecl: 
+  9      Identifier: BeepBeep
+  9      (extends) NamedType: 
+  9         Identifier: Test
+  9      (implements) NamedType: 
+  9         Identifier: Beep

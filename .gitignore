@@ -46,4 +46,4 @@ y.tab.c
 y.output
 dcc
 parser/sample_tests/ours/*
-
+parser/our_tests/output/*

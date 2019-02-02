@@ -6,6 +6,8 @@ echo "building"
 
 make > /dev/null
 
+echo "running sample_tests"
+echo ""
 # run sample tests
 printf 'samples\nsample_tests/ours\ndcc' | ./bin/gen_tests.sh > /dev/null
 
@@ -28,6 +30,35 @@ do
     if $ERROR;
     then
         echo "check diff: sample_tests/diffs/$filename.diff"
+        echo "--------------------------------------------------"
+    else
+        PASSED=$((PASSED+1))
+        echo "test passed for file: $filename ✅"
+        echo "--------------------------------------------------"
+    fi
+
+    ERROR=false
+    TOTAL=$((TOTAL+1))
+done
+
+echo "running our_tests"
+echo ""
+printf 'our_tests/input\nour_tests/output\ndcc' | ./bin/gen_tests.sh > /dev/null
+
+for file in our_tests/correct/*
+do  
+    filename="${file##*/}"
+    filename="${filename%.*}"
+    {
+        diff $file our_tests/output/$filename.txt > our_tests/diffs/$filename.diff    
+    } || {
+        echo "test failed for file: $filename ❗️"
+        ERROR=true
+    }
+
+    if $ERROR;
+    then
+        echo "check diff: our_tests/diffs/$filename.diff"
         echo "--------------------------------------------------"
     else
         PASSED=$((PASSED+1))

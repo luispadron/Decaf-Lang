@@ -1,0 +1,9 @@
+class Test {
+    int b;
+}
+
+class Beep extends Test {
+    int x;
+}
+
+class BeepBeep extends Test implements Beep { }
