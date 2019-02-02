@@ -161,8 +161,6 @@ Type:
     |
     T_Double { $$ = Type::doubleType; }
     |
-    T_Void { $$ = Type::voidType; }
-    |
     T_Bool { $$ = Type::boolType; }
     |
     T_Null { $$ = Type::nullType; }
@@ -178,6 +176,12 @@ FunctionDecl:
     Type T_Identifier '(' Formals ')' StmtBlock 
         { 
             $$ = new FnDecl(new Identifier(@2, $2), $1, $4);
+            $$->SetFunctionBody($6);
+        }
+    |
+    T_Void T_Identifier '(' Formals ')' StmtBlock
+        {
+            $$ = new FnDecl(new Identifier(@2, $2), Type::voidType, $4);
             $$->SetFunctionBody($6);
         }
     ;
