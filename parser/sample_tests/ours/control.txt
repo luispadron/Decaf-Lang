@@ -1,6 +1,0 @@
-
-*** Error line 5.
-  a = 0;
-    ^
-*** syntax error
-

@@ -1,6 +1,0 @@
-
-*** Error line 5.
-  return (b[d] + d);
-         ^
-*** syntax error
-

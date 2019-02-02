@@ -1,6 +1,0 @@
-
-*** Error line 1.
-interface Colorable {
-^^^^^^^^^
-*** syntax error
-

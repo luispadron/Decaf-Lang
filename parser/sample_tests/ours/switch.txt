@@ -1,6 +1,0 @@
-
-*** Error line 10.
-	n = ReadInteger();
-        ^
-*** syntax error
-
