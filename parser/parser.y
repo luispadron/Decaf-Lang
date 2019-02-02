@@ -60,6 +60,7 @@ void yyerror(const char *msg); // standard error-handling routine
     StmtBlock *stmtBlock;
 
     Expr *expr;
+    List<Expr*> *exprList;
 }
 
 
@@ -105,11 +106,12 @@ void yyerror(const char *msg); // standard error-handling routine
 
 %type <fnDecl>      FunctionDecl
 
-%type <stmt>        Stmt
+%type <stmt>        Stmt IfStmt WhileStmt ForStmt ReturnStmt BreakStmt PrintStmt
 %type <stmtList>    StmtList
 %type <stmtBlock>   StmtBlock
 
 %type <expr>        Expr OptExpr Constant
+%type <exprList>    ExprList
 
 %%
 /* Rules
@@ -208,6 +210,58 @@ StmtList:
 
 Stmt: 
     OptExpr ';' { $$ = $1; }
+    |
+    IfStmt { $$ = $1; }
+    |
+    WhileStmt { $$ = $1; }
+    | 
+    ForStmt { $$ = $1; }
+    |
+    ReturnStmt { $$ = $1; }
+    |
+    BreakStmt { $$ = $1; }
+    |
+    PrintStmt { $$ = $1; }
+    |
+    StmtBlock { $$ = $1; }
+    ;
+
+IfStmt:
+    T_If '(' Expr ')' Stmt { $$ = new IfStmt($3, $5, nullptr); }
+    |
+    T_If '(' Expr ')' Stmt T_Else Stmt { $$ = new IfStmt($3, $5, $7); }
+    ;
+
+WhileStmt:
+    T_While '(' Expr ')' Stmt { $$ = new WhileStmt($3, $5); }
+    ;
+
+ForStmt:
+    T_For '(' ';' Expr ';' ')' Stmt { $$ = new ForStmt(new EmptyExpr(), $4, new EmptyExpr(), $7); }
+    |
+    T_For '(' Expr ';' Expr ';' ')' Stmt { $$ = new ForStmt($3, $5, new EmptyExpr(), $8); }
+    |
+    T_For '(' Expr ';' Expr ';' Expr ')' Stmt { $$ = new ForStmt($3, $5, $7, $9); }
+    ;
+
+ReturnStmt:
+    T_Return ';' { $$ = new ReturnStmt(@1, new EmptyExpr()); }
+    |
+    T_Return Expr ';' { $$ = new ReturnStmt(@1, $2); }
+    ;
+
+BreakStmt:
+    T_Break ';' { $$ = new BreakStmt(@1); }
+    ;
+
+PrintStmt:
+    T_Print '(' ExprList ')' ';' { $$ = new PrintStmt($3); }
+    ;
+
+ExprList:
+    ExprList ',' Expr { ($$=$1)->Append($3); }
+    |
+    Expr { ($$ = new List<Expr*>)->Append($1); }
     ;
 
 OptExpr:
