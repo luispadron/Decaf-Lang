@@ -1,27 +1,19 @@
 /* File: parser.y
  * --------------
  * Yacc input file to generate the parser for the compiler.
- *
- * pp2: your job is to write a parser that will construct the parse tree
- *      and if no parse errors were found, print it.  The parser should
- *      accept the language as described in specification, and as augmented
- *      in the pp2 handout.
  */
 
 %{
-
-/* Just like lex, the text within this first region delimited by %{ and %}
- * is assumed to be C/C++ code and will be copied verbatim to the y.tab.c
- * file ahead of the definitions of the yyparse() function. Add other header
- * file inclusions or C++ variable declarations/prototypes that are needed
- * by your code here.
- */
 #include "scanner.h" // for yylex
 #include "parser.h"
 #include "errors.h"
 
 void yyerror(const char *msg);                  // standard error-handling routine
 
+/*
+ * Constants
+ * ---------
+ */
 const char * const equalOp_c = "=";             // '=' character needed for assignment, etc
 const char * const lessThanOp_c = "<";          // '<' less than operator
 const char * const greaterThanOp_c = ">";       // '>' greater than operator
@@ -29,19 +21,8 @@ const char * const notOp_c = "!";               // '!' not (negation) operator
 
 %}
 
-/* The section before the first %% is the Definitions section of the yacc
- * input file. Here is where you declare tokens and types, add precedence
- * and associativity options, and so on.
- */
-
 /* yylval
  * ------
- * Here we define the type of the yylval global variable that is used by
- * the scanner to store attibute information about the token just scanned
- * and thus communicate that information to the parser.
- *
- * pp2: You will need to add new fields to this union as you add different
- *      attributes to your non-terminal symbols.
  */
 %union {
     int integerConstant;
@@ -378,12 +359,6 @@ Constant:
     ;
 
 %%
-
-/* The closing %% above marks the end of the Rules section and the beginning
- * of the User Subroutines section. All text from here to the end of the
- * file is copied verbatim to the end of the generated y.tab.c file.
- * This section is where you put definitions of helper functions.
- */
 
 /* Function: InitParser
  * --------------------
