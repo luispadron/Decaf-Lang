@@ -1,0 +1,14 @@
+void doMath() {
+    int x;
+    int y;
+
+    x = x + x;
+
+    y = y + -y;
+    y = -y;
+    y = x / y + x;
+    y = y * y - x;
+    y = -y / y + x;
+    y = y % y * 3 + 2;
+    x = x + x / 2;
+}

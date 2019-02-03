@@ -43,6 +43,7 @@ done
 
 echo "running our_tests"
 echo ""
+printf 'our_tests/input\nour_tests/correct\nsolution/dcc' | ./bin/gen_tests.sh > /dev/null
 printf 'our_tests/input\nour_tests/output\ndcc' | ./bin/gen_tests.sh > /dev/null
 
 for file in our_tests/correct/*

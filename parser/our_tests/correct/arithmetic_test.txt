@@ -1,0 +1,115 @@
+
+   Program: 
+  1   FnDecl: 
+         (return type) Type: void
+  1      Identifier: doMath
+         (body) StmtBlock: 
+  2         VarDecl: 
+               Type: int
+  2            Identifier: x
+  3         VarDecl: 
+               Type: int
+  3            Identifier: y
+  5         AssignExpr: 
+  5            FieldAccess: 
+  5               Identifier: x
+  5            Operator: =
+  5            ArithmeticExpr: 
+  5               FieldAccess: 
+  5                  Identifier: x
+  5               Operator: +
+  5               FieldAccess: 
+  5                  Identifier: x
+  7         AssignExpr: 
+  7            FieldAccess: 
+  7               Identifier: y
+  7            Operator: =
+  7            ArithmeticExpr: 
+  7               FieldAccess: 
+  7                  Identifier: y
+  7               Operator: +
+  7               ArithmeticExpr: 
+  7                  Operator: -
+  7                  FieldAccess: 
+  7                     Identifier: y
+  8         AssignExpr: 
+  8            FieldAccess: 
+  8               Identifier: y
+  8            Operator: =
+  8            ArithmeticExpr: 
+  8               Operator: -
+  8               FieldAccess: 
+  8                  Identifier: y
+  9         AssignExpr: 
+  9            FieldAccess: 
+  9               Identifier: y
+  9            Operator: =
+  9            ArithmeticExpr: 
+  9               ArithmeticExpr: 
+  9                  FieldAccess: 
+  9                     Identifier: x
+  9                  Operator: /
+  9                  FieldAccess: 
+  9                     Identifier: y
+  9               Operator: +
+  9               FieldAccess: 
+  9                  Identifier: x
+ 10         AssignExpr: 
+ 10            FieldAccess: 
+ 10               Identifier: y
+ 10            Operator: =
+ 10            ArithmeticExpr: 
+ 10               ArithmeticExpr: 
+ 10                  FieldAccess: 
+ 10                     Identifier: y
+ 10                  Operator: *
+ 10                  FieldAccess: 
+ 10                     Identifier: y
+ 10               Operator: -
+ 10               FieldAccess: 
+ 10                  Identifier: x
+ 11         AssignExpr: 
+ 11            FieldAccess: 
+ 11               Identifier: y
+ 11            Operator: =
+ 11            ArithmeticExpr: 
+ 11               ArithmeticExpr: 
+ 11                  ArithmeticExpr: 
+ 11                     Operator: -
+ 11                     FieldAccess: 
+ 11                        Identifier: y
+ 11                  Operator: /
+ 11                  FieldAccess: 
+ 11                     Identifier: y
+ 11               Operator: +
+ 11               FieldAccess: 
+ 11                  Identifier: x
+ 12         AssignExpr: 
+ 12            FieldAccess: 
+ 12               Identifier: y
+ 12            Operator: =
+ 12            ArithmeticExpr: 
+ 12               ArithmeticExpr: 
+ 12                  ArithmeticExpr: 
+ 12                     FieldAccess: 
+ 12                        Identifier: y
+ 12                     Operator: %
+ 12                     FieldAccess: 
+ 12                        Identifier: y
+ 12                  Operator: *
+ 12                  IntConstant: 3
+ 12               Operator: +
+ 12               IntConstant: 2
+ 13         AssignExpr: 
+ 13            FieldAccess: 
+ 13               Identifier: x
+ 13            Operator: =
+ 13            ArithmeticExpr: 
+ 13               FieldAccess: 
+ 13                  Identifier: x
+ 13               Operator: +
+ 13               ArithmeticExpr: 
+ 13                  FieldAccess: 
+ 13                     Identifier: x
+ 13                  Operator: /
+ 13                  IntConstant: 2

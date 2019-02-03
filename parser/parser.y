@@ -16,8 +16,17 @@ void yyerror(const char *msg);                  // standard error-handling routi
  */
 const char * const equalOp_c = "=";             // '=' character needed for assignment, etc
 const char * const lessThanOp_c = "<";          // '<' less than operator
+const char * const lessThanEqlOp_c = "<=";      // '<=' less than or equal operator
 const char * const greaterThanOp_c = ">";       // '>' greater than operator
+const char * const greaterThanEqlOp_C = ">=";   // '>=' greater than or equal operator
+const char * const equalEqualOp_C = "==";       // '==' equal to operator
+const char * const notEqualOp_c = "!=";         // '!=' not equal to operator
 const char * const notOp_c = "!";               // '!' not (negation) operator
+const char * const plusOp_c = "+";              // '+' plus operator
+const char * const minusOp_c = "-";             // '-' minus operator
+const char * const multOp_c = "*";              // '*' multiplication operator
+const char * const divOp_c = "/";               // '/' division operator
+const char * const modOp_c = "%";               // '%' (mod) operator
 
 %}
 
@@ -78,7 +87,8 @@ const char * const notOp_c = "!";               // '!' not (negation) operator
  */
 %left '<' '>' T_LessEqual T_GreaterEqual T_Equal T_NotEqual
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
+%left UMINUS    // used for unary minus since precedence is higher than just simple '-'
 
 
 /* Non-terminal types
@@ -331,11 +341,35 @@ ExprList:
 Expr: 
     LValue '=' Expr { $$ = new AssignExpr($1, new Operator(@2, equalOp_c), $3); }
     |
-    LValue { $$ = $1; }
-    |
     Constant { $$ = $1; }
     |
+    LValue { $$ = $1; }
+    |
     T_This { $$ = new This(@1); }
+    |
+    Expr '+' Expr { $$ = new ArithmeticExpr($1, new Operator(@2, plusOp_c), $3); }
+    |
+    Expr '-' Expr { $$ = new ArithmeticExpr($1, new Operator(@2, minusOp_c), $3); }
+    |
+    Expr '*' Expr { $$ = new ArithmeticExpr($1, new Operator(@2, multOp_c), $3); }
+    |
+    Expr '/' Expr { $$ = new ArithmeticExpr($1, new Operator(@2, divOp_c), $3); }
+    |
+    Expr '%' Expr { $$ = new ArithmeticExpr($1, new Operator(@2, modOp_c), $3); }
+    |
+    '-' Expr %prec UMINUS { $$ = new ArithmeticExpr(new Operator(@1, minusOp_c), $2); }
+    |
+    Expr '<' Expr { $$ = new RelationalExpr($1, new Operator(@2, lessThanOp_c), $3); }
+    |
+    Expr T_LessEqual Expr { $$ = new RelationalExpr($1, new Operator(@2, lessThanEqlOp_c), $3); }
+    |
+    Expr '>' Expr { $$ = new RelationalExpr($1, new Operator(@2, greaterThanOp_c), $3); }
+    |
+    Expr T_GreaterEqual Expr { $$ = new RelationalExpr($1, new Operator(@2, greaterThanEqlOp_C), $3); }
+    |
+    Expr T_Equal Expr { $$ = new EqualityExpr($1, new Operator(@2, equalEqualOp_C), $3); }
+    |
+    Expr T_NotEqual Expr { $$ = new EqualityExpr($1, new Operator(@2, notEqualOp_c), $3); }
     ;
 
 LValue:
