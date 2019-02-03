@@ -21,12 +21,14 @@ const char * const greaterThanOp_c = ">";       // '>' greater than operator
 const char * const greaterThanEqlOp_C = ">=";   // '>=' greater than or equal operator
 const char * const equalEqualOp_C = "==";       // '==' equal to operator
 const char * const notEqualOp_c = "!=";         // '!=' not equal to operator
-const char * const notOp_c = "!";               // '!' not (negation) operator
 const char * const plusOp_c = "+";              // '+' plus operator
 const char * const minusOp_c = "-";             // '-' minus operator
 const char * const multOp_c = "*";              // '*' multiplication operator
 const char * const divOp_c = "/";               // '/' division operator
 const char * const modOp_c = "%";               // '%' (mod) operator
+const char * const notOp_c = "!";               // '!' not (negation) operator
+const char * const andOp_c = "&&";              // '&&' and operator
+const char * const orOp_c = "||";               // '||' or operator
 
 %}
 
@@ -113,8 +115,8 @@ const char * const modOp_c = "%";               // '%' (mod) operator
 %type <stmtList>        StmtList
 %type <stmtBlock>       StmtBlock
 
-%type <expr>            Expr LValue Constant
-%type <exprList>        ExprList
+%type <expr>            Expr LValue Call Constant
+%type <exprList>        ExprList Actuals
 
 %%
 /* Rules
@@ -347,6 +349,8 @@ Expr:
     |
     T_This { $$ = new This(@1); }
     |
+    Call { $$ = $1; }
+    |
     Expr '+' Expr { $$ = new ArithmeticExpr($1, new Operator(@2, plusOp_c), $3); }
     |
     Expr '-' Expr { $$ = new ArithmeticExpr($1, new Operator(@2, minusOp_c), $3); }
@@ -370,6 +374,20 @@ Expr:
     Expr T_Equal Expr { $$ = new EqualityExpr($1, new Operator(@2, equalEqualOp_C), $3); }
     |
     Expr T_NotEqual Expr { $$ = new EqualityExpr($1, new Operator(@2, notEqualOp_c), $3); }
+    |
+    Expr T_And Expr { $$ = new LogicalExpr($1, new Operator(@2, andOp_c), $3); }
+    |
+    Expr T_Or Expr { $$ = new LogicalExpr($1, new Operator(@2, orOp_c), $3); }
+    |
+    '!' Expr { $$ = new LogicalExpr(new Operator(@1, notOp_c), $2); }
+    |
+    T_ReadInteger '(' ')' { $$ = new ReadIntegerExpr(@1); }
+    |
+    T_ReadLine '(' ')' { $$ = new ReadLineExpr(@1); }
+    |
+    T_New '(' T_Identifier ')' { $$ = new NewExpr(@1, new NamedType(new Identifier(@3, $3))); }
+    |
+    T_NewArray '(' Expr ',' Type ')' { $$ = new NewArrayExpr(@1, $3, $5); }
     ;
 
 LValue:
@@ -378,6 +396,18 @@ LValue:
     Expr '.' T_Identifier { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
     |
     Expr '[' Expr ']' { $$ = new ArrayAccess(@1, $1, $3); }
+    ;
+
+Call:
+    T_Identifier '(' Actuals ')' { $$ = new Call(@1, nullptr, new Identifier(@1, $1), $3); }
+    |
+    Expr '.' T_Identifier '(' Actuals ')' { $$ = new Call(@3, $1, new Identifier(@3, $3), $5); }
+    ;
+
+Actuals:
+    ExprList { $$ = $1; }
+    |
+    %empty { $$ = new List<Expr*>; }
     ;
 
 Constant:
