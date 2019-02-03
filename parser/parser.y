@@ -20,7 +20,12 @@
 #include "parser.h"
 #include "errors.h"
 
-void yyerror(const char *msg); // standard error-handling routine
+void yyerror(const char *msg);                  // standard error-handling routine
+
+const char * const equalOp_c = "=";             // '=' character needed for assignment, etc
+const char * const lessThanOp_c = "<";          // '<' less than operator
+const char * const greaterThanOp_c = ">";       // '>' greater than operator
+const char * const notOp_c = "!";               // '!' not (negation) operator
 
 %}
 
@@ -71,9 +76,6 @@ void yyerror(const char *msg); // standard error-handling routine
 
 /* Tokens
  * ------
- * Here we tell yacc about all the token types that we are using.
- * Yacc will assign unique numbers to these and export the #define
- * in the generated y.tab.h header file.
  */
 %token   T_Void T_Bool T_Int T_Double T_String T_Class
 %token   T_LessEqual T_GreaterEqual T_Equal T_NotEqual T_Dims
@@ -88,6 +90,14 @@ void yyerror(const char *msg); // standard error-handling routine
 %token   <boolConstant> T_BoolConstant
 
 %token   T_Increm T_Decrem T_Switch T_Case T_Default
+
+
+/* Precedence
+ * ----------
+ */
+%left '<' '>' T_LessEqual T_GreaterEqual T_Equal T_NotEqual
+%left '+' '-'
+%left '*' '/'
 
 
 /* Non-terminal types
@@ -112,7 +122,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <stmtList>        StmtList
 %type <stmtBlock>       StmtBlock
 
-%type <expr>            Expr Constant
+%type <expr>            Expr LValue Constant
 %type <exprList>        ExprList
 
 %%
@@ -338,9 +348,21 @@ ExprList:
     ;
 
 Expr: 
-    Constant
+    LValue '=' Expr { $$ = new AssignExpr($1, new Operator(@2, equalOp_c), $3); }
+    |
+    LValue { $$ = $1; }
+    |
+    Constant { $$ = $1; }
     |
     T_This { $$ = new This(@1); }
+    ;
+
+LValue:
+    T_Identifier { $$ = new FieldAccess(nullptr, new Identifier(@1, $1)); }
+    |
+    Expr '.' T_Identifier { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
+    |
+    Expr '[' Expr ']' { $$ = new ArrayAccess(@1, $1, $3); }
     ;
 
 Constant:

@@ -1,0 +1,22 @@
+
+   Program: 
+  1   FnDecl: 
+         (return type) Type: void
+  1      Identifier: main
+         (body) StmtBlock: 
+            IfStmt: 
+  2            (test) IntConstant: 0
+               (then) StmtBlock: 
+  2               VarDecl: 
+                     Type: int
+  2                  Identifier: x
+            IfStmt: 
+  3            (test) IntConstant: 1
+               (then) StmtBlock: 
+  3               VarDecl: 
+                     Type: int
+  3                  Identifier: y
+               (else) StmtBlock: 
+  4               VarDecl: 
+                     Type: int
+  4                  Identifier: b
