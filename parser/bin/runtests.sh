@@ -21,7 +21,7 @@ do
     filename="${file##*/}"
     filename="${filename%.*}"
     {
-        diff $file sample_tests/ours/$filename.txt > sample_tests/diffs/$filename.diff    
+        diff -w $file sample_tests/ours/$filename.txt > sample_tests/diffs/$filename.diff    
     } || {
         echo "test failed for file: $filename ❗️"
         ERROR=true
@@ -51,7 +51,7 @@ do
     filename="${file##*/}"
     filename="${filename%.*}"
     {
-        diff $file our_tests/output/$filename.txt > our_tests/diffs/$filename.diff    
+        diff -w $file our_tests/output/$filename.txt > our_tests/diffs/$filename.diff    
     } || {
         echo "test failed for file: $filename ❗️"
         ERROR=true
