@@ -369,6 +369,8 @@ Expr:
     |
     Call { $$ = $1; }
     |
+    '(' Expr ')' { $$ = $2; }
+    |
     Expr '+' Expr { $$ = new ArithmeticExpr($1, new Operator(@2, plusOp_c), $3); }
     |
     Expr '-' Expr { $$ = new ArithmeticExpr($1, new Operator(@2, minusOp_c), $3); }
