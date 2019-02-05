@@ -168,6 +168,20 @@ public:
     void PrintChildren(int indentLevel);
 };
 
+/**
+ * Used for postfix (++, --)
+ */
+class PostfixExpr: public Expr {
+protected:
+    Expr *lvalue;
+    Operator *postfixOp;
+
+public:
+    PostfixExpr(Expr *lval, Operator *op);
+    const char *GetPrintNameForNode() { return "PostfixExpr"; }
+    void PrintChildren(int indentLevel);
+}; 
+
 /* Like field access, call is used both for qualified base.field()
  * and unqualified field().  We won't figure out until later
  * whether we need implicit "this." so we use one node type for either

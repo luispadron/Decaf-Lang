@@ -29,6 +29,8 @@ const char * const modOp_c = "%";               // '%' (mod) operator
 const char * const notOp_c = "!";               // '!' not (negation) operator
 const char * const andOp_c = "&&";              // '&&' and operator
 const char * const orOp_c = "||";               // '||' or operator
+const char * const incremOp_c = "++";           // '++' increment operator
+const char * const decremOp_c = "--";           // '--' decrement operator
 
 %}
 
@@ -89,14 +91,14 @@ const char * const orOp_c = "||";               // '||' or operator
 /* Precedence (less -> greater)
  * ----------
  */
-%right '='
-%left T_And T_Or
-%left T_Equal T_NotEqual
-%left '<' T_LessEqual '>' T_GreaterEqual
-%left '+' '-'
-%left '*' '/' '%'
-%right UMINUS '!'
-%left T_Increm T_Decrem T_Dims '.'
+%right  '='
+%left   T_And T_Or
+%left   T_Equal T_NotEqual
+%left   '<' T_LessEqual '>' T_GreaterEqual
+%left   '+' '-'
+%left   '*' '/' '%'
+%right  UMINUS '!' T_Increm T_Decrem T_Dims
+%left   '.'
 
 /* Non-terminal types
  * ------------------
@@ -354,6 +356,10 @@ ExprList:
 
 Expr: 
     LValue '=' Expr { $$ = new AssignExpr($1, new Operator(@2, equalOp_c), $3); }
+    |
+    LValue T_Increm { $$ = new PostfixExpr($1, new Operator(@2, incremOp_c)); }
+    |
+    LValue T_Decrem { $$ = new PostfixExpr($1, new Operator(@2, decremOp_c)); }
     |
     Constant { $$ = $1; }
     |
