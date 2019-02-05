@@ -86,15 +86,17 @@ const char * const orOp_c = "||";               // '||' or operator
 %token   T_Increm T_Decrem T_Switch T_Case T_Default
 
 
-/* Precedence
+/* Precedence (less -> greater)
  * ----------
  */
-%left T_Or T_And
-%left '<' '>' T_LessEqual T_GreaterEqual T_Equal T_NotEqual
+%right '='
+%left T_And T_Or
+%left T_Equal T_NotEqual
+%left '<' T_LessEqual '>' T_GreaterEqual
 %left '+' '-'
 %left '*' '/' '%'
-%left UMINUS    // used for unary minus since precedence is higher than just simple '-'
-
+%right UMINUS '!'
+%left T_Increm T_Decrem T_Dims '.'
 
 /* Non-terminal types
  * ------------------
@@ -278,8 +280,6 @@ Prototype:
 
 StmtBlock:
     '{' VariableDeclList StmtList '}' { $$ = new StmtBlock($2, $3); }
-    |
-    '{' VariableDeclList '}' { $$ = new StmtBlock($2, new List<Stmt*>); }
     |
     '{' StmtList '}' { $$ = new StmtBlock(new List<VarDecl*>, $2); }
     ;
