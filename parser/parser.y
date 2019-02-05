@@ -89,7 +89,8 @@ const char * const orOp_c = "||";               // '||' or operator
 /* Precedence
  * ----------
  */
-%left '=' '<' '>' T_LessEqual T_GreaterEqual T_Equal T_NotEqual
+%left T_Or T_And
+%left '<' '>' T_LessEqual T_GreaterEqual T_Equal T_NotEqual
 %left '+' '-'
 %left '*' '/' '%'
 %left UMINUS    // used for unary minus since precedence is higher than just simple '-'
@@ -277,6 +278,10 @@ Prototype:
 
 StmtBlock:
     '{' VariableDeclList StmtList '}' { $$ = new StmtBlock($2, $3); }
+    |
+    '{' VariableDeclList '}' { $$ = new StmtBlock($2, new List<Stmt*>); }
+    |
+    '{' StmtList '}' { $$ = new StmtBlock(new List<VarDecl*>, $2); }
     ;
 
 StmtList:
@@ -298,9 +303,9 @@ Stmt:
     | 
     ForStmt { $$ = $1; }
     |
-    ReturnStmt { $$ = $1; }
-    |
     BreakStmt { $$ = $1; }
+    |
+    ReturnStmt { $$ = $1; }
     |
     PrintStmt { $$ = $1; }
     |
@@ -319,6 +324,8 @@ WhileStmt:
 
 ForStmt:
     T_For '(' ';' Expr ';' ')' Stmt { $$ = new ForStmt(new EmptyExpr(), $4, new EmptyExpr(), $7); }
+    |
+    T_For '(' ';' Expr ';' Expr ')' Stmt { $$ = new ForStmt(new EmptyExpr(), $4, $6, $8); }
     |
     T_For '(' Expr ';' Expr ';' ')' Stmt { $$ = new ForStmt($3, $5, new EmptyExpr(), $8); }
     |
