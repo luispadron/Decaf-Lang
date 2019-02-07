@@ -126,7 +126,7 @@ const char * const decremOp_c = "--";           // '--' decrement operator
 %type <stmtList>        StmtList
 %type <stmtBlock>       StmtBlock
 
-%type <expr>            Expr LValue Call Constant
+%type <expr>            Expr OptExpr LValue Call Constant
 %type <exprList>        ExprList Actuals
 
 %%
@@ -316,19 +316,11 @@ WhileStmt:
     ;
 
 ForStmt:
-    T_For '(' ';' Expr ';' ')' Stmt { $$ = new ForStmt(new EmptyExpr(), $4, new EmptyExpr(), $7); }
-    |
-    T_For '(' ';' Expr ';' Expr ')' Stmt { $$ = new ForStmt(new EmptyExpr(), $4, $6, $8); }
-    |
-    T_For '(' Expr ';' Expr ';' ')' Stmt { $$ = new ForStmt($3, $5, new EmptyExpr(), $8); }
-    |
-    T_For '(' Expr ';' Expr ';' Expr ')' Stmt { $$ = new ForStmt($3, $5, $7, $9); }
+    T_For '(' OptExpr ';' Expr ';' OptExpr ')' Stmt { $$ = new ForStmt($3, $5, $7, $9); }
     ;
 
 ReturnStmt:
-    T_Return ';' { $$ = new ReturnStmt(@1, new EmptyExpr()); }
-    |
-    T_Return Expr ';' { $$ = new ReturnStmt(@1, $2); }
+    T_Return OptExpr ';' { $$ = new ReturnStmt(@1, $2); }
     ;
 
 BreakStmt:
@@ -343,6 +335,12 @@ ExprList:
     ExprList ',' Expr { ($$=$1)->Append($3); }
     |
     Expr { ($$ = new List<Expr*>)->Append($1); }
+    ;
+
+OptExpr:
+    Expr { $$ = $1; }
+    |
+    %empty { $$ = new EmptyExpr(); }
     ;
 
 Expr: 
