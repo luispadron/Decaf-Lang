@@ -1,0 +1,21 @@
+
+   Program: 
+  1   FnDecl: 
+         (return type) Type: void
+  1      Identifier: testPrec
+         (body) StmtBlock: 
+            IfStmt: 
+  2            (test) LogicalExpr: 
+  2               FieldAccess: 
+  2                  Identifier: y
+  2               Operator: ||
+  2               LogicalExpr: 
+  2                  FieldAccess: 
+  2                     Identifier: x
+  2                  Operator: &&
+  2                  RelationalExpr: 
+  2                     FieldAccess: 
+  2                        Identifier: x
+  2                     Operator: >
+  2                     IntConstant: 32
+               (then) StmtBlock: 

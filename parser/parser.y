@@ -92,14 +92,14 @@ const char * const decremOp_c = "--";           // '--' decrement operator
 /* Precedence (less -> greater)
  * ----------
  */
-%right  '='
+%nonassoc  '='
 %left   T_And T_Or
 %left   T_Equal T_NotEqual
-%left   '<' T_LessEqual '>' T_GreaterEqual
+%nonassoc   '<' T_LessEqual '>' T_GreaterEqual
 %left   '+' '-'
 %left   '*' '/' '%'
-%right  UMINUS '!' T_Increm T_Decrem T_Dims
-%left   '.'
+%right  UMINUS '!' T_Increm T_Decrem
+%left   T_Dims '.' 
 
 /* Non-terminal types
  * ------------------
