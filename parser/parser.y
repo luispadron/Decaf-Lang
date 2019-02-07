@@ -4,6 +4,7 @@
  */
 
 %{
+#include <algorithm>
 #include "scanner.h" // for yylex
 #include "parser.h"
 #include "errors.h"
@@ -164,8 +165,6 @@ Decl:
 VariableDeclList:
     VariableDeclList VariableDecl { ($$=$1)->Append($2); }
     |
-    VariableDecl { ($$ = new List<VarDecl*>)->Append($1); }
-    |
     %empty  { $$ = new List<VarDecl*>; }
     ;
 
@@ -248,8 +247,6 @@ NamedTypeList:
 FieldList:
     FieldList Field { ($$=$1)->Append($2); }
     |
-    Field { ($$ = new List<Decl*>)->Append($1); }
-    |
     %empty { $$ = new List<Decl*>; }
     ;
 
@@ -267,8 +264,6 @@ InterfaceDecl:
 PrototypeList:
     PrototypeList Prototype { ($$=$1)->Append($2); }
     |
-    Prototype { ($$ = new List<Decl*>)->Append($1); }
-    |
     %empty { $$ = new List<Decl*>; }
     ;
 
@@ -282,14 +277,10 @@ Prototype:
 
 StmtBlock:
     '{' VariableDeclList StmtList '}' { $$ = new StmtBlock($2, $3); }
-    |
-    '{' StmtList '}' { $$ = new StmtBlock(new List<VarDecl*>, $2); }
     ;
 
 StmtList:
-    StmtList Stmt { ($$=$1)->Append($2); }
-    |
-    Stmt { ($$ = new List<Stmt*>)->Append($1); }
+    Stmt StmtList { ($$=$2)->InsertAt($1, 0); }
     |
     %empty { $$ = new List<Stmt*>; }
     ;
