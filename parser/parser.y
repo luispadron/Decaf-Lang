@@ -105,7 +105,7 @@ const char * const decremOp_c = "--";           // '--' decrement operator
  * ------------------
  */
 
-%type<ident>            Ident
+%type <ident>            Ident
 
 %type <declList>        DeclList FieldList PrototypeList
 %type <decl>            Decl Field Prototype
@@ -122,7 +122,7 @@ const char * const decremOp_c = "--";           // '--' decrement operator
 
 %type <type>            Type
 
-%type <stmt>            Stmt IfStmt WhileStmt ForStmt ReturnStmt BreakStmt PrintStmt
+%type <stmt>            Stmt IfStmt WhileStmt ForStmt ReturnStmt BreakStmt PrintStmt SwitchStmt
 %type <stmtList>        StmtList
 %type <stmtBlock>       StmtBlock
 
@@ -305,10 +305,28 @@ Stmt:
     StmtBlock { $$ = $1; }
     ;
 
+SwitchCaseList:
+    SwitchCaseList SwitchCase
+    |
+    SwitchCase
+    ;
+
+SwitchCase:
+    T_Case T_IntConstant ':' Stmt
+    ;
+
+SwitchDefaultCase:
+    T_Default ':' Stmt
+    ;
+    
 IfStmt:
     T_If '(' Expr ')' Stmt { $$ = new IfStmt($3, $5, nullptr); }
     |
     T_If '(' Expr ')' Stmt T_Else Stmt { $$ = new IfStmt($3, $5, $7); }
+    ;
+
+SwitchStmt:
+    T_Switch '(' Expr ')' Stmt '{' SwitchCaseList SwitchDefaultCase '}'
     ;
 
 WhileStmt:
