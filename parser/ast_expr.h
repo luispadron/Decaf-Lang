@@ -236,10 +236,10 @@ public:
 class SwitchCaseStmt : public Node {
 protected:
     IntConstant *caseValue; // if this is null, then we have default case
-    Stmt *stmt;
+    List<Stmt*> *stmts;
 
 public: 
-    SwitchCaseStmt(yyltype loc, IntConstant *caseValue_, Stmt *stmt_);
+    SwitchCaseStmt(IntConstant *caseValue_, List<Stmt*> *stmts_);
     const char *GetPrintNameForNode() override;
     void PrintChildren(int indentLevel) override;
 };

@@ -319,11 +319,11 @@ SwitchCaseList:
     ;
 
 SwitchCase:
-    T_Case T_IntConstant ':' Stmt { $$ = new SwitchCaseStmt(@1, new IntConstant(@2, $2), $4); }
+    T_Case T_IntConstant ':' StmtList { $$ = new SwitchCaseStmt(new IntConstant(@2, $2), $4); }
     ;
 
 SwitchDefaultCase:
-    T_Default ':' Stmt { $$ = new SwitchCaseStmt(@1, nullptr, $3); }
+    T_Default ':' StmtList { $$ = new SwitchCaseStmt(nullptr, $3); }
     ;
     
 IfStmt:
@@ -334,7 +334,7 @@ IfStmt:
 
 SwitchStmt:
     T_Switch '(' Expr ')' '{' SwitchCaseList SwitchDefaultCase '}' 
-        { $$ = new SwitchStmt(@1, $3, $6, $7); }
+        { $$ = new SwitchStmt($3, $6, $7); }
     ;
 
 WhileStmt:
