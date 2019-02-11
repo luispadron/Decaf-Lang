@@ -65,6 +65,8 @@ const char * const decremOp_c = "--";           // '--' decrement operator
     Stmt *stmt;
     List<Stmt*> *stmtList;
     StmtBlock *stmtBlock;
+    SwitchCaseStmt *switchCaseStmt;
+    List<SwitchCaseStmt*> *switchCaseList;
 
     Expr *expr;
     List<Expr*> *exprList;
@@ -125,6 +127,9 @@ const char * const decremOp_c = "--";           // '--' decrement operator
 %type <stmt>            Stmt IfStmt WhileStmt ForStmt ReturnStmt BreakStmt PrintStmt SwitchStmt
 %type <stmtList>        StmtList
 %type <stmtBlock>       StmtBlock
+%type <switchCaseStmt>  SwitchCase SwitchDefaultCase
+%type <switchCaseList>  SwitchCaseList
+
 
 %type <expr>            Expr OptExpr LValue Call Constant
 %type <exprList>        ExprList Actuals
@@ -292,6 +297,8 @@ Stmt:
     |
     IfStmt { $$ = $1; }
     |
+    SwitchStmt { $$ = $1; }
+    |
     WhileStmt { $$ = $1; }
     | 
     ForStmt { $$ = $1; }
@@ -306,17 +313,17 @@ Stmt:
     ;
 
 SwitchCaseList:
-    SwitchCaseList SwitchCase
+    SwitchCaseList SwitchCase { ($$=$1)->Append($2); }
     |
-    SwitchCase
+    SwitchCase { ($$ = new List<SwitchCaseStmt*>)->Append($1); }
     ;
 
 SwitchCase:
-    T_Case T_IntConstant ':' Stmt
+    T_Case T_IntConstant ':' Stmt { $$ = new SwitchCaseStmt(@1, new IntConstant(@2, $2), $4); }
     ;
 
 SwitchDefaultCase:
-    T_Default ':' Stmt
+    T_Default ':' Stmt { $$ = new SwitchCaseStmt(@1, nullptr, $3); }
     ;
     
 IfStmt:
@@ -326,7 +333,8 @@ IfStmt:
     ;
 
 SwitchStmt:
-    T_Switch '(' Expr ')' Stmt '{' SwitchCaseList SwitchDefaultCase '}'
+    T_Switch '(' Expr ')' '{' SwitchCaseList SwitchDefaultCase '}' 
+        { $$ = new SwitchStmt(@1, $3, $6, $7); }
     ;
 
 WhileStmt:

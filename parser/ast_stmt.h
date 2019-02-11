@@ -19,6 +19,7 @@
 class Decl;
 class VarDecl;
 class Expr;
+class SwitchCaseStmt;
   
 class Program : public Node {
 protected:
@@ -112,6 +113,17 @@ protected:
 public:
     PrintStmt(List<Expr*> *arguments);
     const char *GetPrintNameForNode() { return "PrintStmt"; }
+    void PrintChildren(int indentLevel);
+};
+
+class SwitchStmt: public Stmt {
+protected: 
+    Expr *expr;
+    List<SwitchCaseStmt*> *cases;
+    SwitchCaseStmt *defaultCase;
+public:
+    SwitchStmt(yyltype loc, Expr *expr, List<SwitchCaseStmt*> *cases_, SwitchCaseStmt *defaultCase_);
+    const char *GetPrintNameForNode() { return "SwitchStmt"; }
     void PrintChildren(int indentLevel);
 };
 

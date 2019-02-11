@@ -84,4 +84,16 @@ void PrintStmt::PrintChildren(int indentLevel) {
     args->PrintAll(indentLevel+1, "(args) ");
 }
 
+SwitchStmt::SwitchStmt(yyltype loc, Expr *expr_, List<SwitchCaseStmt*> *cases_, SwitchCaseStmt *defaultCase_) 
+    : Stmt(loc), expr(expr_), cases(cases_), defaultCase(defaultCase_) {
+    Assert(expr != nullptr);
+    Assert(cases != nullptr);
+    cases->SetParentAll(this);
+    if (defaultCase) defaultCase->SetParent(this);
+}
 
+void SwitchStmt::PrintChildren(int indentLevel) {
+    expr->Print(indentLevel + 1);
+    cases->PrintAll(indentLevel + 1);
+    if (defaultCase) defaultCase->Print(indentLevel + 1);
+}

@@ -140,4 +140,21 @@ void NewArrayExpr::PrintChildren(int indentLevel) {
     elemType->Print(indentLevel+1);
 }
 
+SwitchCaseStmt::SwitchCaseStmt(yyltype loc, IntConstant *caseValue_, Stmt *stmt_) 
+    : Node(loc), caseValue(caseValue_), stmt(stmt_) {
+    Assert(stmt != nullptr);
+    if (caseValue) caseValue->SetParent(this);
+    stmt->SetParent(this);
+}
        
+const char * SwitchCaseStmt::GetPrintNameForNode() {
+    if (caseValue)
+        return "Case";
+    else
+        return "Default";
+}
+
+void SwitchCaseStmt::PrintChildren(int indentLevel) {
+    if (caseValue) caseValue->Print(indentLevel + 1);
+    stmt->Print(indentLevel + 1);   
+}

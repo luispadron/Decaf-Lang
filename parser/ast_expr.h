@@ -230,5 +230,18 @@ public:
     ReadLineExpr(yyltype loc) : Expr (loc) {}
     const char *GetPrintNameForNode() { return "ReadLineExpr"; }
 };
+
+// custom switch statement node
+
+class SwitchCaseStmt : public Node {
+protected:
+    IntConstant *caseValue; // if this is null, then we have default case
+    Stmt *stmt;
+
+public: 
+    SwitchCaseStmt(yyltype loc, IntConstant *caseValue_, Stmt *stmt_);
+    const char *GetPrintNameForNode() override;
+    void PrintChildren(int indentLevel) override;
+};
     
 #endif
