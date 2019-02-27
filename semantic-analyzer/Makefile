@@ -12,7 +12,7 @@ PRODUCTS = $(COMPILER)
 default: $(PRODUCTS)
 
 # Set up the list of source and object files
-SRCS = ast.cc ast_decl.cc ast_expr.cc ast_stmt.cc ast_type.cc errors.cc utility.cc main.cc
+SRCS = Scope.cc Symbol_table.cc ast.cc ast_decl.cc ast_expr.cc ast_stmt.cc ast_type.cc errors.cc utility.cc main.cc
 
 # OBJS can deal with either .cc or .c files listed in SRCS
 OBJS = y.tab.o lex.yy.o $(patsubst %.cc, %.o, $(filter %.cc,$(SRCS))) $(patsubst %.c, %.o, $(filter %.c, $(SRCS)))
@@ -89,6 +89,9 @@ clean:
 	rm -f $(JUNK) y.output $(PRODUCTS)
 
 # DO NOT DELETE
+Scope.o: Scope.cc Scope.h Symbol_table_exception.h
+Symbol_table.o: Symbol_table.cc Symbol_table.h Scope.h \
+ Symbol_table_exception.h
 ast.o: ast.cc ast.h location.h ast_type.h list.h utility.h ast_decl.h
 ast_decl.o: ast_decl.cc ast_decl.h ast.h location.h ast_type.h list.h \
  utility.h ast_stmt.h
