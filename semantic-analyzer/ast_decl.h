@@ -20,56 +20,59 @@
 class Identifier;
 class Stmt;
 
-class Decl : public Node 
-{
-  protected:
+class Decl : public Node {
+protected:
     Identifier *id;
   
-  public:
+public:
     Decl(Identifier *name);
     friend std::ostream& operator<<(std::ostream& out, Decl *d) { return out << d->id; }
 };
 
-class VarDecl : public Decl 
-{
-  protected:
+class VarDecl : public Decl {
+protected:
     Type *type;
     
-  public:
+public:
     VarDecl(Identifier *name, Type *type);
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
-class ClassDecl : public Decl 
-{
-  protected:
+class ClassDecl : public Decl {
+protected:
     List<Decl*> *members;
     NamedType *extends;
     List<NamedType*> *implements;
 
-  public:
+public:
     ClassDecl(Identifier *name, NamedType *extends, 
               List<NamedType*> *implements, List<Decl*> *members);
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
-class InterfaceDecl : public Decl 
-{
-  protected:
+class InterfaceDecl : public Decl {
+protected:
     List<Decl*> *members;
     
-  public:
+public:
     InterfaceDecl(Identifier *name, List<Decl*> *members);
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
-class FnDecl : public Decl 
-{
-  protected:
+class FnDecl : public Decl {
+protected:
     List<VarDecl*> *formals;
     Type *returnType;
     Stmt *body;
     
-  public:
+public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
     void SetFunctionBody(Stmt *b);
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
 #endif

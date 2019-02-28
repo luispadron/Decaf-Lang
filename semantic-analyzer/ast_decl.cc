@@ -17,6 +17,10 @@ VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
     Assert(n != NULL && t != NULL);
     (type=t)->SetParent(this);
 }
+
+void VarDecl::Check(Symbol_table<std::string, Node *> &sym_table) {
+
+}
   
 
 ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
@@ -28,10 +32,18 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
     (members=m)->SetParentAll(this);
 }
 
+void ClassDecl::Check(Symbol_table<std::string, Node *> &sym_table) {
+
+}
+
 
 InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
     Assert(n != NULL && m != NULL);
     (members=m)->SetParentAll(this);
+}
+
+void InterfaceDecl::Check(Symbol_table<std::string, Node *> &sym_table) {
+
 }
 
 	
@@ -44,6 +56,10 @@ FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
 
 void FnDecl::SetFunctionBody(Stmt *b) { 
     (body=b)->SetParent(this);
+}
+
+void FnDecl::Check(Symbol_table<std::string, Node *> &sym_table) {
+
 }
 
 

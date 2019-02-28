@@ -27,18 +27,28 @@ Type::Type(const char *n) {
     typeName = strdup(n);
 }
 
+void Type::Check(Symbol_table<std::string, Node *> &sym_table) {
+
+}
 
 
-	
 NamedType::NamedType(Identifier *i) : Type(*i->GetLocation()) {
     Assert(i != NULL);
     (id=i)->SetParent(this);
-} 
+}
+
+void NamedType::Check(Symbol_table<std::string, Node *> &sym_table) {
+
+}
 
 
 ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
     Assert(et != NULL);
     (elemType=et)->SetParent(this);
+}
+
+void ArrayType::Check(Symbol_table<std::string, Node *> &sym_table) {
+
 }
 
 

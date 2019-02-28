@@ -6,6 +6,12 @@
 #include "ast_type.h"
 #include "ast_decl.h"
 #include "ast_expr.h"
+#include "Symbol_table.h"
+
+#include <iostream>
+#include <exception>
+
+using namespace std;
 
 
 Program::Program(List<Decl*> *d) {
@@ -13,15 +19,23 @@ Program::Program(List<Decl*> *d) {
     (decls=d)->SetParentAll(this);
 }
 
-void Program::Check() {
-    /* pp3: here is where the semantic analyzer is kicked off.
-     *      The general idea is perform a tree traversal of the
-     *      entire program, examining all constructs for compliance
-     *      with the semantic rules.  Each node can have its own way of
-     *      checking itself, which makes for a great use of inheritance
-     *      and polymorphism in the node classes.
-     */
+/**
+ * This is the main entry point for the parser.
+ * This function should set off all the children to have them verify the semantics are valid.
+ */
+void Program::Check(Symbol_table<std::string, Node *> &sym_table) {
+    try {
+        for (int i = 0; i < decls->NumElements(); ++i) {
+            Decl* decl = decls->Nth(i);
+            cout << decl << endl;
+        }
+    } catch (const Symbol_table_exception &e) {
+        cout << e.what() << endl;
+    } catch (const std::exception &e) {
+        cout << e.what() << endl;
+    }
 }
+
 
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
@@ -29,11 +43,21 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     (stmts=s)->SetParentAll(this);
 }
 
+void StmtBlock::Check(Symbol_table<std::string, Node *> &sym_table) {
+
+}
+
+
 ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) { 
     Assert(t != NULL && b != NULL);
     (test=t)->SetParent(this); 
     (body=b)->SetParent(this);
 }
+
+void ConditionalStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
+
+}
+
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) { 
     Assert(i != NULL && t != NULL && s != NULL && b != NULL);
@@ -41,10 +65,29 @@ ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
     (step=s)->SetParent(this);
 }
 
+void ForStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
+
+}
+
+
+void WhileStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
+
+}
+
+
 IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) { 
     Assert(t != NULL && tb != NULL); // else can be NULL
     elseBody = eb;
     if (elseBody) elseBody->SetParent(this);
+}
+
+void IfStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
+
+}
+
+
+void BreakStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
+
 }
 
 
@@ -52,10 +95,17 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
     Assert(e != NULL);
     (expr=e)->SetParent(this);
 }
-  
+
+void ReturnStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
+
+}
+
+
 PrintStmt::PrintStmt(List<Expr*> *a) {    
     Assert(a != NULL);
     (args=a)->SetParentAll(this);
 }
 
+void PrintStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
 
+}

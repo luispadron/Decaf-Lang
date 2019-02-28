@@ -17,43 +17,49 @@
 #include <iostream>
 
 
-class Type : public Node 
-{
-  protected:
+class Type : public Node {
+protected:
     char *typeName;
 
-  public :
+public:
     static Type *intType, *doubleType, *boolType, *voidType,
                 *nullType, *stringType, *errorType;
 
     Type(yyltype loc) : Node(loc) {}
     Type(const char *str);
-    
-    virtual void PrintToStream(std::ostream& out) { out << typeName; }
+
     friend std::ostream& operator<<(std::ostream& out, Type *t) { t->PrintToStream(out); return out; }
+
+    virtual void PrintToStream(std::ostream& out) { out << typeName; }
+
     virtual bool IsEquivalentTo(Type *other) { return this == other; }
+
+    void Check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
-class NamedType : public Type 
-{
-  protected:
+
+class NamedType : public Type {
+protected:
     Identifier *id;
     
-  public:
+public:
     NamedType(Identifier *i);
     
     void PrintToStream(std::ostream& out) { out << id; }
+
+    void Check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
-class ArrayType : public Type 
-{
-  protected:
+class ArrayType : public Type {
+protected:
     Type *elemType;
 
-  public:
+public:
     ArrayType(yyltype loc, Type *elemType);
     
     void PrintToStream(std::ostream& out) { out << elemType << "[]"; }
+
+    void Check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
  

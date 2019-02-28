@@ -5,9 +5,12 @@
 
 %{
 
+#include "Symbol_table.h"
 #include "scanner.h" // for yylex
 #include "parser.h"
 #include "errors.h"
+
+#include <string>
 
 void yyerror(const char *msg); // standard error-handling routine
 
@@ -98,9 +101,15 @@ void yyerror(const char *msg); // standard error-handling routine
 Program   :    DeclList            { 
                                       @1; 
                                       Program *program = new Program($1);
-                                      // if no errors, advance to next phase
-                                      if (ReportError::NumErrors() == 0) 
-                                          program->Check(); 
+                                      // if no errors, advance to next phase which is semantic analysis
+                                      // we create a sybmol table object and pass it to program
+                                      // program will then tell its children to traverse the AST
+                                      // and check for any semantic errors
+
+                                      if (ReportError::NumErrors() == 0) {
+                                          Symbol_table<std::string, Node*> table;
+                                          program->Check(table);
+                                      }
                                     }
           ;
 

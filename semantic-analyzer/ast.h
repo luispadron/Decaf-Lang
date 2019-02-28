@@ -29,34 +29,40 @@
 #ifndef _H_ast
 #define _H_ast
 
-#include <stdlib.h>   // for NULL
+#include "Symbol_table.h"
 #include "location.h"
+
+#include <stdlib.h>   // for NULL
+#include <string>
 #include <iostream>
 
-class Node 
-{
-  protected:
+class Node {
+protected:
     yyltype *location;
     Node *parent;
 
-  public:
+public:
     Node(yyltype loc);
     Node();
     
     yyltype *GetLocation()   { return location; }
     void SetParent(Node *p)  { parent = p; }
     Node *GetParent()        { return parent; }
+
+    /// this method should be implemented by any concrete children
+    virtual void Check(Symbol_table<std::string, Node*> &sym_table) = 0;
 };
    
 
-class Identifier : public Node 
-{
-  protected:
+class Identifier : public Node {
+protected:
     char *name;
     
-  public:
+public:
     Identifier(yyltype loc, const char *name);
     friend std::ostream& operator<<(std::ostream& out, Identifier *id) { return out << id->name; }
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
 
@@ -65,12 +71,11 @@ class Identifier : public Node
 // is discarded along with the states being popped, and an instance of
 // the Error class can stand in as the placeholder in the parse tree
 // when your parser can continue after an error.
-class Error : public Node
-{
-  public:
+class Error : public Node {
+public:
     Error() : Node() {}
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override { }
 };
-
-
 
 #endif

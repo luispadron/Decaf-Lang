@@ -22,3 +22,4 @@ Identifier::Identifier(yyltype loc, const char *n) : Node(loc) {
     name = strdup(n);
 } 
 
+void Identifier::Check(Symbol_table<std::string, Node *> &sym_table) { }

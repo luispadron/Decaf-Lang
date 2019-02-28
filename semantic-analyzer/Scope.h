@@ -11,7 +11,7 @@
 #include <map>
 #include <stack>
 #include <string>
-#include <strstream>
+#include <sstream>
 
 // forward declare Symbol_table
 template<typename K, typename V>
@@ -124,7 +124,7 @@ void Scope<Key, Value>::debug_print() const {
     std::stack<std::string> pstack; // used to print in reverse since we go current->parent
 
     for (; scope_ptr; scope_ptr = scope_ptr->parent_ptr) {
-        std::strstream ss;
+        std::stringstream ss;
         ss << "----------- Scope -----------" << std::endl;
         for (auto symbol : scope_ptr->symbols) {
             ss << symbol.first << "\t|\t" << symbol.second << std::endl;

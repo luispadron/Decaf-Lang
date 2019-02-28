@@ -20,97 +20,111 @@ class Decl;
 class VarDecl;
 class Expr;
   
-class Program : public Node
-{
-  protected:
-     List<Decl*> *decls;
+class Program : public Node {
+protected:
+    List<Decl*> *decls;
      
-  public:
-     Program(List<Decl*> *declList);
-     void Check();
+public:
+    Program(List<Decl*> *declList);
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
-class Stmt : public Node
-{
-  public:
-     Stmt() : Node() {}
-     Stmt(yyltype loc) : Node(loc) {}
+
+class Stmt : public Node {
+public:
+    Stmt() : Node() {}
+    Stmt(yyltype loc) : Node(loc) {}
 };
 
-class StmtBlock : public Stmt 
-{
-  protected:
+
+class StmtBlock : public Stmt {
+protected:
     List<VarDecl*> *decls;
     List<Stmt*> *stmts;
     
-  public:
+public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
   
-class ConditionalStmt : public Stmt
-{
-  protected:
+class ConditionalStmt : public Stmt {
+protected:
     Expr *test;
     Stmt *body;
   
-  public:
+public:
     ConditionalStmt(Expr *testExpr, Stmt *body);
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
-class LoopStmt : public ConditionalStmt 
-{
-  public:
-    LoopStmt(Expr *testExpr, Stmt *body)
-            : ConditionalStmt(testExpr, body) {}
+
+class LoopStmt : public ConditionalStmt {
+public:
+    LoopStmt(Expr *testExpr, Stmt *body) : ConditionalStmt(testExpr, body) {}
 };
 
-class ForStmt : public LoopStmt 
-{
-  protected:
+
+class ForStmt : public LoopStmt {
+protected:
     Expr *init, *step;
   
-  public:
+public:
     ForStmt(Expr *init, Expr *test, Expr *step, Stmt *body);
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
-class WhileStmt : public LoopStmt 
-{
-  public:
+
+class WhileStmt : public LoopStmt {
+public:
     WhileStmt(Expr *test, Stmt *body) : LoopStmt(test, body) {}
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
-class IfStmt : public ConditionalStmt 
-{
-  protected:
+
+class IfStmt : public ConditionalStmt {
+protected:
     Stmt *elseBody;
   
-  public:
+public:
     IfStmt(Expr *test, Stmt *thenBody, Stmt *elseBody);
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
-class BreakStmt : public Stmt 
-{
-  public:
+
+class BreakStmt : public Stmt {
+public:
     BreakStmt(yyltype loc) : Stmt(loc) {}
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
-class ReturnStmt : public Stmt  
-{
-  protected:
+
+class ReturnStmt : public Stmt {
+protected:
     Expr *expr;
   
-  public:
+public:
     ReturnStmt(yyltype loc, Expr *expr);
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
-class PrintStmt : public Stmt
-{
-  protected:
+
+class PrintStmt : public Stmt {
+protected:
     List<Expr*> *args;
     
-  public:
+public:
     PrintStmt(List<Expr*> *arguments);
+
+    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
 
