@@ -69,15 +69,28 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r)
     (right = r)->set_parent(this);
 }
 
-void CompoundExpr::check(Symbol_table<std::string, Node *> &sym_table) {
-
-}
+void CompoundExpr::check(Symbol_table<std::string, Node *> &sym_table) { }
 
 
 void ArithmeticExpr::check(Symbol_table<std::string, Node *> &sym_table) {
-    // TODO: add type checking
-    left->check(sym_table);
-    right->check(sym_table);
+    auto rhs_type = dynamic_cast<VarDecl*>(sym_table.get_symbol(right->get_name()))->get_type();
+
+    if (!left) {
+        right->check(sym_table);
+
+        // type must be either int or double
+        if (!rhs_type->is_arithmetic()) { ReportError::incompatible_operand(op, rhs_type); }
+    } else {
+        left->check(sym_table);
+        right->check(sym_table);
+
+        auto lhs_type = dynamic_cast<VarDecl*>(sym_table.get_symbol(left->get_name()))->get_type();
+
+        // check types match and are either int/double
+        if (!lhs_type->is_arithmetic()|| !rhs_type->is_arithmetic() || !lhs_type->is_equal_to(rhs_type)) {
+            ReportError::incompatible_operands(op, lhs_type, rhs_type);
+        }
+    }
 }
 
 

@@ -15,16 +15,16 @@
 
 #include "ast.h"
 #include "ast_stmt.h"
+#include "ast_type.h"
 #include "list.h"
-
-class NamedType; // for new
-class Type; // for NewArray
 
 
 class Expr : public Stmt {
 public:
     explicit Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
+
+    virtual const char * get_name() const { return nullptr; }
 };
 
 
@@ -199,6 +199,8 @@ public:
     FieldAccess(Expr *base, Identifier *field); //ok to pass NULL base
 
     void check(Symbol_table<std::string, Node *> &sym_table) override;
+
+    const char * get_name() const override { return field->get_name(); }
 };
 
 
@@ -216,6 +218,8 @@ public:
     Call(yyltype loc, Expr *base, Identifier *field, List<Expr*> *args);
 
     void check(Symbol_table<std::string, Node *> &sym_table) override;
+
+    const char * get_name() const override { return field->get_name(); }
 };
 
 
@@ -227,6 +231,8 @@ public:
     NewExpr(yyltype loc, NamedType *clsType);
 
     void check(Symbol_table<std::string, Node *> &sym_table) override;
+
+    const char * get_name() const override { return cType->get_name(); }
 };
 
 

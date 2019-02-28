@@ -1,0 +1,11 @@
+// this file tests general arithmetic type checking, should result in errors
+
+int main(int x) {
+    int y;
+    double d;
+    string s;
+
+    -s; // this should error
+
+    return d + x; // this should error
+}

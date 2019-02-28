@@ -14,25 +14,31 @@
 
 #include "ast.h"
 #include "list.h"
+
 #include <iostream>
+#include <string>
 
 
 class Type : public Node {
 protected:
-    char *typeName;
+    std::string typeName;
 
 public:
     static Type *intType, *doubleType, *boolType, *voidType,
                 *nullType, *stringType, *errorType;
 
-    Type(yyltype loc) : Node(loc) {}
-    Type(const char *str);
+    explicit Type(yyltype loc) : Node(loc) {}
+    explicit Type(const char *str);
 
-    friend std::ostream& operator<<(std::ostream& out, Type *t) { t->PrintToStream(out); return out; }
+    friend std::ostream& operator<<(std::ostream& out, Type *t) { t->print_to(out); return out; }
 
-    virtual void PrintToStream(std::ostream& out) { out << typeName; }
+    virtual void print_to(std::ostream &out) { out << typeName; }
 
-    virtual bool IsEquivalentTo(Type *other) { return this == other; }
+    virtual bool is_equal_to(Type *other) { return this == other; }
+
+    /// returns whether type is either int or double, since these are the only
+    /// types that can perform arithmetic operations
+    bool is_arithmetic() const { return this == intType || this == doubleType; }
 
     void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
@@ -43,9 +49,17 @@ protected:
     Identifier *id;
     
 public:
-    NamedType(Identifier *i);
+    explicit NamedType(Identifier *i);
     
-    void PrintToStream(std::ostream& out) { out << id; }
+    void print_to(std::ostream &out) override { out << id; }
+
+    bool is_equal_to(Type *other) override {
+        auto named_other = dynamic_cast<NamedType*>(other);
+        if (!named_other) { return false; }
+        return id == named_other->id;
+    }
+
+    const char * get_name() const { return id->get_name(); }
 
     void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
@@ -57,7 +71,13 @@ protected:
 public:
     ArrayType(yyltype loc, Type *elemType);
     
-    void PrintToStream(std::ostream& out) { out << elemType << "[]"; }
+    void print_to(std::ostream &out) override { out << elemType << "[]"; }
+
+    bool is_equal_to(Type *other) override {
+        auto array_other = dynamic_cast<ArrayType*>(other);
+        if (!array_other) { return false; }
+        return elemType->is_equal_to(array_other->elemType);
+    }
 
     void check(Symbol_table<std::string, Node *> &sym_table) override;
 };

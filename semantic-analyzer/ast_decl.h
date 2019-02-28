@@ -37,6 +37,8 @@ protected:
 public:
     VarDecl(Identifier *name, Type *type);
 
+    Type * get_type() { return type; }
+
     void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
