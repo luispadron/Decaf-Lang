@@ -12,13 +12,13 @@ using namespace std;
         
          
 Decl::Decl(Identifier *n) : Node(*n->GetLocation()) {
-    Assert(n != NULL);
+    Assert(n != nullptr);
     (id=n)->SetParent(this); 
 }
 
 
 VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
-    Assert(n != NULL && t != NULL);
+    Assert(n != nullptr && t != nullptr);
     ident = n;
     (type=t)->SetParent(this);
 }
@@ -30,7 +30,7 @@ void VarDecl::Check(Symbol_table<std::string, Node *> &sym_table) {
 
 ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
     // extends can be NULL, impl & mem may be empty lists but cannot be NULL
-    Assert(n != NULL && imp != NULL && m != NULL);
+    Assert(n != nullptr && imp != nullptr && m != nullptr);
     name = n;
     extends = ex;
     if (extends) extends->SetParent(this);
@@ -44,7 +44,7 @@ void ClassDecl::Check(Symbol_table<std::string, Node *> &sym_table) {
 
 
 InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
-    Assert(n != NULL && m != NULL);
+    Assert(n != nullptr && m != nullptr);
     (members=m)->SetParentAll(this);
 }
 
@@ -54,10 +54,10 @@ void InterfaceDecl::Check(Symbol_table<std::string, Node *> &sym_table) {
 
 	
 FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
-    Assert(n != NULL && r!= NULL && d != NULL);
+    Assert(n != nullptr && r!= nullptr && d != nullptr);
     (returnType=r)->SetParent(this);
     (formals=d)->SetParentAll(this);
-    body = NULL;
+    body = nullptr;
 }
 
 void FnDecl::SetFunctionBody(Stmt *b) { 

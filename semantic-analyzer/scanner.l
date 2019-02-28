@@ -118,9 +118,9 @@ SINGLE_COMMENT    ("//"[^\n]*)
  /* -------------------- Constants ------------------------------ */
 "true"|"false"      { yylval.boolConstant = (yytext[0] == 't');
                          return T_BoolConstant; }
-{INTEGER}           { yylval.integerConstant = strtol(yytext, NULL, 10);
+{INTEGER}           { yylval.integerConstant = strtol(yytext, nullptr, 10);
                          return T_IntConstant; }
-{HEX_INTEGER}       { yylval.integerConstant = strtol(yytext, NULL, 16);
+{HEX_INTEGER}       { yylval.integerConstant = strtol(yytext, nullptr, 16);
                          return T_IntConstant; }
 {DOUBLE}            { yylval.doubleConstant = atof(yytext);
                          return T_DoubleConstant; }

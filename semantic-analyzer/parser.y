@@ -153,7 +153,7 @@ ClassDecl :    T_Class T_Identifier OptExt OptImpl '{' FieldList '}'
                 
 OptExt    :    T_Extends T_Identifier    
                                     { $$ = new NamedType(new Identifier(@2, $2)); }
-          |    /* empty */          { $$ = NULL; }
+          |    /* empty */          { $$ = nullptr; }
           ;
 
 OptImpl   :    T_Implements ImpList 
@@ -222,13 +222,13 @@ Stmt      :    OptExpr ';'          { $$ = $1; }
           |    T_Break ';'          { $$ = new BreakStmt(@1); }
           ;
 
-LValue    :    T_Identifier          { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }
+LValue    :    T_Identifier          { $$ = new FieldAccess(nullptr, new Identifier(@1, $1)); }
           |    Expr '.' T_Identifier { $$ = new FieldAccess($1, new Identifier(@3, $3)); } 
           |    Expr '[' Expr ']'     { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
           ;
 
 Call      :    T_Identifier '(' Actuals ')' 
-                                    { $$ = new Call(Join(@1,@4), NULL, new Identifier(@1,$1), $3); }
+                                    { $$ = new Call(Join(@1,@4), nullptr, new Identifier(@1,$1), $3); }
           |    Expr '.' T_Identifier '(' Actuals ')' 
                                     { $$ = new Call(Join(@1,@6), $1, new Identifier(@3,$3), $5); }
           ;
@@ -287,7 +287,7 @@ ExprList  :    ExprList ',' Expr    { ($$=$1)->Append($3); }
 
 OptElse   :    T_Else Stmt          { $$ = $2; }
           |    /* empty */   %prec T_Lower_Than_Else 
-                                    { $$ = NULL; }
+                                    { $$ = nullptr; }
           ;
 
 %%

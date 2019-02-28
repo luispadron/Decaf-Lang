@@ -31,7 +31,7 @@ void BoolConstant::Check(Symbol_table<std::string, Node *> &sym_table) {}
 
 
 StringConstant::StringConstant(yyltype loc, const char *val) : Expr(loc) {
-    Assert(val != NULL);
+    Assert(val != nullptr);
     value = strdup(val);
 }
 
@@ -43,7 +43,7 @@ void StringConstant::Check(Symbol_table<std::string, Node *> &sym_table) {}
 
 
 Operator::Operator(yyltype loc, const char *tok) : Node(loc) {
-    Assert(tok != NULL);
+    Assert(tok != nullptr);
     strncpy(tokenString, tok, sizeof(tokenString));
 }
 
@@ -54,7 +54,7 @@ void Operator::Check(Symbol_table<std::string, Node *> &sym_table) {
 
 CompoundExpr::CompoundExpr(Expr *l, Operator *o, Expr *r) 
   : Expr(Join(l->GetLocation(), r->GetLocation())) {
-    Assert(l != NULL && o != NULL && r != NULL);
+    Assert(l != nullptr && o != nullptr && r != nullptr);
     (op=o)->SetParent(this);
     (left=l)->SetParent(this); 
     (right=r)->SetParent(this);
@@ -62,8 +62,8 @@ CompoundExpr::CompoundExpr(Expr *l, Operator *o, Expr *r)
 
 CompoundExpr::CompoundExpr(Operator *o, Expr *r) 
   : Expr(Join(o->GetLocation(), r->GetLocation())) {
-    Assert(o != NULL && r != NULL);
-    left = NULL; 
+    Assert(o != nullptr && r != nullptr);
+    left = nullptr;
     (op=o)->SetParent(this);
     (right=r)->SetParent(this);
 }
@@ -114,7 +114,7 @@ void ArrayAccess::Check(Symbol_table<std::string, Node *> &sym_table) { }
 
 FieldAccess::FieldAccess(Expr *b, Identifier *f) 
   : LValue(b? Join(b->GetLocation(), f->GetLocation()) : *f->GetLocation()) {
-    Assert(f != NULL); // b can be be NULL (just means no explicit base)
+    Assert(f != nullptr); // b can be be nullptr (just means no explicit base)
     base = b; 
     if (base) base->SetParent(this); 
     (field=f)->SetParent(this);
@@ -127,7 +127,7 @@ void FieldAccess::Check(Symbol_table<std::string, Node *> &sym_table) {
 
 
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
-    Assert(f != NULL && a != NULL); // b can be be NULL (just means no explicit base)
+    Assert(f != nullptr && a != nullptr); // b can be be nullptr (just means no explicit base)
     base = b;
     if (base) base->SetParent(this);
     (field=f)->SetParent(this);
@@ -138,7 +138,7 @@ void Call::Check(Symbol_table<std::string, Node *> &sym_table) {}
 
 
 NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) { 
-  Assert(c != NULL);
+  Assert(c != nullptr);
   (cType=c)->SetParent(this);
 }
 
@@ -146,7 +146,7 @@ void NewExpr::Check(Symbol_table<std::string, Node *> &sym_table) { }
 
 
 NewArrayExpr::NewArrayExpr(yyltype loc, Expr *sz, Type *et) : Expr(loc) {
-    Assert(sz != NULL && et != NULL);
+    Assert(sz != nullptr && et != nullptr);
     (size=sz)->SetParent(this); 
     (elemType=et)->SetParent(this);
 }

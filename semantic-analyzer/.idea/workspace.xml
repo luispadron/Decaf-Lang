@@ -21,12 +21,15 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+    <leaf>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/ast_stmt.cpp">
+        <entry file="file://$PROJECT_DIR$/ast_decl.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="311">
-              <caret line="37" column="5" lean-forward="true" selection-start-line="37" selection-start-column="5" selection-end-line="37" selection-end-column="5" />
+            <state relative-caret-position="295">
+              <caret line="27" column="27" selection-start-line="27" selection-start-column="27" selection-end-line="27" selection-end-column="27" />
+              <folding>
+                <element signature="e#463#479#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -43,7 +46,6 @@
       <find>virtual</find>
       <find>get_loca</find>
       <find>SetParent</find>
-      <find>NULL</find>
       <find>getprint</find>
       <find>operator</find>
       <find>LoopStmt(</find>
@@ -63,9 +65,11 @@
       <find>set_</find>
       <find>string</find>
       <find>std::</find>
+      <find>NULL</find>
     </findStrings>
     <replaceStrings>
       <replace>.cpp</replace>
+      <replace>nullptr</replace>
     </replaceStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -76,7 +80,6 @@
         <option value="$PROJECT_DIR$/ast_stmt.h" />
         <option value="$PROJECT_DIR$/ast.h" />
         <option value="$PROJECT_DIR$/list.h" />
-        <option value="$PROJECT_DIR$/ast_decl.h" />
         <option value="$PROJECT_DIR$/Symbol_table.h" />
         <option value="$PROJECT_DIR$/ast_expr.h" />
         <option value="$PROJECT_DIR$/ast_expr.cc" />
@@ -90,6 +93,7 @@
         <option value="$PROJECT_DIR$/parser.y" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/ast_stmt.cpp" />
+        <option value="$PROJECT_DIR$/ast_decl.h" />
       </list>
     </option>
   </component>
@@ -107,7 +111,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -119,12 +122,13 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Color Scheme Font" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -184,7 +188,7 @@
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1680" height="1027" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17826618" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18376069" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -228,27 +232,10 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ast_type.cc" />
-    <entry file="file://$PROJECT_DIR$/utility.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="646">
-          <caret line="38" column="99" lean-forward="true" selection-start-line="38" selection-start-column="99" selection-end-line="38" selection-end-column="99" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/list.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="51">
           <caret line="3" column="57" selection-start-line="3" selection-start-column="57" selection-end-line="3" selection-end-column="57" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ast_decl.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="33" column="22" lean-forward="true" selection-start-line="33" selection-start-column="22" selection-end-line="33" selection-end-column="22" />
-          <folding>
-            <element signature="e#463#479#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -397,10 +384,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/utility.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="422">
+          <caret line="44" column="29" lean-forward="true" selection-start-line="44" selection-start-column="29" selection-end-line="44" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ast_stmt.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="311">
-          <caret line="37" column="5" lean-forward="true" selection-start-line="37" selection-start-column="5" selection-end-line="37" selection-end-column="5" />
+        <state relative-caret-position="425">
+          <caret line="32" column="32" lean-forward="true" selection-start-line="32" selection-start-column="32" selection-end-line="32" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ast_decl.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="295">
+          <caret line="27" column="27" selection-start-line="27" selection-start-column="27" selection-end-line="27" selection-end-column="27" />
+          <folding>
+            <element signature="e#463#479#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

@@ -15,7 +15,7 @@ using namespace std;
 
 
 Program::Program(List<Decl*> *d) {
-    Assert(d != NULL);
+    Assert(d != nullptr);
     (decls=d)->SetParentAll(this);
 }
 
@@ -40,7 +40,7 @@ void Program::Check(Symbol_table<std::string, Node *> &sym_table) {
 
 
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
-    Assert(d != NULL && s != NULL);
+    Assert(d != nullptr && s != nullptr);
     (decls=d)->SetParentAll(this);
     (stmts=s)->SetParentAll(this);
 }
@@ -54,7 +54,7 @@ void StmtBlock::Check(Symbol_table<std::string, Node *> &sym_table) {
 
 
 ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) { 
-    Assert(t != NULL && b != NULL);
+    Assert(t != nullptr && b != nullptr);
     (test=t)->SetParent(this); 
     (body=b)->SetParent(this);
 }
@@ -65,7 +65,7 @@ void ConditionalStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
 
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) { 
-    Assert(i != NULL && t != NULL && s != NULL && b != NULL);
+    Assert(i != nullptr && t != nullptr && s != nullptr && b != nullptr);
     (init=i)->SetParent(this);
     (step=s)->SetParent(this);
 }
@@ -81,7 +81,7 @@ void WhileStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
 
 
 IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) { 
-    Assert(t != NULL && tb != NULL); // else can be NULL
+    Assert(t != nullptr && tb != nullptr); // else can be nullptr
     elseBody = eb;
     if (elseBody) elseBody->SetParent(this);
 }
@@ -97,7 +97,7 @@ void BreakStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
 
 
 ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) { 
-    Assert(e != NULL);
+    Assert(e != nullptr);
     (expr=e)->SetParent(this);
 }
 
@@ -107,7 +107,7 @@ void ReturnStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
 
 
 PrintStmt::PrintStmt(List<Expr*> *a) {    
-    Assert(a != NULL);
+    Assert(a != nullptr);
     (args=a)->SetParentAll(this);
 }
 

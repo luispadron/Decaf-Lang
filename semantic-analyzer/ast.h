@@ -32,7 +32,6 @@
 #include "Symbol_table.h"
 #include "location.h"
 
-#include <stdlib.h>   // for NULL
 #include <string>
 #include <iostream>
 
@@ -42,7 +41,7 @@ protected:
     Node *parent;
 
 public:
-    Node(yyltype loc);
+    explicit Node(yyltype loc);
     Node();
     
     yyltype *GetLocation()   { return location; }

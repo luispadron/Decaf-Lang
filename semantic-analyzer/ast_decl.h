@@ -25,7 +25,7 @@ protected:
     Identifier *id;
   
 public:
-    Decl(Identifier *name);
+    explicit Decl(Identifier *name);
     friend std::ostream& operator<<(std::ostream& out, Decl *d) { return out << d->id; }
 };
 

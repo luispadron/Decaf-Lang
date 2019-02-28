@@ -7,7 +7,6 @@
 #ifndef _H_utility
 #define _H_utility
 
-#include <stdlib.h>
 #include <stdio.h>
 
 

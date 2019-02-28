@@ -64,7 +64,7 @@ void ReportError::Formatted(yyltype *loc, const char *format, ...) {
 }
 
 void ReportError::UntermComment() {
-    EmitError(NULL, "Input ends with unterminated comment");
+    EmitError(nullptr, "Input ends with unterminated comment");
 }
 
 void ReportError::InvalidDirective(int linenum) {

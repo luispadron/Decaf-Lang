@@ -12,12 +12,12 @@
 
 Node::Node(yyltype loc) {
     location = new yyltype(loc);
-    parent = NULL;
+    parent = nullptr;
 }
 
 Node::Node() {
-    location = NULL;
-    parent = NULL;
+    location = nullptr;
+    parent = nullptr;
 }
 	 
 Identifier::Identifier(yyltype loc, const char *n) : Node(loc) {
