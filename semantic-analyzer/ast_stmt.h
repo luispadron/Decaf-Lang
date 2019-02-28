@@ -27,7 +27,7 @@ protected:
 public:
     Program(List<Decl*> *declList);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -46,7 +46,7 @@ protected:
 public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
   
@@ -58,7 +58,7 @@ protected:
 public:
     ConditionalStmt(Expr *testExpr, Stmt *body);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -75,7 +75,7 @@ protected:
 public:
     ForStmt(Expr *init, Expr *test, Expr *step, Stmt *body);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -83,7 +83,7 @@ class WhileStmt : public LoopStmt {
 public:
     WhileStmt(Expr *test, Stmt *body) : LoopStmt(test, body) {}
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -94,7 +94,7 @@ protected:
 public:
     IfStmt(Expr *test, Stmt *thenBody, Stmt *elseBody);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -102,7 +102,7 @@ class BreakStmt : public Stmt {
 public:
     BreakStmt(yyltype loc) : Stmt(loc) {}
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -113,7 +113,7 @@ protected:
 public:
     ReturnStmt(yyltype loc, Expr *expr);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -124,7 +124,7 @@ protected:
 public:
     PrintStmt(List<Expr*> *arguments);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 

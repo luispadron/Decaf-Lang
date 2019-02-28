@@ -17,7 +17,7 @@
  *   int Sum(List<int> *list)
  *   {
  *       int sum = 0;
- *       for (int i = 0; i < list->NumElements(); i++) {
+ *       for (int i = 0; i < list->size(); i++) {
  *          int val = list->Nth(i);
  *          sum += val;
  *       }
@@ -43,61 +43,61 @@ private:
 
 public:
     /// Create a new empty list
-    List() {}
+    List() = default;
 
     /// Copy a list
     List(const List<Element> &lst) : elems(lst.elems) {}
 
     /// Clear the list
-    void Clear() {
+    void clear() {
         elems.clear();
     }
 
     /// Returns count of elements currently in list
-    int NumElements() const {
-        return elems.size();
+    int size() const {
+        return static_cast<int>(elems.size());
     }
 
     /// Returns element at index in list. Indexing is 0-based.
     /// Raises an assert if index is out of range.
-    Element Nth(int index) const {
-        Assert(index >= 0 && index < NumElements());
+    Element get(int index) const {
+        Assert(index >= 0 && index < size());
         return elems[index];
     }
 
     /// Inserts element at index, shuffling over others
     /// Raises assert if index out of range
-    void InsertAt(const Element &elem, int index) {
-        Assert(index >= 0 && index <= NumElements());
+    void insert(const Element &elem, int index) {
+        Assert(index >= 0 && index <= size());
         elems.insert(elems.begin() + index, elem);
     }
 
     /// Adds element to list end
-    void Append(const Element &elem) {
+    void append(const Element &elem) {
         elems.push_back(elem);
     }
 
     /// Adds all elements to list end
-    void AppendAll(const List<Element> &lst) {
-        for (int i = 0; i < lst.NumElements(); i++) {
-            Append(lst.Nth(i));
+    void append(const List<Element> &lst) {
+        for (int i = 0; i < lst.size(); i++) {
+            append(lst.get(i));
         }
     }
 
     /// Removes element at index, shuffling down others
     /// Raises assert if index out of range
-    void RemoveAt(int index) {
-        Assert(index >= 0 && index < NumElements());
+    void remove(int index) {
+        Assert(index >= 0 && index < size());
         elems.erase(elems.begin() + index);
    }
 
 	/// Removes all elements of a specific value
-    void Remove(const Element &elem) {
-               elems.erase(std::remove(elems.begin(), elems.end(), elem), elems.end());
+    void remove(const Element &elem) {
+        elems.erase(std::remove(elems.begin(), elems.end(), elem), elems.end());
     }
 
     /// Sort and remove repeated elements
-    void Unique() {
+    void unique() {
         std::sort(elems.begin(), elems.end());
 	    elems.erase(std::unique(elems.begin(), elems.end()), elems.end());
     }
@@ -107,16 +107,16 @@ public:
     /// messages, but since C++ only instantiates the template if you use
     /// you can still have Lists of ints, chars*, as long as you
     /// don't try to SetParentAll on that list.
-    void SetParentAll(Node *p) {
-        for (int i = 0; i < NumElements(); i++) {
-            Nth(i)->SetParent(p);
+    void set_parent_all(Node *p) {
+        for (int i = 0; i < size(); i++) {
+            get(i)->set_parent(p);
         }
     }
 
     /// calls the `Check` function for all Nodes in the list
-    void CheckAll(Symbol_table<std::string, Node*> &sym_table) {
-        for (int i = 0; i < NumElements(); ++i) {
-            Nth(i)->Check(sym_table);
+    void check_all(Symbol_table<std::string, Node *> &sym_table) {
+        for (int i = 0; i < size(); ++i) {
+            get(i)->check(sym_table);
         }
     }
 };

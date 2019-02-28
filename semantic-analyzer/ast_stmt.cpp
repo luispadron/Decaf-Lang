@@ -16,18 +16,18 @@ using namespace std;
 
 Program::Program(List<Decl*> *d) {
     Assert(d != nullptr);
-    (decls=d)->SetParentAll(this);
+    (decls = d)->set_parent_all(this);
 }
 
 /**
  * This is the main entry point for the parser.
  * This function should set off all the children to have them verify the semantics are valid.
  */
-void Program::Check(Symbol_table<std::string, Node *> &sym_table) {
+void Program::check(Symbol_table<std::string, Node *> &sym_table) {
     try {
-        for (int i = 0; i < decls->NumElements(); ++i) {
-            Decl* decl = decls->Nth(i);
-            decl->Check(sym_table);
+        for (int i = 0; i < decls->size(); ++i) {
+            Decl* decl = decls->get(i);
+            decl->check(sym_table);
         }
 
         sym_table.debug_print();
@@ -41,41 +41,41 @@ void Program::Check(Symbol_table<std::string, Node *> &sym_table) {
 
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != nullptr && s != nullptr);
-    (decls=d)->SetParentAll(this);
-    (stmts=s)->SetParentAll(this);
+    (decls = d)->set_parent_all(this);
+    (stmts = s)->set_parent_all(this);
 }
 
-void StmtBlock::Check(Symbol_table<std::string, Node *> &sym_table) {
+void StmtBlock::check(Symbol_table<std::string, Node *> &sym_table) {
     // push scope and call children check method
     sym_table.push_scope();
-    decls->CheckAll(sym_table);
-    stmts->CheckAll(sym_table);
+    decls->check_all(sym_table);
+    stmts->check_all(sym_table);
 }
 
 
 ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) { 
     Assert(t != nullptr && b != nullptr);
-    (test=t)->SetParent(this); 
-    (body=b)->SetParent(this);
+    (test = t)->set_parent(this);
+    (body = b)->set_parent(this);
 }
 
-void ConditionalStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
+void ConditionalStmt::check(Symbol_table<std::string, Node *> &sym_table) {
 
 }
 
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) { 
     Assert(i != nullptr && t != nullptr && s != nullptr && b != nullptr);
-    (init=i)->SetParent(this);
-    (step=s)->SetParent(this);
+    (init = i)->set_parent(this);
+    (step = s)->set_parent(this);
 }
 
-void ForStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
+void ForStmt::check(Symbol_table<std::string, Node *> &sym_table) {
 
 }
 
 
-void WhileStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
+void WhileStmt::check(Symbol_table<std::string, Node *> &sym_table) {
 
 }
 
@@ -83,34 +83,34 @@ void WhileStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
 IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) { 
     Assert(t != nullptr && tb != nullptr); // else can be nullptr
     elseBody = eb;
-    if (elseBody) elseBody->SetParent(this);
+    if (elseBody) elseBody->set_parent(this);
 }
 
-void IfStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
+void IfStmt::check(Symbol_table<std::string, Node *> &sym_table) {
 
 }
 
 
-void BreakStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
+void BreakStmt::check(Symbol_table<std::string, Node *> &sym_table) {
 
 }
 
 
 ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) { 
     Assert(e != nullptr);
-    (expr=e)->SetParent(this);
+    (expr = e)->set_parent(this);
 }
 
-void ReturnStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
+void ReturnStmt::check(Symbol_table<std::string, Node *> &sym_table) {
 
 }
 
 
 PrintStmt::PrintStmt(List<Expr*> *a) {    
     Assert(a != nullptr);
-    (args=a)->SetParentAll(this);
+    (args = a)->set_parent_all(this);
 }
 
-void PrintStmt::Check(Symbol_table<std::string, Node *> &sym_table) {
+void PrintStmt::check(Symbol_table<std::string, Node *> &sym_table) {
 
 }

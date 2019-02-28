@@ -34,7 +34,7 @@ public:
 
     virtual bool IsEquivalentTo(Type *other) { return this == other; }
 
-    void Check(Symbol_table<std::string, Node *> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -47,7 +47,7 @@ public:
     
     void PrintToStream(std::ostream& out) { out << id; }
 
-    void Check(Symbol_table<std::string, Node *> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 class ArrayType : public Type {
@@ -59,7 +59,7 @@ public:
     
     void PrintToStream(std::ostream& out) { out << elemType << "[]"; }
 
-    void Check(Symbol_table<std::string, Node *> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
  

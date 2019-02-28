@@ -27,27 +27,27 @@ Type::Type(const char *n) {
     typeName = strdup(n);
 }
 
-void Type::Check(Symbol_table<std::string, Node *> &sym_table) {
+void Type::check(Symbol_table<std::string, Node *> &sym_table) {
 
 }
 
 
-NamedType::NamedType(Identifier *i) : Type(*i->GetLocation()) {
+NamedType::NamedType(Identifier *i) : Type(*i->get_location()) {
     Assert(i != nullptr);
-    (id=i)->SetParent(this);
+    (id = i)->set_parent(this);
 }
 
-void NamedType::Check(Symbol_table<std::string, Node *> &sym_table) {
+void NamedType::check(Symbol_table<std::string, Node *> &sym_table) {
 
 }
 
 
 ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
     Assert(et != nullptr);
-    (elemType=et)->SetParent(this);
+    (elemType = et)->set_parent(this);
 }
 
-void ArrayType::Check(Symbol_table<std::string, Node *> &sym_table) {
+void ArrayType::check(Symbol_table<std::string, Node *> &sym_table) {
 
 }
 

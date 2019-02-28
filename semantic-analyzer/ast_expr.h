@@ -22,8 +22,8 @@ class Type; // for NewArray
 
 
 class Expr : public Stmt {
-  public:
-    Expr(yyltype loc) : Stmt(loc) {}
+public:
+    explicit Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
 };
 
@@ -33,7 +33,7 @@ class Expr : public Stmt {
  * NULL. By using a valid, but no-op, node, we save that trouble */
 class EmptyExpr : public Expr {
 public:
-    void Check(Symbol_table<std::string, Node*> &sym_table) override { }
+    void check(Symbol_table<std::string, Node *> &sym_table) override { }
 };
 
 
@@ -44,7 +44,7 @@ protected:
 public:
     IntConstant(yyltype loc, int val);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -55,7 +55,7 @@ protected:
 public:
     DoubleConstant(yyltype loc, double val);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -66,7 +66,7 @@ protected:
 public:
     BoolConstant(yyltype loc, bool val);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -77,15 +77,15 @@ protected:
 public:
     StringConstant(yyltype loc, const char *val);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
 class NullConstant: public Expr {
 public:
-    NullConstant(yyltype loc) : Expr(loc) {}
+    explicit NullConstant(yyltype loc) : Expr(loc) {}
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -98,7 +98,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, Operator *o) { return out << o->tokenString; }
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
  };
 
 
@@ -111,7 +111,7 @@ public:
     CompoundExpr(Expr *lhs, Operator *op, Expr *rhs);  // for binary
     CompoundExpr(Operator *op, Expr *rhs);             // for unary
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -120,7 +120,7 @@ public:
     ArithmeticExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     ArithmeticExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -128,7 +128,7 @@ class RelationalExpr : public CompoundExpr {
 public:
     RelationalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -137,7 +137,7 @@ public:
     EqualityExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     const char *GetPrintNameForNode() { return "EqualityExpr"; }
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -147,7 +147,7 @@ public:
     LogicalExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
     const char *GetPrintNameForNode() { return "LogicalExpr"; }
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -156,21 +156,21 @@ public:
     AssignExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     const char *GetPrintNameForNode() { return "AssignExpr"; }
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
 class LValue : public Expr {
 public:
-    LValue(yyltype loc) : Expr(loc) {}
+    explicit LValue(yyltype loc) : Expr(loc) {}
 };
 
 
 class This : public Expr {
 public:
-    This(yyltype loc) : Expr(loc) {}
+    explicit This(yyltype loc) : Expr(loc) {}
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -181,7 +181,7 @@ protected:
 public:
     ArrayAccess(yyltype loc, Expr *base, Expr *subscript);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -198,7 +198,7 @@ protected:
 public:
     FieldAccess(Expr *base, Identifier *field); //ok to pass NULL base
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -215,7 +215,7 @@ protected:
 public:
     Call(yyltype loc, Expr *base, Identifier *field, List<Expr*> *args);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -226,7 +226,7 @@ protected:
 public:
     NewExpr(yyltype loc, NamedType *clsType);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -238,23 +238,23 @@ protected:
 public:
     NewArrayExpr(yyltype loc, Expr *sizeExpr, Type *elemType);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
 class ReadIntegerExpr : public Expr {
 public:
-    ReadIntegerExpr(yyltype loc) : Expr(loc) {}
+    explicit ReadIntegerExpr(yyltype loc) : Expr(loc) {}
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
 class ReadLineExpr : public Expr {
 public:
-    ReadLineExpr(yyltype loc) : Expr (loc) {}
+    explicit ReadLineExpr(yyltype loc) : Expr (loc) {}
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
     

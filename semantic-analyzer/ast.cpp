@@ -24,7 +24,7 @@ Identifier::Identifier(yyltype loc, const char *n) : Node(loc) {
     name = strdup(n);
 } 
 
-void Identifier::Check(Symbol_table<std::string, Node *> &sym_table) {
+void Identifier::check(Symbol_table<std::string, Node *> &sym_table) {
     // check that this identifier is in the symbol table
     if (!sym_table.is_symbol(name)) {
         ReportError::IdentifierNotDeclared(this, reasonT::LookingForVariable);

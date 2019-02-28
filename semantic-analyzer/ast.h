@@ -19,7 +19,7 @@
  * set up links in both directions. The parent link is typically not used 
  * during parsing, but is more important in later phases.
  *
- * Semantic analysis: For pp3 you are adding "Check" behavior to the ast
+ * Semantic analysis: For pp3 you are adding "check" behavior to the ast
  * node classes. Your semantic analyzer should do an inorder walk on the
  * parse tree, and when visiting each node, verify the particular
  * semantic rules that apply to that construct.
@@ -44,12 +44,12 @@ public:
     explicit Node(yyltype loc);
     Node();
     
-    yyltype *GetLocation()   { return location; }
-    void SetParent(Node *p)  { parent = p; }
-    Node *GetParent()        { return parent; }
+    yyltype *get_location()   { return location; }
+    void set_parent(Node *p)  { parent = p; }
+    Node *get_parent()        { return parent; }
 
     /// this method should be implemented by any concrete children
-    virtual void Check(Symbol_table<std::string, Node*> &sym_table) = 0;
+    virtual void check(Symbol_table<std::string, Node *> &sym_table) = 0;
 };
    
 
@@ -62,9 +62,9 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, Identifier *id) { return out << id->name; }
 
-    const char * GetName() const { return name; }
+    const char * get_name() const { return name; }
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 
@@ -77,7 +77,7 @@ class Error : public Node {
 public:
     Error() : Node() {}
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override { }
+    void check(Symbol_table<std::string, Node *> &sym_table) override { }
 };
 
 #endif

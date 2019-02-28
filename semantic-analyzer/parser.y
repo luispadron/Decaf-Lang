@@ -108,14 +108,14 @@ Program   :    DeclList            {
                                       if (ReportError::NumErrors() == 0) {
                                           Symbol_table<std::string, Node*> table;
                                           table.DEBUG_PRINT = true;
-                                          program->Check(table);
+                                          program->check(table);
                                       }
                                     }
           ;
 
 
-DeclList  :    DeclList Decl        { ($$=$1)->Append($2); }
-          |    Decl                 { ($$ = new List<Decl*>)->Append($1); }
+DeclList  :    DeclList Decl        { ($$=$1)->append($2); }
+          |    Decl                 { ($$ = new List<Decl*>)->append($1); }
           ;
 
 Decl      :    ClassDecl
@@ -143,7 +143,7 @@ IntfDecl  :    T_Interface T_Identifier '{' IntfList '}'
           ; 
 
 IntfList  :    IntfList FnHeader ';'
-                                    { ($$=$1)->Append($2); }
+                                    { ($$=$1)->append($2); }
           |    /* empty */          { $$ = new List<Decl*>(); }
           ;
 
@@ -162,11 +162,11 @@ OptImpl   :    T_Implements ImpList
           ;
 
 ImpList   :    ImpList ',' T_Identifier    
-                                    { ($$=$1)->Append(new NamedType(new Identifier(@3, $3))); }
-          |    T_Identifier         { ($$=new List<NamedType*>)->Append(new NamedType(new Identifier(@1, $1))); }
+                                    { ($$=$1)->append(new NamedType(new Identifier(@3, $3))); }
+          |    T_Identifier         { ($$=new List<NamedType*>)->append(new NamedType(new Identifier(@1, $1))); }
           ;
 
-FieldList :    FieldList Field      { ($$=$1)->Append($2); }
+FieldList :    FieldList Field      { ($$=$1)->append($2); }
           |    /* empty */          { $$ = new List<Decl*>(); }
           ;
 
@@ -186,22 +186,22 @@ Formals   :    FormalList           { $$ = $1; }
           ;
 
 FormalList:    FormalList ',' Variable  
-                                    { ($$=$1)->Append($3); }
-          |    Variable             { ($$ = new List<VarDecl*>)->Append($1); }
+                                    { ($$=$1)->append($3); }
+          |    Variable             { ($$ = new List<VarDecl*>)->append($1); }
           ;
 
-FnDecl    :    FnHeader StmtBlock   { ($$=$1)->SetFunctionBody($2); }
+FnDecl    :    FnHeader StmtBlock   { ($$=$1)->set_function_body($2); }
           ;
 
 StmtBlock :    '{' VarDecls StmtList '}' 
                                     { $$ = new StmtBlock($2, $3); }
           ;
 
-VarDecls  :    VarDecls VarDecl     { ($$=$1)->Append($2); }
+VarDecls  :    VarDecls VarDecl     { ($$=$1)->append($2); }
           |    /* empty */          { $$ = new List<VarDecl*>; }
           ;
 
-StmtList  :    Stmt StmtList        { $$ = $2; $$->InsertAt($1, 0); }
+StmtList  :    Stmt StmtList        { $$ = $2; $$->insert($1, 0); }
           |    /* empty */          { $$ = new List<Stmt*>; }
           ;
 
@@ -281,8 +281,8 @@ Actuals   :    ExprList             { $$ = $1; }
           |    /* empty */          { $$ = new List<Expr*>; }
           ;
 
-ExprList  :    ExprList ',' Expr    { ($$=$1)->Append($3); }
-          |    Expr                 { ($$ = new List<Expr*>)->Append($1); }
+ExprList  :    ExprList ',' Expr    { ($$=$1)->append($3); }
+          |    Expr                 { ($$ = new List<Expr*>)->append($1); }
           ;
 
 OptElse   :    T_Else Stmt          { $$ = $2; }

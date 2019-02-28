@@ -37,7 +37,7 @@ protected:
 public:
     VarDecl(Identifier *name, Type *type);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 class ClassDecl : public Decl {
@@ -51,7 +51,7 @@ public:
     ClassDecl(Identifier *name, NamedType *extends, 
               List<NamedType*> *implements, List<Decl*> *members);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 class InterfaceDecl : public Decl {
@@ -61,7 +61,7 @@ protected:
 public:
     InterfaceDecl(Identifier *name, List<Decl*> *members);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 class FnDecl : public Decl {
@@ -72,9 +72,10 @@ protected:
     
 public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
-    void SetFunctionBody(Stmt *b);
 
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
+    void set_function_body(Stmt *b);
+
+    void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
 
 #endif
