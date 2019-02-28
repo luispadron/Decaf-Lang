@@ -18,10 +18,10 @@ using namespace std;
 #include "ast_decl.h"
 
 
-int ReportError::numErrors = 0;
+int ReportError::_num_errors = 0;
 multimap<yyltype,string> ReportError::errors;
 
-void ReportError::UnderlineErrorInLine(const char *line, const yyltype *pos) {
+void ReportError::underline_error_in_line(const char *line, const yyltype *pos) {
     if (!line) return;
     cerr << line << endl;
     for (int i = 1; i <= pos->last_column; i++)
@@ -30,165 +30,164 @@ void ReportError::UnderlineErrorInLine(const char *line, const yyltype *pos) {
 }
 
  
-void ReportError::EmitError(yyltype *loc, string msg) {
-    numErrors++;
+void ReportError::emit_error(yyltype *loc, string msg) {
+    _num_errors++;
     if (loc)
 	errors.insert(make_pair(*loc, msg));
     else
-	OutputError(loc, msg);
+        output_error(loc, msg);
 }
 
-void ReportError::OutputError(const yyltype *loc, string msg) {
+void ReportError::output_error(const yyltype *loc, string msg) {
     fflush(stdout); // make sure any buffered text has been output
     if (loc) {
         cerr << endl << "*** Error line " << loc->first_line << "." << endl;
-        UnderlineErrorInLine(GetLineNumbered(loc->first_line), loc);
+        underline_error_in_line(GetLineNumbered(loc->first_line), loc);
     } else
         cerr << endl << "*** Error." << endl;
     cerr << "*** " << msg << endl << endl;
 }
 
-void ReportError::PrintErrors() {
+void ReportError::print_errors() {
     for (multimap<yyltype,string>::iterator iter = errors.begin(); iter != errors.end(); ++iter)
-	OutputError(&iter->first, iter->second);
+        output_error(&iter->first, iter->second);
 }
 
-void ReportError::Formatted(yyltype *loc, const char *format, ...) {
+void ReportError::formatted(yyltype *loc, const char *format, ...) {
     va_list args;
     char errbuf[2048];
     
     va_start(args, format);
     vsprintf(errbuf,format, args);
     va_end(args);
-    EmitError(loc, errbuf);
+    emit_error(loc, errbuf);
 }
 
-void ReportError::UntermComment() {
-    EmitError(nullptr, "Input ends with unterminated comment");
+void ReportError::unterm_comment() {
+    emit_error(nullptr, "Input ends with unterminated comment");
 }
 
-void ReportError::InvalidDirective(int linenum) {
+void ReportError::invalid_directive(int linenum) {
     yyltype ll = {0, linenum, 0, 0};
-    EmitError(&ll, "Invalid # directive");
+    emit_error(&ll, "Invalid # directive");
 }
 
-void ReportError::LongIdentifier(yyltype *loc, const char *ident) {
+void ReportError::long_identifier(yyltype *loc, const char *ident) {
     ostringstream s;
     s << "Identifier too long: \"" << ident << "\"";
-    EmitError(loc, s.str());
+    emit_error(loc, s.str());
 }
 
-void ReportError::UntermString(yyltype *loc, const char *str) {
+void ReportError::unterm_string(yyltype *loc, const char *str) {
     ostringstream s;
     s << "Unterminated string constant: " << str;
-    EmitError(loc, s.str());
+    emit_error(loc, s.str());
 }
 
-void ReportError::UnrecogChar(yyltype *loc, char ch) {
+void ReportError::unrecog_char(yyltype *loc, char ch) {
     ostringstream s;
     s << "Unrecognized char: '" << ch << "'";
-    EmitError(loc, s.str());
+    emit_error(loc, s.str());
 }
 
-void ReportError::DeclConflict(Decl *decl, Decl *prevDecl) {
+void ReportError::decl_conflict(Decl *newDecl, Decl *prevDecl) {
     ostringstream s;
-    s << "Declaration of '" << decl << "' here conflicts with declaration on line " 
+    s << "Declaration of '" << newDecl << "' here conflicts with declaration on line "
       << prevDecl->get_location()->first_line;
-    EmitError(decl->get_location(), s.str());
+    emit_error(newDecl->get_location(), s.str());
 }
   
-void ReportError::OverrideMismatch(Decl *fnDecl) {
+void ReportError::override_mismatch(Decl *fnDecl) {
     ostringstream s;
     s << "Method '" << fnDecl << "' must match inherited type signature";
-    EmitError(fnDecl->get_location(), s.str());
+    emit_error(fnDecl->get_location(), s.str());
 }
 
-void ReportError::InterfaceNotImplemented(Decl *cd, Type *interfaceType) {
+void ReportError::interface_not_implemented(Decl *classDecl, Type *intfType) {
     ostringstream s;
-    s << "Class '" << cd << "' does not implement entire interface '" << interfaceType << "'";
-    EmitError(interfaceType->get_location(), s.str());
+    s << "Class '" << classDecl << "' does not implement entire interface '" << intfType << "'";
+    emit_error(intfType->get_location(), s.str());
 }
 
-void ReportError::IdentifierNotDeclared(Identifier *ident, reasonT whyNeeded) {
+void ReportError::identifier_not_found(Identifier *ident, Reason_e whyNeeded) {
     ostringstream s;
     static const char *names[] =  {"type", "class", "interface", "variable", "function"};
-    Assert(whyNeeded >= 0 && whyNeeded <= sizeof(names)/sizeof(names[0]));
-    s << "No declaration found for "<< names[whyNeeded] << " '" << ident << "'";
-    EmitError(ident->get_location(), s.str());
+    s << "No declaration found for "<< names[static_cast<int>(whyNeeded)] << " '" << ident << "'";
+    emit_error(ident->get_location(), s.str());
 }
 
-void ReportError::IncompatibleOperands(Operator *op, Type *lhs, Type *rhs) {
+void ReportError::incompatible_operands(Operator *op, Type *lhs, Type *rhs) {
     ostringstream s;
     s << "Incompatible operands: " << lhs << " " << op << " " << rhs;
-    EmitError(op->get_location(), s.str());
+    emit_error(op->get_location(), s.str());
 }
      
-void ReportError::IncompatibleOperand(Operator *op, Type *rhs) {
+void ReportError::incompatible_operand(Operator *op, Type *rhs) {
     ostringstream s;
     s << "Incompatible operand: " << op << " " << rhs;
-    EmitError(op->get_location(), s.str());
+    emit_error(op->get_location(), s.str());
 }
 
-void ReportError::ThisOutsideClassScope(This *th) {
-    EmitError(th->get_location(), "'this' is only valid within class scope");
+void ReportError::this_outside_class_scope(This *th) {
+    emit_error(th->get_location(), "'this' is only valid within class scope");
 }
 
-void ReportError::BracketsOnNonArray(Expr *baseExpr) {
-    EmitError(baseExpr->get_location(), "[] can only be applied to arrays");
+void ReportError::brackets_on_non_array(Expr *baseExpr) {
+    emit_error(baseExpr->get_location(), "[] can only be applied to arrays");
 }
 
-void ReportError::SubscriptNotInteger(Expr *subscriptExpr) {
-    EmitError(subscriptExpr->get_location(), "Array subscript must be an integer");
+void ReportError::subscript_not_integer(Expr *subscriptExpr) {
+    emit_error(subscriptExpr->get_location(), "Array subscript must be an integer");
 }
 
-void ReportError::NewArraySizeNotInteger(Expr *sizeExpr) {
-    EmitError(sizeExpr->get_location(), "Size for NewArray must be an integer");
+void ReportError::new_array_size_not_integer(Expr *sizeExpr) {
+    emit_error(sizeExpr->get_location(), "Size for NewArray must be an integer");
 }
 
-void ReportError::NumArgsMismatch(Identifier *fnIdent, int numExpected, int numGiven) {
+void ReportError::num_args_mismatch(Identifier *fnIdentifier, int numExpected, int numGiven) {
     ostringstream s;
-    s << "Function '"<< fnIdent << "' expects " << numExpected << " argument" << (numExpected==1?"":"s") 
+    s << "Function '"<< fnIdentifier << "' expects " << numExpected << " argument" << (numExpected==1?"":"s")
       << " but " << numGiven << " given";
-    EmitError(fnIdent->get_location(), s.str());
+    emit_error(fnIdentifier->get_location(), s.str());
 }
 
-void ReportError::ArgMismatch(Expr *arg, int argIndex, Type *given, Type *expected) {
+void ReportError::arg_mismatch(Expr *arg, int argIndex, Type *given, Type *expected) {
   ostringstream s;
   s << "Incompatible argument " << argIndex << ": " << given << " given, " << expected << " expected";
-  EmitError(arg->get_location(), s.str());
+    emit_error(arg->get_location(), s.str());
 }
 
-void ReportError::ReturnMismatch(ReturnStmt *rStmt, Type *given, Type *expected) {
+void ReportError::return_mismatch(ReturnStmt *rStmt, Type *given, Type *expected) {
     ostringstream s;
     s << "Incompatible return: " << given << " given, " << expected << " expected";
-    EmitError(rStmt->get_location(), s.str());
+    emit_error(rStmt->get_location(), s.str());
 }
 
-void ReportError::FieldNotFoundInBase(Identifier *field, Type *base) {
+void ReportError::field_not_found_in_base(Identifier *field, Type *base) {
     ostringstream s;
     s << base << " has no such field '" << field << "'";
-    EmitError(field->get_location(), s.str());
+    emit_error(field->get_location(), s.str());
 }
      
-void ReportError::InaccessibleField(Identifier *field, Type *base) {
+void ReportError::inaccessible_field(Identifier *field, Type *base) {
     ostringstream s;
     s  << base << " field '" << field << "' only accessible within class scope";
-    EmitError(field->get_location(), s.str());
+    emit_error(field->get_location(), s.str());
 }
 
-void ReportError::PrintArgMismatch(Expr *arg, int argIndex, Type *given) {
+void ReportError::print_arg_mismatch(Expr *arg, int argIndex, Type *given) {
     ostringstream s;
     s << "Incompatible argument " << argIndex << ": " << given
         << " given, int/bool/string expected";
-    EmitError(arg->get_location(), s.str());
+    emit_error(arg->get_location(), s.str());
 }
 
-void ReportError::TestNotBoolean(Expr *expr) {
-    EmitError(expr->get_location(), "Test expression must have boolean type");
+void ReportError::test_not_boolean(Expr *testExpr) {
+    emit_error(testExpr->get_location(), "Test expression must have boolean type");
 }
 
-void ReportError::BreakOutsideLoop(BreakStmt *bStmt) {
-    EmitError(bStmt->get_location(), "break is only allowed inside a loop");
+void ReportError::break_outside_loop(BreakStmt *bStmt) {
+    emit_error(bStmt->get_location(), "break is only allowed inside a loop");
 }
   
 /* Function: yyerror()
@@ -201,5 +200,5 @@ void ReportError::BreakOutsideLoop(BreakStmt *bStmt) {
  * message.
  */
 void yyerror(const char *msg) {
-    ReportError::Formatted(&yylloc, "%s", msg);
+    ReportError::formatted(&yylloc, "%s", msg);
 }

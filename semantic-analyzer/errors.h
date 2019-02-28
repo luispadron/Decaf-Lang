@@ -46,78 +46,77 @@ class Operator;
  */
 
 
-typedef enum {LookingForType, LookingForClass, LookingForInterface, LookingForVariable, LookingForFunction} reasonT;
+enum class Reason_e {LookingForType, LookingForClass, LookingForInterface, LookingForVariable, LookingForFunction};
 
-class ReportError
-{
- public:
+class ReportError {
+public:
 
   // Errors used by preprocessor
-  static void UntermComment();
-  static void InvalidDirective(int linenum);
+  static void unterm_comment();
+  static void invalid_directive(int linenum);
 
 
   // Errors used by scanner
-  static void LongIdentifier(yyltype *loc, const char *ident);
-  static void UntermString(yyltype *loc, const char *str);
-  static void UnrecogChar(yyltype *loc, char ch);
+  static void long_identifier(yyltype *loc, const char *ident);
+  static void unterm_string(yyltype *loc, const char *str);
+  static void unrecog_char(yyltype *loc, char ch);
 
   
   // Errors used by semantic analyzer for declarations
-  static void DeclConflict(Decl *newDecl, Decl *prevDecl);
-  static void OverrideMismatch(Decl *fnDecl);
-  static void InterfaceNotImplemented(Decl *classDecl, Type *intfType);
+  static void decl_conflict(Decl *newDecl, Decl *prevDecl);
+  static void override_mismatch(Decl *fnDecl);
+  static void interface_not_implemented(Decl *classDecl, Type *intfType);
 
 
   // Errors used by semantic analyzer for identifiers
-  static void IdentifierNotDeclared(Identifier *ident, reasonT whyNeeded);
+  static void identifier_not_found(Identifier *ident, Reason_e whyNeeded);
 
   
   // Errors used by semantic analyzer for expressions
-  static void IncompatibleOperand(Operator *op, Type *rhs); // unary
-  static void IncompatibleOperands(Operator *op, Type *lhs, Type *rhs); // binary
-  static void ThisOutsideClassScope(This *th);
+  static void incompatible_operand(Operator *op, Type *rhs); // unary
+  static void incompatible_operands(Operator *op, Type *lhs, Type *rhs); // binary
+  static void this_outside_class_scope(This *th);
 
   
  // Errors used by semantic analyzer for array acesss & NewArray
-  static void BracketsOnNonArray(Expr *baseExpr); 
-  static void SubscriptNotInteger(Expr *subscriptExpr);
-  static void NewArraySizeNotInteger(Expr *sizeExpr);
+  static void brackets_on_non_array(Expr *baseExpr);
+  static void subscript_not_integer(Expr *subscriptExpr);
+  static void new_array_size_not_integer(Expr *sizeExpr);
 
 
   // Errors used by semantic analyzer for function/method calls
-  static void NumArgsMismatch(Identifier *fnIdentifier, int numExpected, int numGiven);
-  static void ArgMismatch(Expr *arg, int argIndex, Type *given, Type *expected);
-  static void PrintArgMismatch(Expr *arg, int argIndex, Type *given);
+  static void num_args_mismatch(Identifier *fnIdentifier, int numExpected, int numGiven);
+  static void arg_mismatch(Expr *arg, int argIndex, Type *given, Type *expected);
+  static void print_arg_mismatch(Expr *arg, int argIndex, Type *given);
 
 
   // Errors used by semantic analyzer for field access
-  static void FieldNotFoundInBase(Identifier *field, Type *base);
-  static void InaccessibleField(Identifier *field, Type *base);
+  static void field_not_found_in_base(Identifier *field, Type *base);
+  static void inaccessible_field(Identifier *field, Type *base);
 
 
   // Errors used by semantic analyzer for control structures
-  static void TestNotBoolean(Expr *testExpr);
-  static void ReturnMismatch(ReturnStmt *rStmt, Type *given, Type *expected);
-  static void BreakOutsideLoop(BreakStmt *bStmt);
+  static void test_not_boolean(Expr *testExpr);
+  static void return_mismatch(ReturnStmt *rStmt, Type *given, Type *expected);
+  static void break_outside_loop(BreakStmt *bStmt);
 
 
   // Generic method to report a printf-style error message
-  static void Formatted(yyltype *loc, const char *format, ...);
+  static void formatted(yyltype *loc, const char *format, ...);
 
 
   // Returns number of error messages printed
-  static int NumErrors() { return numErrors; }
+  static int num_errors() { return _num_errors; }
 
   // Print out all error messages in lexical order
-  static void PrintErrors();
+  static void print_errors();
   
  private:
 
-  static void UnderlineErrorInLine(const char *line, const yyltype *pos);
-  static void EmitError(yyltype *loc, string msg);
-  static void OutputError(const yyltype *loc, string msg);
-  static int numErrors;
+  static void underline_error_in_line(const char *line, const yyltype *pos);
+  static void emit_error(yyltype *loc, string msg);
+  static void output_error(const yyltype *loc, string msg);
+  static int _num_errors;
   static multimap<yyltype,string> errors;
   
 };

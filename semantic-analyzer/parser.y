@@ -105,9 +105,8 @@ Program   :    DeclList            {
                                       // program will then tell its children to traverse the AST
                                       // and check for any semantic errors
 
-                                      if (ReportError::NumErrors() == 0) {
+                                      if (ReportError::num_errors() == 0) {
                                           Symbol_table<std::string, Node*> table;
-                                          table.DEBUG_PRINT = true;
                                           program->check(table);
                                       }
                                     }

@@ -24,13 +24,34 @@ Program::Program(List<Decl*> *d) {
  * This function should set off all the children to have them verify the semantics are valid.
  */
 void Program::check(Symbol_table<std::string, Node *> &sym_table) {
+    // TODO: remove this
+    sym_table.DEBUG_PRINT = true;
+
     try {
+        // push root scope
+        sym_table.push_scope("root");
+
+
+        // first we push all function names into global scope
         for (int i = 0; i < decls->size(); ++i) {
-            Decl* decl = decls->get(i);
-            decl->check(sym_table);
+            auto decl = decls->get(i);
+            auto fdecl = dynamic_cast<FnDecl *>(decl);
+
+            if (fdecl) {
+                sym_table.insert_symbol(fdecl->get_name(), fdecl);
+            }
         }
 
-        sym_table.debug_print();
+        // now we can traverse the AST
+        for (int i = 0; i < decls->size(); ++i) {
+            auto decl = decls->get(i);
+            decl->check(sym_table);
+
+            // TODO: remove this
+            cout << endl;
+            sym_table.debug_print();
+            cout << endl;
+        }
     } catch (const Symbol_table_exception &e) {
         cout << e.what() << endl;
     } catch (const std::exception &e) {
@@ -47,9 +68,10 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
 
 void StmtBlock::check(Symbol_table<std::string, Node *> &sym_table) {
     // push scope and call children check method
-    sym_table.push_scope();
+    sym_table.push_scope("block");
     decls->check_all(sym_table);
     stmts->check_all(sym_table);
+    sym_table.pop_scope();
 }
 
 
@@ -102,7 +124,7 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
 }
 
 void ReturnStmt::check(Symbol_table<std::string, Node *> &sym_table) {
-
+    expr->check(sym_table);
 }
 
 

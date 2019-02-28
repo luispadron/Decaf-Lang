@@ -55,6 +55,7 @@ void InterfaceDecl::check(Symbol_table<std::string, Node *> &sym_table) {
 	
 FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
     Assert(n != nullptr && r!= nullptr && d != nullptr);
+    ident = n;
     (returnType = r)->set_parent(this);
     (formals = d)->set_parent_all(this);
     body = nullptr;
@@ -66,9 +67,10 @@ void FnDecl::set_function_body(Stmt *b) {
 
 void FnDecl::check(Symbol_table<std::string, Node *> &sym_table) {
     // push scope and call check for children
-    sym_table.push_scope();
+    sym_table.push_scope(ident->get_name());
     formals->check_all(sym_table);
     body->check(sym_table);
+    sym_table.pop_scope();
 }
 
 

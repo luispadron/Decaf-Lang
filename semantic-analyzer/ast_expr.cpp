@@ -5,8 +5,9 @@
 #include "ast_expr.h"
 #include "ast_type.h"
 #include "ast_decl.h"
-#include <string.h>
 #include "errors.h"
+
+#include <string.h>
 
 
 IntConstant::IntConstant(yyltype loc, int val) : Expr(loc) {
@@ -74,7 +75,9 @@ void CompoundExpr::check(Symbol_table<std::string, Node *> &sym_table) {
 
 
 void ArithmeticExpr::check(Symbol_table<std::string, Node *> &sym_table) {
-
+    // TODO: add type checking
+    left->check(sym_table);
+    right->check(sym_table);
 }
 
 
@@ -134,7 +137,14 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     (actuals = a)->set_parent_all(this);
 }
 
-void Call::check(Symbol_table<std::string, Node *> &sym_table) {}
+void Call::check(Symbol_table<std::string, Node *> &sym_table) {
+    // verify function name is in scope
+    if (!sym_table.is_symbol(field->get_name())) {
+        ReportError::identifier_not_found(field, Reason_e::LookingForFunction);
+    }
+
+    actuals->check_all(sym_table);
+}
 
 
 NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) { 

@@ -66,6 +66,7 @@ public:
 
 class FnDecl : public Decl {
 protected:
+    Identifier *ident;
     List<VarDecl*> *formals;
     Type *returnType;
     Stmt *body;
@@ -74,6 +75,8 @@ public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
 
     void set_function_body(Stmt *b);
+
+    const char * get_name() const noexcept { return ident->get_name(); }
 
     void check(Symbol_table<std::string, Node *> &sym_table) override;
 };

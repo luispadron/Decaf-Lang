@@ -25,7 +25,7 @@ protected:
     List<Decl*> *decls;
      
 public:
-    Program(List<Decl*> *declList);
+    explicit Program(List<Decl*> *declList);
 
     void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
@@ -34,7 +34,7 @@ public:
 class Stmt : public Node {
 public:
     Stmt() : Node() {}
-    Stmt(yyltype loc) : Node(loc) {}
+    explicit Stmt(yyltype loc) : Node(loc) {}
 };
 
 

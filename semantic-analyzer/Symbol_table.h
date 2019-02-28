@@ -33,7 +33,7 @@ public:
     ~Symbol_table();
 
     /// pushes a new scope to the symbol table
-    void push_scope();
+    void push_scope(const std::string &name);
 
     /// pops the current scope to be the parent scope
     void pop_scope();
@@ -73,10 +73,10 @@ Symbol_table<Key, Value>::~Symbol_table() {
 }
 
 template <typename Key, typename Value>
-void Symbol_table<Key, Value>::push_scope() {
-    if (DEBUG_PRINT) { std::cout << "pushing scope" << std::endl; }
+void Symbol_table<Key, Value>::push_scope(const std::string &name) {
+    if (DEBUG_PRINT) { std::cout << "pushing scope: " << name << std::endl; }
 
-    auto new_scope = new Scope<Key, Value>();
+    auto new_scope = new Scope<Key, Value>(name);
     new_scope->parent_ptr = scope_ptr;
     scopes.push_back(new_scope);
     scope_ptr = new_scope;
@@ -84,7 +84,7 @@ void Symbol_table<Key, Value>::push_scope() {
 
 template <typename Key, typename Value>
 void Symbol_table<Key, Value>::pop_scope() {
-    if (DEBUG_PRINT) { std::cout << "popping scope" << std::endl; }
+    if (DEBUG_PRINT) { std::cout << "popping scope " << scope_ptr->name << std::endl; }
 
     if (!scope_ptr) return;
     scope_ptr = scope_ptr->parent_ptr;
@@ -93,7 +93,7 @@ void Symbol_table<Key, Value>::pop_scope() {
 template <typename Key, typename Value>
 void Symbol_table<Key, Value>::insert_symbol(const Key& k, const Value& v) {
     if (DEBUG_PRINT) {
-        std::cout << "inserting symbol" << k << ", " << v << std::endl;
+        std::cout << "inserting symbol '" << k << "' in scope: " << scope_ptr->name << std::endl;
     }
 
     if (!scope_ptr) {

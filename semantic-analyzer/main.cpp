@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
     InitScanner();
     InitParser();
     yyparse();
-    if (ReportError::NumErrors() > 0)
-	ReportError::PrintErrors();
-    return (ReportError::NumErrors() == 0? 0 : -1);
+    if (ReportError::num_errors() > 0)
+        ReportError::print_errors();
+    return (ReportError::num_errors() == 0? 0 : -1);
 }
 

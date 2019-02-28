@@ -31,6 +31,13 @@ template<typename Key, typename Value>
 class Scope {
 
 public:
+
+    /// constructs a scope with no name
+    Scope() = default;
+
+    /// constructs a scope with a name
+    explicit Scope(std::string name_) : name{name_} { }
+
     /// declares Symbol_table class as a friend
     friend class Symbol_table<Key, Value>;
 
@@ -56,6 +63,9 @@ private:
 
     /// typedef for iterator of symbol type
     using Symbol_iter = typename std::map<Key, Value>::iterator;
+
+    /// the name of the scope, used for debugging purposes
+    std::string name;
 
     /// the symbols this scope knows about
     Symbols symbols;
@@ -125,9 +135,9 @@ void Scope<Key, Value>::debug_print() const {
 
     for (; scope_ptr; scope_ptr = scope_ptr->parent_ptr) {
         std::stringstream ss;
-        ss << "----------- Scope -----------" << std::endl;
+        ss << "------- " << scope_ptr->name << " scope -------" << std::endl;
         for (auto symbol : scope_ptr->symbols) {
-            ss << symbol.first << "\t|\t" << symbol.second << std::endl;
+            ss << symbol.first << std::endl;
         }
 
         ss << std::endl;
