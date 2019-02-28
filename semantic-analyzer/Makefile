@@ -12,10 +12,10 @@ PRODUCTS = $(COMPILER)
 default: $(PRODUCTS)
 
 # Set up the list of source and object files
-SRCS = Scope.cc Symbol_table.cc ast.cc ast_decl.cc ast_expr.cc ast_stmt.cc ast_type.cc errors.cc utility.cc main.cc
+SRCS = Scope.cpp Symbol_table.cpp ast.cpp ast_decl.cpp ast_expr.cpp ast_stmt.cpp ast_type.cpp errors.cpp utility.cpp main.cpp
 
-# OBJS can deal with either .cc or .c files listed in SRCS
-OBJS = y.tab.o lex.yy.o $(patsubst %.cc, %.o, $(filter %.cc,$(SRCS))) $(patsubst %.c, %.o, $(filter %.c, $(SRCS)))
+# OBJS can deal with either .cpp or .c files listed in SRCS
+OBJS = y.tab.o lex.yy.o $(patsubst %.cpp, %.o, $(filter %.cpp,$(SRCS))) $(patsubst %.c, %.o, $(filter %.c, $(SRCS)))
 
 JUNK = $(OBJS) lex.yy.c dpp.yy.c y.tab.c y.tab.h *.core core $(COMPILER).purify purify.log 
 
@@ -66,8 +66,8 @@ y.tab.o: y.tab.c
 
 y.tab.h y.tab.c: parser.y
 	$(YACC) $(YACCFLAGS) parser.y
-%.o: %.cc
-	$(CC) $(CFLAGS) -c -o $@ $*.cc
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c -o $@ $*.cpp
 
 # rules to build compiler (dcc)
 
@@ -97,26 +97,26 @@ clean:
 	rm -f $(JUNK) y.output $(PRODUCTS)
 
 # DO NOT DELETE
-Scope.o: Scope.cc Scope.h Symbol_table_exception.h
-Symbol_table.o: Symbol_table.cc Symbol_table.h Scope.h \
+Scope.o: Scope.cpp Scope.h Symbol_table_exception.h
+Symbol_table.o: Symbol_table.cpp Symbol_table.h Scope.h \
  Symbol_table_exception.h
-ast.o: ast.cc ast.h Symbol_table.h Scope.h Symbol_table_exception.h \
+ast.o: ast.cpp ast.h Symbol_table.h Scope.h Symbol_table_exception.h \
  location.h ast_type.h list.h utility.h ast_decl.h
-ast_decl.o: ast_decl.cc ast_decl.h ast.h Symbol_table.h Scope.h \
+ast_decl.o: ast_decl.cpp ast_decl.h ast.h Symbol_table.h Scope.h \
  Symbol_table_exception.h location.h ast_type.h list.h utility.h \
  ast_stmt.h
-ast_expr.o: ast_expr.cc ast_expr.h ast.h Symbol_table.h Scope.h \
+ast_expr.o: ast_expr.cpp ast_expr.h ast.h Symbol_table.h Scope.h \
  Symbol_table_exception.h location.h ast_stmt.h list.h utility.h \
  ast_type.h ast_decl.h errors.h
-ast_stmt.o: ast_stmt.cc ast_stmt.h list.h utility.h ast.h Symbol_table.h \
+ast_stmt.o: ast_stmt.cpp ast_stmt.h list.h utility.h ast.h Symbol_table.h \
  Scope.h Symbol_table_exception.h location.h ast_type.h ast_decl.h \
  ast_expr.h
-ast_type.o: ast_type.cc ast_type.h ast.h Symbol_table.h Scope.h \
+ast_type.o: ast_type.cpp ast_type.h ast.h Symbol_table.h Scope.h \
  Symbol_table_exception.h location.h list.h utility.h ast_decl.h
-errors.o: errors.cc errors.h location.h scanner.h ast_type.h ast.h \
+errors.o: errors.cpp errors.h location.h scanner.h ast_type.h ast.h \
  Symbol_table.h Scope.h Symbol_table_exception.h list.h utility.h \
  ast_expr.h ast_stmt.h ast_decl.h
-utility.o: utility.cc utility.h list.h
-main.o: main.cc utility.h errors.h location.h parser.h scanner.h list.h \
+utility.o: utility.cpp utility.h list.h
+main.o: main.cpp utility.h errors.h location.h parser.h scanner.h list.h \
  ast.h Symbol_table.h Scope.h Symbol_table_exception.h ast_type.h \
  ast_decl.h ast_expr.h ast_stmt.h y.tab.h

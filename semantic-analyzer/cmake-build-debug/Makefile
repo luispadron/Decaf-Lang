@@ -110,6 +110,343 @@ depend:
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
+#=============================================================================
+# Target rules for targets named semantic
+
+# Build rule for target.
+semantic: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 semantic
+.PHONY : semantic
+
+# fast build rule for target.
+semantic/fast:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/build
+.PHONY : semantic/fast
+
+Scope.o: Scope.cpp.o
+
+.PHONY : Scope.o
+
+# target to build an object file
+Scope.cpp.o:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/Scope.cpp.o
+.PHONY : Scope.cpp.o
+
+Scope.i: Scope.cpp.i
+
+.PHONY : Scope.i
+
+# target to preprocess a source file
+Scope.cpp.i:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/Scope.cpp.i
+.PHONY : Scope.cpp.i
+
+Scope.s: Scope.cpp.s
+
+.PHONY : Scope.s
+
+# target to generate assembly for a file
+Scope.cpp.s:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/Scope.cpp.s
+.PHONY : Scope.cpp.s
+
+Symbol_table.o: Symbol_table.cpp.o
+
+.PHONY : Symbol_table.o
+
+# target to build an object file
+Symbol_table.cpp.o:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/Symbol_table.cpp.o
+.PHONY : Symbol_table.cpp.o
+
+Symbol_table.i: Symbol_table.cpp.i
+
+.PHONY : Symbol_table.i
+
+# target to preprocess a source file
+Symbol_table.cpp.i:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/Symbol_table.cpp.i
+.PHONY : Symbol_table.cpp.i
+
+Symbol_table.s: Symbol_table.cpp.s
+
+.PHONY : Symbol_table.s
+
+# target to generate assembly for a file
+Symbol_table.cpp.s:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/Symbol_table.cpp.s
+.PHONY : Symbol_table.cpp.s
+
+ast.o: ast.cpp.o
+
+.PHONY : ast.o
+
+# target to build an object file
+ast.cpp.o:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast.cpp.o
+.PHONY : ast.cpp.o
+
+ast.i: ast.cpp.i
+
+.PHONY : ast.i
+
+# target to preprocess a source file
+ast.cpp.i:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast.cpp.i
+.PHONY : ast.cpp.i
+
+ast.s: ast.cpp.s
+
+.PHONY : ast.s
+
+# target to generate assembly for a file
+ast.cpp.s:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast.cpp.s
+.PHONY : ast.cpp.s
+
+ast_decl.o: ast_decl.cpp.o
+
+.PHONY : ast_decl.o
+
+# target to build an object file
+ast_decl.cpp.o:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_decl.cpp.o
+.PHONY : ast_decl.cpp.o
+
+ast_decl.i: ast_decl.cpp.i
+
+.PHONY : ast_decl.i
+
+# target to preprocess a source file
+ast_decl.cpp.i:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_decl.cpp.i
+.PHONY : ast_decl.cpp.i
+
+ast_decl.s: ast_decl.cpp.s
+
+.PHONY : ast_decl.s
+
+# target to generate assembly for a file
+ast_decl.cpp.s:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_decl.cpp.s
+.PHONY : ast_decl.cpp.s
+
+ast_expr.o: ast_expr.cpp.o
+
+.PHONY : ast_expr.o
+
+# target to build an object file
+ast_expr.cpp.o:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_expr.cpp.o
+.PHONY : ast_expr.cpp.o
+
+ast_expr.i: ast_expr.cpp.i
+
+.PHONY : ast_expr.i
+
+# target to preprocess a source file
+ast_expr.cpp.i:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_expr.cpp.i
+.PHONY : ast_expr.cpp.i
+
+ast_expr.s: ast_expr.cpp.s
+
+.PHONY : ast_expr.s
+
+# target to generate assembly for a file
+ast_expr.cpp.s:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_expr.cpp.s
+.PHONY : ast_expr.cpp.s
+
+ast_stmt.o: ast_stmt.cpp.o
+
+.PHONY : ast_stmt.o
+
+# target to build an object file
+ast_stmt.cpp.o:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_stmt.cpp.o
+.PHONY : ast_stmt.cpp.o
+
+ast_stmt.i: ast_stmt.cpp.i
+
+.PHONY : ast_stmt.i
+
+# target to preprocess a source file
+ast_stmt.cpp.i:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_stmt.cpp.i
+.PHONY : ast_stmt.cpp.i
+
+ast_stmt.s: ast_stmt.cpp.s
+
+.PHONY : ast_stmt.s
+
+# target to generate assembly for a file
+ast_stmt.cpp.s:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_stmt.cpp.s
+.PHONY : ast_stmt.cpp.s
+
+ast_type.o: ast_type.cpp.o
+
+.PHONY : ast_type.o
+
+# target to build an object file
+ast_type.cpp.o:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_type.cpp.o
+.PHONY : ast_type.cpp.o
+
+ast_type.i: ast_type.cpp.i
+
+.PHONY : ast_type.i
+
+# target to preprocess a source file
+ast_type.cpp.i:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_type.cpp.i
+.PHONY : ast_type.cpp.i
+
+ast_type.s: ast_type.cpp.s
+
+.PHONY : ast_type.s
+
+# target to generate assembly for a file
+ast_type.cpp.s:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_type.cpp.s
+.PHONY : ast_type.cpp.s
+
+errors.o: errors.cpp.o
+
+.PHONY : errors.o
+
+# target to build an object file
+errors.cpp.o:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/errors.cpp.o
+.PHONY : errors.cpp.o
+
+errors.i: errors.cpp.i
+
+.PHONY : errors.i
+
+# target to preprocess a source file
+errors.cpp.i:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/errors.cpp.i
+.PHONY : errors.cpp.i
+
+errors.s: errors.cpp.s
+
+.PHONY : errors.s
+
+# target to generate assembly for a file
+errors.cpp.s:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/errors.cpp.s
+.PHONY : errors.cpp.s
+
+main.o: main.cpp.o
+
+.PHONY : main.o
+
+# target to build an object file
+main.cpp.o:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/main.cpp.o
+.PHONY : main.cpp.o
+
+main.i: main.cpp.i
+
+.PHONY : main.i
+
+# target to preprocess a source file
+main.cpp.i:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/main.cpp.i
+.PHONY : main.cpp.i
+
+main.s: main.cpp.s
+
+.PHONY : main.s
+
+# target to generate assembly for a file
+main.cpp.s:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/main.cpp.s
+.PHONY : main.cpp.s
+
+scanner.yy.o: scanner.yy.cpp.o
+
+.PHONY : scanner.yy.o
+
+# target to build an object file
+scanner.yy.cpp.o:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/scanner.yy.cpp.o
+.PHONY : scanner.yy.cpp.o
+
+scanner.yy.i: scanner.yy.cpp.i
+
+.PHONY : scanner.yy.i
+
+# target to preprocess a source file
+scanner.yy.cpp.i:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/scanner.yy.cpp.i
+.PHONY : scanner.yy.cpp.i
+
+scanner.yy.s: scanner.yy.cpp.s
+
+.PHONY : scanner.yy.s
+
+# target to generate assembly for a file
+scanner.yy.cpp.s:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/scanner.yy.cpp.s
+.PHONY : scanner.yy.cpp.s
+
+utility.o: utility.cpp.o
+
+.PHONY : utility.o
+
+# target to build an object file
+utility.cpp.o:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/utility.cpp.o
+.PHONY : utility.cpp.o
+
+utility.i: utility.cpp.i
+
+.PHONY : utility.i
+
+# target to preprocess a source file
+utility.cpp.i:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/utility.cpp.i
+.PHONY : utility.cpp.i
+
+utility.s: utility.cpp.s
+
+.PHONY : utility.s
+
+# target to generate assembly for a file
+utility.cpp.s:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/utility.cpp.s
+.PHONY : utility.cpp.s
+
+y.tab.o: y.tab.cpp.o
+
+.PHONY : y.tab.o
+
+# target to build an object file
+y.tab.cpp.o:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/y.tab.cpp.o
+.PHONY : y.tab.cpp.o
+
+y.tab.i: y.tab.cpp.i
+
+.PHONY : y.tab.i
+
+# target to preprocess a source file
+y.tab.cpp.i:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/y.tab.cpp.i
+.PHONY : y.tab.cpp.i
+
+y.tab.s: y.tab.cpp.s
+
+.PHONY : y.tab.s
+
+# target to generate assembly for a file
+y.tab.cpp.s:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/y.tab.cpp.s
+.PHONY : y.tab.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -118,6 +455,43 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... semantic"
+	@echo "... Scope.o"
+	@echo "... Scope.i"
+	@echo "... Scope.s"
+	@echo "... Symbol_table.o"
+	@echo "... Symbol_table.i"
+	@echo "... Symbol_table.s"
+	@echo "... ast.o"
+	@echo "... ast.i"
+	@echo "... ast.s"
+	@echo "... ast_decl.o"
+	@echo "... ast_decl.i"
+	@echo "... ast_decl.s"
+	@echo "... ast_expr.o"
+	@echo "... ast_expr.i"
+	@echo "... ast_expr.s"
+	@echo "... ast_stmt.o"
+	@echo "... ast_stmt.i"
+	@echo "... ast_stmt.s"
+	@echo "... ast_type.o"
+	@echo "... ast_type.i"
+	@echo "... ast_type.s"
+	@echo "... errors.o"
+	@echo "... errors.i"
+	@echo "... errors.s"
+	@echo "... main.o"
+	@echo "... main.i"
+	@echo "... main.s"
+	@echo "... scanner.yy.o"
+	@echo "... scanner.yy.i"
+	@echo "... scanner.yy.s"
+	@echo "... utility.o"
+	@echo "... utility.i"
+	@echo "... utility.s"
+	@echo "... y.tab.o"
+	@echo "... y.tab.i"
+	@echo "... y.tab.s"
 .PHONY : help
 
 

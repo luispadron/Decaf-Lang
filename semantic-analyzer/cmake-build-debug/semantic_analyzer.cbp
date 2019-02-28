@@ -37,7 +37,131 @@
 					<DistClean command="/usr/local/bin/gmake -j12 -f &quot;/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="semantic">
+				<Option output="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/semantic" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/."/>
+					<Add directory="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug"/>
+					<Add directory="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer"/>
+					<Add directory="/usr/local/opt/flex/include"/>
+					<Add directory="/usr/local/Cellar/gcc/8.2.0/lib/gcc/8/gcc/x86_64-apple-darwin18.2.0/8.2.0/../../../../../../include/c++/8.2.0"/>
+					<Add directory="/usr/local/Cellar/gcc/8.2.0/lib/gcc/8/gcc/x86_64-apple-darwin18.2.0/8.2.0/../../../../../../include/c++/8.2.0/x86_64-apple-darwin18.2.0"/>
+					<Add directory="/usr/local/Cellar/gcc/8.2.0/lib/gcc/8/gcc/x86_64-apple-darwin18.2.0/8.2.0/../../../../../../include/c++/8.2.0/backward"/>
+					<Add directory="/usr/local/Cellar/gcc/8.2.0/lib/gcc/8/gcc/x86_64-apple-darwin18.2.0/8.2.0/include"/>
+					<Add directory="/usr/local/Cellar/gcc/8.2.0/lib/gcc/8/gcc/x86_64-apple-darwin18.2.0/8.2.0/include-fixed"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/local/bin/gmake -j12 -f &quot;/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/Makefile&quot;  VERBOSE=1 semantic"/>
+					<CompileFile command="/usr/local/bin/gmake -j12 -f &quot;/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/local/bin/gmake -j12 -f &quot;/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/local/bin/gmake -j12 -f &quot;/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="semantic/fast">
+				<Option output="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/semantic" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/."/>
+					<Add directory="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug"/>
+					<Add directory="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer"/>
+					<Add directory="/usr/local/opt/flex/include"/>
+					<Add directory="/usr/local/Cellar/gcc/8.2.0/lib/gcc/8/gcc/x86_64-apple-darwin18.2.0/8.2.0/../../../../../../include/c++/8.2.0"/>
+					<Add directory="/usr/local/Cellar/gcc/8.2.0/lib/gcc/8/gcc/x86_64-apple-darwin18.2.0/8.2.0/../../../../../../include/c++/8.2.0/x86_64-apple-darwin18.2.0"/>
+					<Add directory="/usr/local/Cellar/gcc/8.2.0/lib/gcc/8/gcc/x86_64-apple-darwin18.2.0/8.2.0/../../../../../../include/c++/8.2.0/backward"/>
+					<Add directory="/usr/local/Cellar/gcc/8.2.0/lib/gcc/8/gcc/x86_64-apple-darwin18.2.0/8.2.0/include"/>
+					<Add directory="/usr/local/Cellar/gcc/8.2.0/lib/gcc/8/gcc/x86_64-apple-darwin18.2.0/8.2.0/include-fixed"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/local/bin/gmake -j12 -f &quot;/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/Makefile&quot;  VERBOSE=1 semantic/fast"/>
+					<CompileFile command="/usr/local/bin/gmake -j12 -f &quot;/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/local/bin/gmake -j12 -f &quot;/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/local/bin/gmake -j12 -f &quot;/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 		</Build>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/Scope.cpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/Scope.h">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/Symbol_table.cpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/Symbol_table.h">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast.cpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast.h">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast_decl.cpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast_decl.h">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast_expr.cpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast_expr.h">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast_stmt.cpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast_stmt.h">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast_type.cpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast_type.h">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/scanner.yy.cpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/scanner.yy.cpp.rule">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/y.tab.cpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/y.tab.cpp.rule">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/cmake-build-debug/y.tab.hpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/errors.cpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/errors.h">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/main.cpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/utility.cpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/utility.h">
+			<Option target="semantic"/>
+		</Unit>
 		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

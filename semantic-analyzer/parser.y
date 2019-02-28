@@ -13,7 +13,6 @@
 #include <string>
 
 void yyerror(const char *msg); // standard error-handling routine
-
 %}
 
  

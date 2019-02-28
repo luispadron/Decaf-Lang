@@ -399,7 +399,7 @@ CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding BISON
 FIND_PACKAGE_MESSAGE_DETAILS_BISON:INTERNAL=[/usr/local/opt/bison/bin/bison][v3.3.2()]
 //Details about finding FLEX
-FIND_PACKAGE_MESSAGE_DETAILS_FLEX:INTERNAL=[/usr/bin/flex][v2.5.35()]
+FIND_PACKAGE_MESSAGE_DETAILS_FLEX:INTERNAL=[/usr/local/opt/flex/bin/flex][v2.6.4()]
 //ADVANCED property for variable: FLEX_EXECUTABLE
 FLEX_EXECUTABLE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: FLEX_INCLUDE_DIR
