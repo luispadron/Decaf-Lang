@@ -26,6 +26,9 @@ template <typename Key, typename Value>
 class Symbol_table {
 public:
 
+    /// whether to print debug messages or not
+    bool DEBUG_PRINT = false;
+
     /// cleans up any associated memory
     ~Symbol_table();
 
@@ -62,6 +65,7 @@ private:
 
 template <typename Key, typename Value>
 Symbol_table<Key, Value>::~Symbol_table() {
+    if (DEBUG_PRINT) { std::cout << "destroying table" << std::endl; }
     // delete all scopes
     for (auto scope : scopes) {
         delete scope;
@@ -70,6 +74,8 @@ Symbol_table<Key, Value>::~Symbol_table() {
 
 template <typename Key, typename Value>
 void Symbol_table<Key, Value>::push_scope() {
+    if (DEBUG_PRINT) { std::cout << "pushing scope" << std::endl; }
+
     auto new_scope = new Scope<Key, Value>();
     new_scope->parent_ptr = scope_ptr;
     scopes.push_back(new_scope);
@@ -78,12 +84,18 @@ void Symbol_table<Key, Value>::push_scope() {
 
 template <typename Key, typename Value>
 void Symbol_table<Key, Value>::pop_scope() {
+    if (DEBUG_PRINT) { std::cout << "popping scope" << std::endl; }
+
     if (!scope_ptr) return;
     scope_ptr = scope_ptr->parent_ptr;
 }
 
 template <typename Key, typename Value>
 void Symbol_table<Key, Value>::insert_symbol(const Key& k, const Value& v) {
+    if (DEBUG_PRINT) {
+        std::cout << "inserting symbol" << k << ", " << v << std::endl;
+    }
+
     if (!scope_ptr) {
         throw Symbol_table_exception{"error (Symbol_table::insert_symbol) no scopes available."};
     }

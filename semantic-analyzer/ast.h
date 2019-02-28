@@ -60,7 +60,10 @@ protected:
     
 public:
     Identifier(yyltype loc, const char *name);
+
     friend std::ostream& operator<<(std::ostream& out, Identifier *id) { return out << id->name; }
+
+    const char * GetName() const { return name; }
 
     void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };

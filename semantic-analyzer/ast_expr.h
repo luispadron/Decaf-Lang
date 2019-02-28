@@ -163,8 +163,6 @@ public:
 class LValue : public Expr {
 public:
     LValue(yyltype loc) : Expr(loc) {}
-
-    void Check(Symbol_table<std::string, Node*> &sym_table) override;
 };
 
 

@@ -108,6 +108,7 @@ Program   :    DeclList            {
 
                                       if (ReportError::NumErrors() == 0) {
                                           Symbol_table<std::string, Node*> table;
+                                          table.DEBUG_PRINT = true;
                                           program->Check(table);
                                       }
                                     }

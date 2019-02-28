@@ -94,12 +94,8 @@ void LogicalExpr::Check(Symbol_table<std::string, Node *> &sym_table) {
 
 
 void AssignExpr::Check(Symbol_table<std::string, Node *> &sym_table) {
-
-}
-
-
-void LValue::Check(Symbol_table<std::string, Node *> &sym_table) {
-
+    left->Check(sym_table);
+    right->Check(sym_table);
 }
 
 
@@ -124,7 +120,10 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
     (field=f)->SetParent(this);
 }
 
-void FieldAccess::Check(Symbol_table<std::string, Node *> &sym_table) {}
+void FieldAccess::Check(Symbol_table<std::string, Node *> &sym_table) {
+    /// TODO: add check for this/super, etc
+    field->Check(sym_table);
+}
 
 
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {

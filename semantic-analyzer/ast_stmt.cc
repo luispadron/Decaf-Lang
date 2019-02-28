@@ -27,8 +27,10 @@ void Program::Check(Symbol_table<std::string, Node *> &sym_table) {
     try {
         for (int i = 0; i < decls->NumElements(); ++i) {
             Decl* decl = decls->Nth(i);
-            cout << decl << endl;
+            decl->Check(sym_table);
         }
+
+        sym_table.debug_print();
     } catch (const Symbol_table_exception &e) {
         cout << e.what() << endl;
     } catch (const std::exception &e) {
@@ -44,7 +46,10 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
 }
 
 void StmtBlock::Check(Symbol_table<std::string, Node *> &sym_table) {
-
+    // push scope and call children check method
+    sym_table.push_scope();
+    decls->CheckAll(sym_table);
+    stmts->CheckAll(sym_table);
 }
 
 

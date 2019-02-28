@@ -40,7 +40,7 @@ public:
 
     /// returns whether or not the given symbol is in the given scope
     /// searches this scope and any parent scopes that are above this scope
-    bool is_symbol(const Key& k) const;
+    bool is_symbol(const Key& k);
 
     /// returns the first value for given key in this scope or any parent scope
     /// if does not exist, exception is thrown
@@ -90,7 +90,7 @@ void Scope<Key, Value>::insert_symbol(const Key &k, const Value &v) {
 }
 
 template <typename Key, typename Value>
-bool Scope<Key, Value>::is_symbol(const Key &k) const {
+bool Scope<Key, Value>::is_symbol(const Key &k) {
     return get_symbol_iter(k) != symbols.end();
 }
 
@@ -109,7 +109,7 @@ template <typename Key, typename Value>
 typename Scope<Key, Value>::Symbol_iter Scope<Key, Value>::get_symbol_iter(const Key &k) {
     auto scope_ptr = this;
     for (; scope_ptr; scope_ptr = scope_ptr->parent_ptr) {
-        auto it = scope_ptr->symbols.find();
+        auto it = scope_ptr->symbols.find(k);
         if (it != scope_ptr->symbols.end()) {
             return it;
         }

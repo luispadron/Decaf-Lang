@@ -31,6 +31,7 @@ public:
 
 class VarDecl : public Decl {
 protected:
+    Identifier *ident;
     Type *type;
     
 public:
@@ -41,6 +42,7 @@ public:
 
 class ClassDecl : public Decl {
 protected:
+    Identifier* name;
     List<Decl*> *members;
     NamedType *extends;
     List<NamedType*> *implements;
