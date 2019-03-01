@@ -34,11 +34,30 @@ public:
 
     virtual void print_to(std::ostream &out) { out << typeName; }
 
-    virtual bool is_equal_to(Type *other) { return this == other; }
+    /// returns whether this type is equal to another type
+    virtual bool is_equal_to(const Type *other) const {
+        return this == other;
+    }
 
-    /// returns whether type is either int or double, since these are the only
-    /// types that can perform arithmetic operations
-    bool is_arithmetic() const { return this == intType || this == doubleType; }
+    /// returns whether this type can perform arithmetic
+    virtual bool can_perform_arithmetic() const {
+        return this == intType || this == doubleType;
+    }
+
+    /// returns whether this type can perform arithmetic with other type
+    virtual bool can_perform_arithmetic_with(const Type *other) const {
+        return can_perform_arithmetic() && is_equal_to(other);
+    }
+
+    /// returns whether this type can perform relational operations with another type (<, > <=, >=)
+    virtual bool can_perform_relational_with(const Type *other) const {
+        return (this == intType || this == doubleType) && is_equal_to(other);
+    }
+
+    /// returns whether this type can perform an equality operation with another type (==, !=)
+    virtual bool can_perform_equality_with(const Type *other) const {
+        return is_equal_to(other);
+    }
 
     void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
@@ -53,13 +72,18 @@ public:
     
     void print_to(std::ostream &out) override { out << id; }
 
-    bool is_equal_to(Type *other) override {
-        auto named_other = dynamic_cast<NamedType*>(other);
+    const char * get_name() const { return id->get_name(); }
+
+    /// returns whether two named types are equal to each other (same identifier)
+    bool is_equal_to(const Type *other) const override {
+        auto named_other = dynamic_cast<const NamedType*>(other);
         if (!named_other) { return false; }
         return id == named_other->id;
     }
 
-    const char * get_name() const { return id->get_name(); }
+    bool can_perform_equality_with(const Type *other) const override {
+        return other == nullType || is_equal_to(other); // types must be same or comparing to null
+    }
 
     void check(Symbol_table<std::string, Node *> &sym_table) override;
 };
@@ -73,10 +97,14 @@ public:
     
     void print_to(std::ostream &out) override { out << elemType << "[]"; }
 
-    bool is_equal_to(Type *other) override {
-        auto array_other = dynamic_cast<ArrayType*>(other);
+    bool is_equal_to(const Type *other) const override {
+        auto array_other = dynamic_cast<const ArrayType*>(other);
         if (!array_other) { return false; }
         return elemType->is_equal_to(array_other->elemType);
+    }
+
+    bool can_perform_equality_with(const Type *other) const override {
+        return is_equal_to(other); // array types must match
     }
 
     void check(Symbol_table<std::string, Node *> &sym_table) override;
