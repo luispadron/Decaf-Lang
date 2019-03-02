@@ -112,6 +112,9 @@ bool PrintStmt::check() {
 
         if (!res_type->is_printable()) {
             ReportError::print_arg_mismatch(arg, i + 1, res_type);
+            return false;
         }
     }
+
+    return true;
 }

@@ -62,6 +62,9 @@ public:
     void debug_print() const;
 
 private:
+    /// disallow creation
+    Symbol_table() = default;
+
     /// the current scope were at
     Scope<Key, Value>* scope_ptr = nullptr;
 

@@ -1,0 +1,12 @@
+
+*** Error line 21.
+  betsy.Init(100, 122);
+        ^^^^
+*** No declaration found for function 'Init'
+
+
+*** Error line 22.
+  betsy.Moo();
+        ^^^
+*** No declaration found for function 'Moo'
+

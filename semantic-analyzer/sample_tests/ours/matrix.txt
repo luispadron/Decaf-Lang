@@ -1,0 +1,36 @@
+
+*** Error line 130.
+  m.Init();
+    ^^^^
+*** No declaration found for function 'Init'
+
+
+*** Error line 131.
+  m.SeedMatrix();
+    ^^^^^^^^^^
+*** No declaration found for function 'SeedMatrix'
+
+
+*** Error line 132.
+  m.PrintMatrix();
+    ^^^^^^^^^^^
+*** No declaration found for function 'PrintMatrix'
+
+
+*** Error line 137.
+  m.Init();
+    ^^^^
+*** No declaration found for function 'Init'
+
+
+*** Error line 138.
+  m.SeedMatrix();
+    ^^^^^^^^^^
+*** No declaration found for function 'SeedMatrix'
+
+
+*** Error line 139.
+  m.PrintMatrix();
+    ^^^^^^^^^^^
+*** No declaration found for function 'PrintMatrix'
+

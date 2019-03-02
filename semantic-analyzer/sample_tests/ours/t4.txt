@@ -1,0 +1,6 @@
+
+*** Error line 24.
+  Print(d[d[0]], "\n", d.length(), "\n");
+        ^^^^^^^
+*** Incompatible argument 1: int[] given, int/bool/string expected
+

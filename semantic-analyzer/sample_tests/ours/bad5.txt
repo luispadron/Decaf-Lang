@@ -1,0 +1,12 @@
+
+*** Error line 8.
+   cheryl();
+   ^^^^^^
+*** No declaration found for function 'cheryl'
+
+
+*** Error line 9.
+   tbc.Meeting(caroline);
+       ^^^^^^^
+*** No declaration found for function 'Meeting'
+

@@ -1,0 +1,6 @@
+
+*** Error line 12.
+  B b;
+  ^
+*** No declaration found for type 'B'
+

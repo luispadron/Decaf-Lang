@@ -82,6 +82,7 @@ bool FnDecl::check() {
     formals->check_all();
     body->check();
     Sym_table_t::shared().pop_scope();
+    return true;
 }
 
 

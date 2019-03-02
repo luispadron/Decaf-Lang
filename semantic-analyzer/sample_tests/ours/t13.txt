@@ -1,0 +1,18 @@
+
+*** Error line 30.
+  Colorable s;
+  ^^^^^^^^^
+*** No declaration found for type 'Colorable'
+
+
+*** Error line 34.
+  green.SetRGB(0, 0, 255);
+        ^^^^^^
+*** No declaration found for function 'SetRGB'
+
+
+*** Error line 36.
+  s.SetColor(green);
+    ^^^^^^^^
+*** No declaration found for function 'SetColor'
+

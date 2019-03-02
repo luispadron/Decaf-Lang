@@ -6,7 +6,6 @@
 %{
 
 #include "ast_program.h"
-#include "Symbol_table.h"
 #include "scanner.h" // for yylex
 #include "parser.h"
 #include "errors.h"
@@ -107,8 +106,7 @@ Program   :    DeclList            {
                                       // and check for any semantic errors
 
                                       if (ReportError::num_errors() == 0) {
-                                          Symbol_table<std::string, Node*> table;
-                                          program->check(table);
+                                          program->check();
                                       }
                                     }
           ;

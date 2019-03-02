@@ -67,12 +67,12 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r)
 
 Type* CompoundExpr::get_lhs_type() {
     if (!left) return nullptr;
-    return dynamic_cast<VarDecl*>(Sym_table_t::shared().get_symbol(left->get_id()->get_name()))->get_type();
+    return left->get_result_type();
 }
 
 Type* CompoundExpr::get_rhs_type() {
     if (!right) return nullptr;
-    return dynamic_cast<VarDecl*>(Sym_table_t::shared().get_symbol(right->get_id()->get_name()))->get_type();
+    return right->get_result_type();
 }
 
 bool CompoundExpr::check() {
