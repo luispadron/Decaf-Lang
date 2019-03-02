@@ -7,58 +7,7 @@
 #include "ast_decl.h"
 #include "ast_expr.h"
 #include "Symbol_table.h"
-
-#include <iostream>
-#include <exception>
-
-using namespace std;
-
-
-Program::Program(List<Decl*> *d) {
-    Assert(d != nullptr);
-    (decls = d)->set_parent_all(this);
-}
-
-/**
- * This is the main entry point for the parser.
- * This function should set off all the children to have them verify the semantics are valid.
- */
-void Program::check(Symbol_table<std::string, Node *> &sym_table) {
-    // TODO: remove this
-    sym_table.DEBUG_PRINT = true;
-
-    try {
-        // push root scope
-        sym_table.push_scope("root");
-
-
-        // first we push all function names into global scope
-        for (int i = 0; i < decls->size(); ++i) {
-            auto decl = decls->get(i);
-            auto fdecl = dynamic_cast<FnDecl *>(decl);
-
-            if (fdecl) {
-                sym_table.insert_symbol(fdecl->get_name(), fdecl);
-            }
-        }
-
-        // now we can traverse the AST
-        for (int i = 0; i < decls->size(); ++i) {
-            auto decl = decls->get(i);
-            decl->check(sym_table);
-
-            // TODO: remove this
-            cout << endl;
-            sym_table.debug_print();
-            cout << endl;
-        }
-    } catch (const Symbol_table_exception &e) {
-        cout << e.what() << endl;
-    } catch (const std::exception &e) {
-        cout << e.what() << endl;
-    }
-}
-
+#include "errors.h"
 
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != nullptr && s != nullptr);
@@ -66,12 +15,14 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     (stmts = s)->set_parent_all(this);
 }
 
-void StmtBlock::check(Symbol_table<std::string, Node *> &sym_table) {
+bool StmtBlock::check() {
     // push scope and call children check method
-    sym_table.push_scope("block");
-    decls->check_all(sym_table);
-    stmts->check_all(sym_table);
-    sym_table.pop_scope();
+    Sym_table_t::shared().push_scope("block");
+    decls->check_all();
+    stmts->check_all();
+    Sym_table_t::shared().pop_scope();
+
+    return true;
 }
 
 
@@ -81,8 +32,13 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
     (body = b)->set_parent(this);
 }
 
-void ConditionalStmt::check(Symbol_table<std::string, Node *> &sym_table) {
+bool ConditionalStmt::check() {
+    return test->check() && body->check();
+}
 
+
+bool LoopStmt::check() {
+    return ConditionalStmt::check();
 }
 
 
@@ -92,13 +48,14 @@ ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
     (step = s)->set_parent(this);
 }
 
-void ForStmt::check(Symbol_table<std::string, Node *> &sym_table) {
-
+bool ForStmt::check() {
+    return init->check() && test->check() &&
+           step->check() && body->check();
 }
 
 
-void WhileStmt::check(Symbol_table<std::string, Node *> &sym_table) {
-
+bool WhileStmt::check() {
+    return LoopStmt::check();
 }
 
 
@@ -108,13 +65,25 @@ IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) {
     if (elseBody) elseBody->set_parent(this);
 }
 
-void IfStmt::check(Symbol_table<std::string, Node *> &sym_table) {
-
+bool IfStmt::check() {
+    bool ret = ConditionalStmt::check();
+    ret = ret && elseBody ? elseBody->check() : true;
+    return ret;
 }
 
 
-void BreakStmt::check(Symbol_table<std::string, Node *> &sym_table) {
+bool BreakStmt::check() {
+    // check that the break stmt is within a loop stmt
+    auto loop_stmt = find_if([](Node *node){
+       return dynamic_cast<LoopStmt*>(node) != nullptr;
+    });
 
+    if (!loop_stmt) {
+        ReportError::break_outside_loop(this);
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -123,8 +92,9 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
     (expr = e)->set_parent(this);
 }
 
-void ReturnStmt::check(Symbol_table<std::string, Node *> &sym_table) {
-    expr->check(sym_table);
+bool ReturnStmt::check() {
+    // TODO: add type checking?
+    return expr->check();
 }
 
 
@@ -133,6 +103,15 @@ PrintStmt::PrintStmt(List<Expr*> *a) {
     (args = a)->set_parent_all(this);
 }
 
-void PrintStmt::check(Symbol_table<std::string, Node *> &sym_table) {
+bool PrintStmt::check() {
+    // check all types in the print function are printable
+    for (int i = 0; i < args->size(); ++i) {
+        auto arg = args->get(i);
+        auto res_type = arg->get_result_type();
+        Assert(res_type != nullptr);
 
+        if (!res_type->is_printable()) {
+            ReportError::print_arg_mismatch(arg, i + 1, res_type);
+        }
+    }
 }

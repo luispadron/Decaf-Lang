@@ -5,6 +5,7 @@
 
 %{
 
+#include "ast_program.h"
 #include "Symbol_table.h"
 #include "scanner.h" // for yylex
 #include "parser.h"

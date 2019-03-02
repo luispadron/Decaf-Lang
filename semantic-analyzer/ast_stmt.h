@@ -19,16 +19,6 @@
 class Decl;
 class VarDecl;
 class Expr;
-  
-class Program : public Node {
-protected:
-    List<Decl*> *decls;
-     
-public:
-    explicit Program(List<Decl*> *declList);
-
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
-};
 
 
 class Stmt : public Node {
@@ -46,7 +36,7 @@ protected:
 public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
+    bool check() override;
 };
 
   
@@ -58,24 +48,27 @@ protected:
 public:
     ConditionalStmt(Expr *testExpr, Stmt *body);
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
+    bool check() override;
 };
 
 
 class LoopStmt : public ConditionalStmt {
 public:
     LoopStmt(Expr *testExpr, Stmt *body) : ConditionalStmt(testExpr, body) {}
+
+    bool check() override;
 };
 
 
 class ForStmt : public LoopStmt {
 protected:
-    Expr *init, *step;
+    Expr *init;
+    Expr *step;
   
 public:
     ForStmt(Expr *init, Expr *test, Expr *step, Stmt *body);
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
+    bool check() override;
 };
 
 
@@ -83,7 +76,7 @@ class WhileStmt : public LoopStmt {
 public:
     WhileStmt(Expr *test, Stmt *body) : LoopStmt(test, body) {}
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
+    bool check() override;
 };
 
 
@@ -94,15 +87,15 @@ protected:
 public:
     IfStmt(Expr *test, Stmt *thenBody, Stmt *elseBody);
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
+    bool check() override;
 };
 
 
 class BreakStmt : public Stmt {
 public:
-    BreakStmt(yyltype loc) : Stmt(loc) {}
+    explicit BreakStmt(yyltype loc) : Stmt(loc) {}
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
+    bool check() override;
 };
 
 
@@ -113,7 +106,7 @@ protected:
 public:
     ReturnStmt(yyltype loc, Expr *expr);
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
+    bool check() override;
 };
 
 
@@ -122,9 +115,9 @@ protected:
     List<Expr*> *args;
     
 public:
-    PrintStmt(List<Expr*> *arguments);
+    explicit PrintStmt(List<Expr*> *arguments);
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
+    bool check() override;
 };
 
 

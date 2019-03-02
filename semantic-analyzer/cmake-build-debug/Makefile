@@ -258,6 +258,33 @@ ast_expr.cpp.s:
 	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_expr.cpp.s
 .PHONY : ast_expr.cpp.s
 
+ast_program.o: ast_program.cpp.o
+
+.PHONY : ast_program.o
+
+# target to build an object file
+ast_program.cpp.o:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_program.cpp.o
+.PHONY : ast_program.cpp.o
+
+ast_program.i: ast_program.cpp.i
+
+.PHONY : ast_program.i
+
+# target to preprocess a source file
+ast_program.cpp.i:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_program.cpp.i
+.PHONY : ast_program.cpp.i
+
+ast_program.s: ast_program.cpp.s
+
+.PHONY : ast_program.s
+
+# target to generate assembly for a file
+ast_program.cpp.s:
+	$(MAKE) -f CMakeFiles/semantic.dir/build.make CMakeFiles/semantic.dir/ast_program.cpp.s
+.PHONY : ast_program.cpp.s
+
 ast_stmt.o: ast_stmt.cpp.o
 
 .PHONY : ast_stmt.o
@@ -471,6 +498,9 @@ help:
 	@echo "... ast_expr.o"
 	@echo "... ast_expr.i"
 	@echo "... ast_expr.s"
+	@echo "... ast_program.o"
+	@echo "... ast_program.i"
+	@echo "... ast_program.s"
 	@echo "... ast_stmt.o"
 	@echo "... ast_stmt.i"
 	@echo "... ast_stmt.s"

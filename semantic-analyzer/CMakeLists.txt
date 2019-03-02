@@ -28,6 +28,7 @@ add_executable(semantic
         ${BISON_MyParser_OUTPUTS}
         ${FLEX_MyScanner_OUTPUTS}
         ast.cpp
+        ast_program.cpp
         ast_decl.cpp
         ast_expr.cpp
         ast_stmt.cpp
@@ -36,8 +37,7 @@ add_executable(semantic
         Scope.cpp
         Symbol_table.cpp
         utility.cpp
-        main.cpp
-)
+        main.cpp)
 
 target_link_libraries(semantic
         ${FLEX_LIBRARIES}

@@ -114,9 +114,9 @@ public:
     }
 
     /// calls the `Check` function for all Nodes in the list
-    void check_all(Symbol_table<std::string, Node *> &sym_table) {
+    void check_all() {
         for (int i = 0; i < size(); ++i) {
-            get(i)->check(sym_table);
+            get(i)->check();
         }
     }
 };

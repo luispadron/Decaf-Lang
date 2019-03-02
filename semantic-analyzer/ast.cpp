@@ -7,8 +7,7 @@
 #include "ast_decl.h"
 #include "errors.h"
 
-#include <string.h> // strdup
-#include <stdio.h>  // printf
+#include <cstring>
 
 Node::Node(yyltype loc) {
     location = new yyltype(loc);
@@ -22,11 +21,12 @@ Node::Node() {
 	 
 Identifier::Identifier(yyltype loc, const char *n) : Node(loc) {
     name = strdup(n);
-} 
+}
 
-void Identifier::check(Symbol_table<std::string, Node *> &sym_table) {
-    // check that this identifier is in the symbol table
-    if (!sym_table.is_symbol(name)) {
-        ReportError::identifier_not_found(this, Reason_e::LookingForVariable);
-    }
+bool Identifier::check() {
+    return Sym_table_t::shared().is_symbol(name);
+}
+
+bool Error::check() {
+    return false;
 }

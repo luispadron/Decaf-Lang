@@ -4,7 +4,9 @@
  */
 #include "ast_type.h"
 #include "ast_decl.h"
-#include <string.h>
+#include "errors.h"
+
+#include <cstring>
  
 /* Class constants
  * ---------------
@@ -27,8 +29,40 @@ Type::Type(const char *n) {
     typeName = strdup(n);
 }
 
-void Type::check(Symbol_table<std::string, Node *> &sym_table) {
+bool Type::is_printable() const {
+    return this == intType || this == boolType || this == stringType;
+}
 
+bool Type::is_equal_to(const Type *other) const {
+    return this == other;
+}
+
+bool Type::can_perform_arithmetic() const {
+    return this == intType || this == doubleType;
+}
+
+bool Type::can_perform_arithmetic_with(const Type *other) const {
+    return can_perform_arithmetic() && is_equal_to(other);
+}
+
+bool Type::can_perform_relational_with(const Type *other) const {
+    return (this == intType || this == doubleType) && is_equal_to(other);
+}
+
+bool Type::can_perform_equality_with(const Type *other) const {
+    return is_equal_to(other);
+}
+
+bool Type::can_perform_logical() const {
+    return this == boolType;
+}
+
+bool Type::can_perform_logical_with(const Type *other) const {
+    return this == boolType && other == boolType;
+}
+
+bool Type::check() {
+    return true;
 }
 
 
@@ -37,8 +71,18 @@ NamedType::NamedType(Identifier *i) : Type(*i->get_location()) {
     (id = i)->set_parent(this);
 }
 
-void NamedType::check(Symbol_table<std::string, Node *> &sym_table) {
+bool NamedType::is_equal_to(const Type *other) const {
+    auto named_other = dynamic_cast<const NamedType*>(other);
+    if (!named_other) { return false; }
+    return id == named_other->id;
+}
 
+bool NamedType::can_perform_equality_with(const Type *other) const {
+    return other == nullType || is_equal_to(other); // types must be same or comparing to null
+}
+
+bool NamedType::check() {
+    return Sym_table_t::shared().is_symbol(id->get_name());
 }
 
 
@@ -47,8 +91,18 @@ ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
     (elemType = et)->set_parent(this);
 }
 
-void ArrayType::check(Symbol_table<std::string, Node *> &sym_table) {
+bool ArrayType::is_equal_to(const Type *other) const {
+    auto array_other = dynamic_cast<const ArrayType*>(other);
+    if (!array_other) { return false; }
+    return elemType->is_equal_to(array_other->elemType);
+}
 
+bool ArrayType::can_perform_equality_with(const Type *other) const {
+    return is_equal_to(other); // array types must match
+}
+
+bool ArrayType::check() {
+    return elemType->check();
 }
 
 

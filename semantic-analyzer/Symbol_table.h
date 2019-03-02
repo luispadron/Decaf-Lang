@@ -26,6 +26,12 @@ template <typename Key, typename Value>
 class Symbol_table {
 public:
 
+    /// returns singleton instance
+    static Symbol_table<Key, Value> & shared() {
+        static Symbol_table<Key, Value> table = Symbol_table<Key, Value>();
+        return table;
+    }
+
     /// whether to print debug messages or not
     bool DEBUG_PRINT = false;
 
@@ -44,6 +50,9 @@ public:
 
     /// returns whether or not given symbol is defined in current scope (or parent scopes)
     bool is_symbol(const Key& k) const;
+
+    /// returns whether the current scope is within a class
+    bool is_class_scope() const;
 
     /// returns the value of the symbol with given key
     /// if no such symbol exists, exception is thrown
@@ -106,6 +115,11 @@ void Symbol_table<Key, Value>::insert_symbol(const Key& k, const Value& v) {
 template <typename Key, typename Value>
 bool Symbol_table<Key, Value>::is_symbol(const Key &k) const {
     return scope_ptr->is_symbol(k);
+}
+
+template <typename Key, typename Value>
+bool Symbol_table<Key, Value>::is_class_scope() const {
+    return scope_ptr->this_ptr != nullptr;
 }
 
 template <typename Key, typename Value>

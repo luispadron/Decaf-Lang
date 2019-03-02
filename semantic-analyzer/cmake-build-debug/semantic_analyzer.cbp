@@ -120,6 +120,12 @@
 		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast_expr.h">
 			<Option target="semantic"/>
 		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast_program.cpp">
+			<Option target="semantic"/>
+		</Unit>
+		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast_program.h">
+			<Option target="semantic"/>
+		</Unit>
 		<Unit filename="/Users/luis/Programming/C++/Decaf-Lang/semantic-analyzer/ast_stmt.cpp">
 			<Option target="semantic"/>
 		</Unit>

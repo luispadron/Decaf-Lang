@@ -39,7 +39,7 @@ public:
 
     Type * get_type() { return type; }
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
+    bool check() override;
 };
 
 class ClassDecl : public Decl {
@@ -53,7 +53,7 @@ public:
     ClassDecl(Identifier *name, NamedType *extends, 
               List<NamedType*> *implements, List<Decl*> *members);
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
+    bool check() override;
 };
 
 class InterfaceDecl : public Decl {
@@ -63,7 +63,7 @@ protected:
 public:
     InterfaceDecl(Identifier *name, List<Decl*> *members);
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
+    bool check() override;
 };
 
 class FnDecl : public Decl {
@@ -80,7 +80,9 @@ public:
 
     const char * get_name() const noexcept { return ident->get_name(); }
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
+    Type * get_return_type() { return returnType; }
+
+    bool check() override;
 };
 
 #endif

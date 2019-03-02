@@ -35,6 +35,11 @@
 #include <string>
 #include <iostream>
 
+class Node;
+
+/// type alias for the symbol table type
+using Sym_table_t = Symbol_table<std::string, Node*>;
+
 class Node {
 protected:
     yyltype *location;
@@ -48,8 +53,21 @@ public:
     void set_parent(Node *p)  { parent = p; }
     Node *get_parent()        { return parent; }
 
-    /// this method should be implemented by any concrete children
-    virtual void check(Symbol_table<std::string, Node *> &sym_table) = 0;
+    /// this method gives any Node in the AST the ability to check that
+    /// they are semantically correct, if an error is found implementations should return false
+    virtual bool check() = 0;
+
+    /// traverses the AST upwards, at each step calling the given function
+    /// with the current node, if the function predicate returns true this function returns the current node.
+    /// if predicate never returns true, nullptr is returned.
+    template <typename Fn>
+    Node * find_if(Fn pred) {
+        for (auto curr = this; curr; curr = curr->get_parent()) {
+            if (pred(curr)) return curr;
+        }
+
+        return nullptr;
+    }
 };
    
 
@@ -64,7 +82,7 @@ public:
 
     const char * get_name() const { return name; }
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override;
+    bool check() override;
 };
 
 
@@ -77,7 +95,7 @@ class Error : public Node {
 public:
     Error() : Node() {}
 
-    void check(Symbol_table<std::string, Node *> &sym_table) override { }
+    bool check() override;
 };
 
 #endif

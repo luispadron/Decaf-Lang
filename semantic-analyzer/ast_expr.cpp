@@ -14,21 +14,21 @@ IntConstant::IntConstant(yyltype loc, int val) : Expr(loc) {
     value = val;
 }
 
-void IntConstant::check(Symbol_table<std::string, Node *> &sym_table) {}
+bool IntConstant::check() { return true; }
 
 
 DoubleConstant::DoubleConstant(yyltype loc, double val) : Expr(loc) {
     value = val;
 }
 
-void DoubleConstant::check(Symbol_table<std::string, Node *> &sym_table) {}
+bool DoubleConstant::check() { return true; }
 
 
 BoolConstant::BoolConstant(yyltype loc, bool val) : Expr(loc) {
     value = val;
 }
 
-void BoolConstant::check(Symbol_table<std::string, Node *> &sym_table) {}
+bool BoolConstant::check() { return true; }
 
 
 StringConstant::StringConstant(yyltype loc, const char *val) : Expr(loc) {
@@ -36,11 +36,9 @@ StringConstant::StringConstant(yyltype loc, const char *val) : Expr(loc) {
     value = strdup(val);
 }
 
-void NullConstant::check(Symbol_table<std::string, Node *> &sym_table) {
+bool NullConstant::check() { return true; }
 
-}
-
-void StringConstant::check(Symbol_table<std::string, Node *> &sym_table) {}
+bool StringConstant::check() { return true; }
 
 
 Operator::Operator(yyltype loc, const char *tok) : Node(loc) {
@@ -48,9 +46,7 @@ Operator::Operator(yyltype loc, const char *tok) : Node(loc) {
     strncpy(tokenString, tok, sizeof(tokenString));
 }
 
-void Operator::check(Symbol_table<std::string, Node *> &sym_table) {
-
-}
+bool Operator::check() { return true; }
 
 
 CompoundExpr::CompoundExpr(Expr *l, Operator *o, Expr *r) 
@@ -69,45 +65,107 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r)
     (right = r)->set_parent(this);
 }
 
-void CompoundExpr::check(Symbol_table<std::string, Node *> &sym_table) { }
+Type* CompoundExpr::get_lhs_type() {
+    if (!left) return nullptr;
+    return dynamic_cast<VarDecl*>(Sym_table_t::shared().get_symbol(left->get_id()->get_name()))->get_type();
+}
+
+Type* CompoundExpr::get_rhs_type() {
+    if (!right) return nullptr;
+    return dynamic_cast<VarDecl*>(Sym_table_t::shared().get_symbol(right->get_id()->get_name()))->get_type();
+}
+
+bool CompoundExpr::check() {
+    // simply checks that symbols are in table
+    if (left) return left->check() && right->check();
+    return right->check();
+}
 
 
-void ArithmeticExpr::check(Symbol_table<std::string, Node *> &sym_table) {
-    auto rhs_type = dynamic_cast<VarDecl*>(sym_table.get_symbol(right->get_name()))->get_type();
-    if (!left && !rhs_type->can_perform_arithmetic()) {
-        ReportError::incompatible_operand(op, rhs_type);
-    } else if (left) {
-        auto lhs_type = dynamic_cast<VarDecl*>(sym_table.get_symbol(left->get_name()))->get_type();
+bool ArithmeticExpr::check() {
+    // checks typing for arithmetic expression, i.e types must be of int/double and must be the same types
+    CompoundExpr::check();
+
+    auto rhs_type = get_rhs_type();
+    if (left) {
+        auto lhs_type = get_lhs_type();
         if (!lhs_type->can_perform_arithmetic_with(rhs_type)) {
             ReportError::incompatible_operands(op, lhs_type, rhs_type);
+            return false;
         }
+    } else if (!rhs_type->can_perform_arithmetic()) {
+        ReportError::incompatible_operand(op, rhs_type);
+        return false;
     }
+
+    return true;
 }
 
 
-void RelationalExpr::check(Symbol_table<std::string, Node *> &sym_table) {
+bool RelationalExpr::check() {
+    // checks typing for relational expression, i.e. types must be of int/double and must be the same types
+    CompoundExpr::check();
 
+    auto lhs_type = get_lhs_type();
+    auto rhs_type = get_rhs_type();
+    if (!lhs_type->can_perform_relational_with(rhs_type)) {
+        ReportError::incompatible_operands(op, lhs_type, rhs_type);
+        return false;
+    }
+
+    return true;
 }
 
 
-void EqualityExpr::check(Symbol_table<std::string, Node *> &sym_table) {
+bool EqualityExpr::check() {
+    // checks typing for equality expression, types must be the same or if comparing objects one or both may be null
+    CompoundExpr::check();
 
+    auto lhs_type = get_lhs_type();
+    auto rhs_type = get_rhs_type();
+    if (!lhs_type->can_perform_equality_with(rhs_type)) {
+        ReportError::incompatible_operands(op, lhs_type, rhs_type);
+        return false;
+    }
+
+    return true;
 }
 
 
-void LogicalExpr::check(Symbol_table<std::string, Node *> &sym_table) {
+bool LogicalExpr::check() {
+    // checks typing for logical expression, only bools may be used
+    CompoundExpr::check();
 
+    auto rhs_type = get_rhs_type();
+    if (left) {
+        auto lhs_type = get_lhs_type();
+        if (!lhs_type->can_perform_logical_with(rhs_type)) {
+            ReportError::incompatible_operands(op, lhs_type, rhs_type);
+            return false;
+        }
+    } else if (!rhs_type->can_perform_logical()) {
+        ReportError::incompatible_operand(op, rhs_type);
+        return false;
+    }
+
+    return true;
 }
 
 
-void AssignExpr::check(Symbol_table<std::string, Node *> &sym_table) {
-    left->check(sym_table);
-    right->check(sym_table);
+bool AssignExpr::check() {
+    return left->check() && right->check();
 }
 
 
-void This::check(Symbol_table<std::string, Node *> &sym_table) {
+bool This::check() {
+    // simply checks that usage of "this" is within class scope
 
+    if (!Sym_table_t::shared().is_class_scope()) {
+        ReportError::this_outside_class_scope(this);
+        return false;
+    }
+
+    return true;
 }
 
   
@@ -116,7 +174,7 @@ ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
     (subscript = s)->set_parent(this);
 }
 
-void ArrayAccess::check(Symbol_table<std::string, Node *> &sym_table) { }
+bool ArrayAccess::check() { return false; }
 
 
 FieldAccess::FieldAccess(Expr *b, Identifier *f) 
@@ -127,9 +185,20 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
     (field = f)->set_parent(this);
 }
 
-void FieldAccess::check(Symbol_table<std::string, Node *> &sym_table) {
+Type* FieldAccess::get_result_type() {
+    // need to find the type of this field in the symbol table
+    // TODO: add checking for class scope
+    if (Sym_table_t::shared().is_symbol(field->get_name())) {
+        auto decl = dynamic_cast<VarDecl*>(Sym_table_t::shared().get_symbol(field->get_name()));
+        if (decl) return decl->get_type();
+    }
+
+    return nullptr;
+}
+
+bool FieldAccess::check() {
     /// TODO: add check for this/super, etc
-    field->check(sym_table);
+    return field->check();
 }
 
 
@@ -141,13 +210,25 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     (actuals = a)->set_parent_all(this);
 }
 
-void Call::check(Symbol_table<std::string, Node *> &sym_table) {
-    // verify function name is in scope
-    if (!sym_table.is_symbol(field->get_name())) {
-        ReportError::identifier_not_found(field, Reason_e::LookingForFunction);
+Type* Call::get_result_type() {
+    // find function and get its return type
+    if (Sym_table_t::shared().is_symbol(field->get_name())) {
+        auto fn_decl = dynamic_cast<FnDecl*>(Sym_table_t::shared().get_symbol(field->get_name()));
+        if (fn_decl) return fn_decl->get_return_type();
     }
 
-    actuals->check_all(sym_table);
+    return nullptr;
+}
+
+bool Call::check() {
+    // verify function name is in scope
+    if (!Sym_table_t::shared().is_symbol(field->get_name())) {
+        ReportError::identifier_not_found(field, Reason_e::LookingForFunction);
+        return false;
+    }
+
+    actuals->check_all();
+    return true;
 }
 
 
@@ -156,7 +237,9 @@ NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) {
     (cType = c)->set_parent(this);
 }
 
-void NewExpr::check(Symbol_table<std::string, Node *> &sym_table) { }
+bool NewExpr::check() {
+    return false;
+}
 
 
 NewArrayExpr::NewArrayExpr(yyltype loc, Expr *sz, Type *et) : Expr(loc) {
@@ -165,14 +248,16 @@ NewArrayExpr::NewArrayExpr(yyltype loc, Expr *sz, Type *et) : Expr(loc) {
     (elemType = et)->set_parent(this);
 }
 
-void NewArrayExpr::check(Symbol_table<std::string, Node *> &sym_table) { }
-
-
-void ReadIntegerExpr::check(Symbol_table<std::string, Node *> &sym_table) {
-
+bool NewArrayExpr::check() {
+    return false;
 }
 
 
-void ReadLineExpr::check(Symbol_table<std::string, Node *> &sym_table) {
+bool ReadIntegerExpr::check() {
+    return false;
+}
 
+
+bool ReadLineExpr::check() {
+    return false;
 }

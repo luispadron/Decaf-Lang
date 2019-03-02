@@ -5,6 +5,7 @@
 #include "ast_decl.h"
 #include "ast_type.h"
 #include "ast_stmt.h"
+#include "errors.h"
 
 #include <iostream>
 
@@ -23,8 +24,17 @@ VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
     (type = t)->set_parent(this);
 }
 
-void VarDecl::check(Symbol_table<std::string, Node *> &sym_table) {
-    sym_table.insert_symbol(ident->get_name(), this);
+bool VarDecl::check() {
+    if (!type->check()) {
+        auto named_type = dynamic_cast<NamedType*>(type);
+        if (!named_type) { return false; }
+
+        ReportError::identifier_not_found(named_type->get_id(), Reason_e::LookingForType);
+        return false;
+    }
+
+    Sym_table_t::shared().insert_symbol(ident->get_name(), this);
+    return true;
 }
   
 
@@ -38,8 +48,9 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
     (members = m)->set_parent_all(this);
 }
 
-void ClassDecl::check(Symbol_table<std::string, Node *> &sym_table) {
-    sym_table.insert_symbol(name->get_name(), this);
+bool ClassDecl::check() {
+    Sym_table_t::shared().insert_symbol(name->get_name(), this);
+    return true;
 }
 
 
@@ -48,8 +59,8 @@ InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
     (members = m)->set_parent_all(this);
 }
 
-void InterfaceDecl::check(Symbol_table<std::string, Node *> &sym_table) {
-
+bool InterfaceDecl::check() {
+    return true;
 }
 
 	
@@ -65,12 +76,12 @@ void FnDecl::set_function_body(Stmt *b) {
     (body = b)->set_parent(this);
 }
 
-void FnDecl::check(Symbol_table<std::string, Node *> &sym_table) {
+bool FnDecl::check() {
     // push scope and call check for children
-    sym_table.push_scope(ident->get_name());
-    formals->check_all(sym_table);
-    body->check(sym_table);
-    sym_table.pop_scope();
+    Sym_table_t::shared().push_scope(ident->get_name());
+    formals->check_all();
+    body->check();
+    Sym_table_t::shared().pop_scope();
 }
 
 
