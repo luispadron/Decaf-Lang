@@ -34,8 +34,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ast_stmt.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="319">
-              <caret line="21" selection-start-line="21" selection-end-line="21" />
+            <state relative-caret-position="236">
+              <caret line="87" lean-forward="true" selection-start-line="87" selection-end-line="87" />
             </state>
           </provider>
         </entry>
@@ -148,17 +148,6 @@
               <item name="semantic-analyzer" type="462c0819:PsiDirectoryNode" />
               <item name="bin" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="semantic_analyzer" type="b2602c69:ProjectViewProjectNode" />
-              <item name="semantic-analyzer" type="462c0819:PsiDirectoryNode" />
-              <item name="sample_tests" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="semantic_analyzer" type="b2602c69:ProjectViewProjectNode" />
-              <item name="semantic-analyzer" type="462c0819:PsiDirectoryNode" />
-              <item name="sample_tests" type="462c0819:PsiDirectoryNode" />
-              <item name="diffs" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -228,14 +217,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1680" height="1027" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1959707" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32941177" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.32941177" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32941177" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -533,8 +521,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ast_stmt.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="319">
-          <caret line="21" selection-start-line="21" selection-end-line="21" />
+        <state relative-caret-position="236">
+          <caret line="87" lean-forward="true" selection-start-line="87" selection-end-line="87" />
         </state>
       </provider>
     </entry>
