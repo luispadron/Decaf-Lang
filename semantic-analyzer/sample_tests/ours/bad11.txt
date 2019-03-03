@@ -1,6 +1,0 @@
-
-*** Error line 13.
-     Printable p;
-     ^^^^^^^^^
-*** No declaration found for type 'Printable'
-

@@ -1,6 +1,0 @@
-
-*** Error line 13.
-  1.0 + Binky(x, d, x > 3);
-      ^
-*** Incompatible operands: double + int
-

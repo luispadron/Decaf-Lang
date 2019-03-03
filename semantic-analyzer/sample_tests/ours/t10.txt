@@ -1,6 +1,0 @@
-
-*** Error line 46.
-   veggies[1].Eat(veggies[0]);
-              ^^^
-*** No declaration found for function 'Eat'
-

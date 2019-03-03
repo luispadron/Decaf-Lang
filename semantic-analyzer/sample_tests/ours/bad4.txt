@@ -1,6 +1,0 @@
-
-*** Error line 9.
-  blue = this;
-         ^^^^
-*** 'this' is only valid within class scope
-
