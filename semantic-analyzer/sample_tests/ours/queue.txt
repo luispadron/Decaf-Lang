@@ -1,4 +1,4 @@
 
-*** Failure: Assertion failed: ast_stmt.cpp, line 111:
+*** Failure: Assertion failed: ast_stmt.cpp, line 122:
     res_type != nullptr
 

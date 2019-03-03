@@ -4,3 +4,9 @@
               ^^
 *** Incompatible operands: bool && int
 
+
+*** Error line 13.
+  return a;
+         ^
+*** Incompatible return: int given, void expected
+
