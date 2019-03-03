@@ -62,7 +62,7 @@ bool Type::can_perform_logical_with(const Type *other) const {
 }
 
 bool Type::check() {
-    return true;
+    return true; // since all fundamental types are defined
 }
 
 
@@ -74,7 +74,7 @@ NamedType::NamedType(Identifier *i) : Type(*i->get_location()) {
 bool NamedType::is_equal_to(const Type *other) const {
     auto named_other = dynamic_cast<const NamedType*>(other);
     if (!named_other) { return false; }
-    return id == named_other->id;
+    return std::strcmp(id->get_name(), named_other->id->get_name()) == 0;
 }
 
 bool NamedType::can_perform_equality_with(const Type *other) const {

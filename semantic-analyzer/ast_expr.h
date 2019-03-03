@@ -25,6 +25,7 @@ public:
     explicit Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
 
+    /// returns the identifier associated with the given expression
     virtual Identifier * get_id() const { return nullptr; }
 
     /// returns the type of the result of performing some expression
@@ -37,8 +38,6 @@ public:
  * NULL. By using a valid, but no-op, node, we save that trouble */
 class EmptyExpr : public Expr {
 public:
-    Type * get_result_type() override { return nullptr; }
-
     bool check() override { return true; }
 };
 

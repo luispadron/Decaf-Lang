@@ -34,6 +34,9 @@ public:
 
     virtual void print_to(std::ostream &out) { out << typeName; }
 
+    /// returns the element type of this type, only really used in ArrayType, default implementation returns nullptr
+    virtual Type* get_element_type() { return nullptr; }
+
     /// returns whether given type is printable or not
     bool is_printable() const;
 
@@ -71,7 +74,9 @@ public:
     
     void print_to(std::ostream &out) override { out << id; }
 
-    Identifier * get_id() const { return id; }
+    /// returns the identifier of the NamedType, the id in this case is the name.
+    /// Example: dog x; id = "dog"
+    Identifier* get_id() { return id; }
 
     /// returns whether two named types are equal to each other (same identifier)
     bool is_equal_to(const Type *other) const override;
@@ -91,7 +96,7 @@ public:
     
     void print_to(std::ostream &out) override { out << elemType << "[]"; }
 
-    Type * get_element_type() { return elemType; }
+    Type* get_element_type() override { return elemType; }
 
     bool is_equal_to(const Type *other) const override;
 

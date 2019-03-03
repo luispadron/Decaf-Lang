@@ -74,7 +74,7 @@ bool IfStmt::check() {
 
 bool BreakStmt::check() {
     // check that the break stmt is within a loop stmt
-    auto loop_stmt = find_if([](Node *node){
+    auto loop_stmt = find_if([](Node *node) {
        return dynamic_cast<LoopStmt*>(node) != nullptr;
     });
 
@@ -93,7 +93,18 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
 }
 
 bool ReturnStmt::check() {
-    // TODO: add type checking?
+    // verify return statement is within function and expr type is equal to return type
+    auto fn_decl = dynamic_cast<FnDecl*>(find_if([](Node *node) {
+       return dynamic_cast<FnDecl*>(node) != nullptr;
+    }));
+
+    Assert(fn_decl);
+
+    if (!expr->get_result_type()->is_equal_to(fn_decl->get_return_type())) {
+        ReportError::return_mismatch(this, expr->get_result_type(), fn_decl->get_return_type());
+        return false;
+    }
+
     return expr->check();
 }
 

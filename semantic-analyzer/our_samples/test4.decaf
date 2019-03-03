@@ -1,0 +1,34 @@
+// this file tests return types being equal
+
+class dog {}
+class cat {}
+
+int main() {
+	string s;
+	return s; // error
+}
+
+void test() {
+    int x;
+    return x; // error
+}
+
+dog doggo() {
+    dog d;
+    return d;
+}
+
+dog doggo2() {
+    cat c;
+    return c; // error
+}
+
+int[] arr() {
+    int[] a;
+    return a;
+}
+
+int[] arr2() {
+    double[] a;
+    return a; // error
+}

@@ -36,9 +36,10 @@
 #include <iostream>
 
 class Node;
+class Decl;
 
 /// type alias for the symbol table type
-using Sym_table_t = Symbol_table<std::string, Node*>;
+using Sym_table_t = Symbol_table<std::string, Decl*>;
 
 class Node {
 protected:
