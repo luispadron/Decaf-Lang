@@ -49,4 +49,4 @@ parser/sample_tests/ours/*
 parser/our_tests/output/*
 *cmake-build-debug/
 *.idea/
-semantic-analyzer/samples_tests/*
+semantic-analyzer/sample_tests/*
