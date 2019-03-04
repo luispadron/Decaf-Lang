@@ -61,6 +61,10 @@ bool Type::can_perform_logical_with(const Type *other) const {
     return this == boolType && other == boolType;
 }
 
+bool Type::can_perform_assignment_with(const Type *other) const {
+    return is_equal_to(other);
+}
+
 bool Type::check() {
     return true; // since all fundamental types are defined
 }
@@ -97,8 +101,14 @@ bool ArrayType::is_equal_to(const Type *other) const {
     return elemType->is_equal_to(array_other->elemType);
 }
 
-bool ArrayType::can_perform_equality_with(const Type *other) const {
-    return is_equal_to(other); // array types must match
+bool ArrayType::can_perform_assignment_with(const Type *other) const {
+    // the element type and rhs type must be equal
+    auto array_type = dynamic_cast<const ArrayType*>(other);
+    if (array_type) {
+        return elemType->is_equal_to(array_type->elemType);
+    } else {
+        return elemType->is_equal_to(other);
+    }
 }
 
 bool ArrayType::check() {

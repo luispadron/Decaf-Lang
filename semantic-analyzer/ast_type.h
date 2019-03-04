@@ -44,22 +44,25 @@ public:
     virtual bool is_equal_to(const Type *other) const;
 
     /// returns whether this type can perform arithmetic
-    virtual bool can_perform_arithmetic() const;
+    bool can_perform_arithmetic() const;
 
     /// returns whether this type can perform arithmetic with other type
-    virtual bool can_perform_arithmetic_with(const Type *other) const;
+    bool can_perform_arithmetic_with(const Type *other) const;
 
     /// returns whether this type can perform relational operations with another type (<, > <=, >=)
-    virtual bool can_perform_relational_with(const Type *other) const;
+    bool can_perform_relational_with(const Type *other) const;
 
     /// returns whether this type can perform an equality operation with another type (==, !=)
     virtual bool can_perform_equality_with(const Type *other) const;
 
     /// returns whether this type can perform logic operations (||, !, &&)
-    virtual bool can_perform_logical() const;
+    bool can_perform_logical() const;
 
     /// returns whether this type can perform logic operations with another type (||, !, &&)
-    virtual bool can_perform_logical_with(const Type *other) const;
+    bool can_perform_logical_with(const Type *other) const;
+
+    /// returns whether this type can get the other type assigned to it
+    virtual bool can_perform_assignment_with(const Type *other) const;
 
     bool check() override;
 };
@@ -100,7 +103,7 @@ public:
 
     bool is_equal_to(const Type *other) const override;
 
-    bool can_perform_equality_with(const Type *other) const override;
+    bool can_perform_assignment_with(const Type* other) const override;
 
     bool check() override;
 };

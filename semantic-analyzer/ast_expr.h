@@ -88,7 +88,7 @@ protected:
 public:
     StringConstant(yyltype loc, const char *val);
 
-    Type * get_result_type() override { return Type::intType; }
+    Type * get_result_type() override { return Type::stringType; }
 
     bool check() override;
 };
@@ -287,7 +287,7 @@ protected:
 public:
     NewArrayExpr(yyltype loc, Expr *sizeExpr, Type *elemType);
 
-    Type * get_result_type() override { return elemType; }
+    Type * get_result_type() override { return new ArrayType(*get_location(), elemType); }
 
     bool check() override;
 };

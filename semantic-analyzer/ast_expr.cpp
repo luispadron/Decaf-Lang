@@ -153,7 +153,16 @@ bool LogicalExpr::check() {
 
 
 bool AssignExpr::check() {
-    return left->check() && right->check();
+    CompoundExpr::check();
+
+    auto lhs_type = get_lhs_type();
+    auto rhs_type = get_rhs_type();
+    if (!lhs_type->can_perform_assignment_with(rhs_type)) {
+        ReportError::incompatible_operands(op, lhs_type, rhs_type);
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -174,7 +183,21 @@ ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
     (subscript = s)->set_parent(this);
 }
 
-bool ArrayAccess::check() { return false; }
+bool ArrayAccess::check() {
+    auto base_type = base->get_result_type();
+
+    if (!dynamic_cast<ArrayType*>(base_type)) {
+        ReportError::brackets_on_non_array(base);
+        return false;
+    }
+
+    if (subscript->get_result_type() != Type::intType) {
+        ReportError::subscript_not_integer(subscript);
+        return false;
+    }
+
+    return true;
+}
 
 
 FieldAccess::FieldAccess(Expr *b, Identifier *f) 
@@ -249,7 +272,13 @@ NewArrayExpr::NewArrayExpr(yyltype loc, Expr *sz, Type *et) : Expr(loc) {
 }
 
 bool NewArrayExpr::check() {
-    return false;
+    // size type must be integer
+    if (size->get_result_type() != Type::intType) {
+        ReportError::new_array_size_not_integer(size);
+        return false;
+    }
+
+    return true;
 }
 
 
