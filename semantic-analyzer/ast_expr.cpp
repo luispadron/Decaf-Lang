@@ -79,8 +79,10 @@ Type* CompoundExpr::get_rhs_type() {
 
 bool CompoundExpr::check() {
     // simply checks that symbols are in table
-    if (left) return left->check() && right->check();
-    return right->check();
+    bool lcheck = true, rcheck = true;
+    lcheck = left ? left->check() : true;
+    rcheck = right->check();
+    return lcheck && rcheck;
 }
 
 
@@ -236,9 +238,12 @@ bool FieldAccess::check() {
     } else if (base) { // not a class type yet using . syntax, this is invalid
         ReportError::field_not_found_in_base(field, base->get_result_type());
         return false;
+    } else if (!field->check()) { // check that field is declared
+        ReportError::identifier_not_found(field, Reason_e::LookingForVariable);
+        return false;
     }
 
-    return field->check();
+    return true;
 }
 
 
@@ -251,7 +256,6 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
 }
 
 Type* Call::get_result_type() {
-    // find function and get its return type
     if (Sym_table_t::shared().is_symbol(field->get_name())) {
         auto fn_decl = dynamic_cast<FnDecl*>(Sym_table_t::shared().get_symbol(field->get_name()));
         if (fn_decl) return fn_decl->get_return_type();
@@ -262,13 +266,19 @@ Type* Call::get_result_type() {
 
 bool Call::check() {
     // verify function name is in scope
-    if (!Sym_table_t::shared().is_symbol(field->get_name())) {
+    bool ret = true;
+
+    auto named_base = base ? dynamic_cast<NamedType*>(base->get_result_type()) : nullptr;
+    if (named_base && !Sym_table_t::shared().is_symbol_in_class(named_base->get_id()->get_name(), field->get_name())) {
+        ReportError::field_not_found_in_base(field, named_base);
+        ret = false;
+    } else if (!Sym_table_t::shared().is_symbol(field->get_name())) {
         ReportError::identifier_not_found(field, Reason_e::LookingForFunction);
-        return false;
+        ret = false;
     }
 
-    actuals->check_all();
-    return true;
+    bool acheck = actuals->check_all();
+    return ret && acheck;
 }
 
 
