@@ -34,9 +34,6 @@ public:
 
     virtual void print_to(std::ostream &out) { out << typeName; }
 
-    /// returns the element type of this type, only really used in ArrayType, default implementation returns nullptr
-    virtual Type* get_element_type() { return nullptr; }
-
     /// returns whether given type is printable or not
     bool is_printable() const;
 
@@ -98,8 +95,6 @@ public:
     ArrayType(yyltype loc, Type *elemType);
     
     void print_to(std::ostream &out) override { out << elemType << "[]"; }
-
-    Type* get_element_type() override { return elemType; }
 
     bool is_equal_to(const Type *other) const override;
 

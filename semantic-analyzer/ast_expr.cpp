@@ -7,7 +7,9 @@
 #include "ast_decl.h"
 #include "errors.h"
 
-#include <string.h>
+#include <cstring>
+
+using namespace std;
 
 
 IntConstant::IntConstant(yyltype loc, int val) : Expr(loc) {
@@ -84,7 +86,7 @@ bool CompoundExpr::check() {
 
 bool ArithmeticExpr::check() {
     // checks typing for arithmetic expression, i.e types must be of int/double and must be the same types
-    CompoundExpr::check();
+    if (!CompoundExpr::check()) return false;
 
     auto rhs_type = get_rhs_type();
     if (left) {
@@ -104,7 +106,7 @@ bool ArithmeticExpr::check() {
 
 bool RelationalExpr::check() {
     // checks typing for relational expression, i.e. types must be of int/double and must be the same types
-    CompoundExpr::check();
+    if (!CompoundExpr::check()) return false;
 
     auto lhs_type = get_lhs_type();
     auto rhs_type = get_rhs_type();
@@ -119,7 +121,7 @@ bool RelationalExpr::check() {
 
 bool EqualityExpr::check() {
     // checks typing for equality expression, types must be the same or if comparing objects one or both may be null
-    CompoundExpr::check();
+    if (!CompoundExpr::check()) return false;
 
     auto lhs_type = get_lhs_type();
     auto rhs_type = get_rhs_type();
@@ -134,7 +136,7 @@ bool EqualityExpr::check() {
 
 bool LogicalExpr::check() {
     // checks typing for logical expression, only bools may be used
-    CompoundExpr::check();
+    if (!CompoundExpr::check()) return false;
 
     auto rhs_type = get_rhs_type();
     if (left) {
@@ -153,7 +155,7 @@ bool LogicalExpr::check() {
 
 
 bool AssignExpr::check() {
-    CompoundExpr::check();
+    if (!CompoundExpr::check()) return false;
 
     auto lhs_type = get_lhs_type();
     auto rhs_type = get_rhs_type();
@@ -220,7 +222,15 @@ Type* FieldAccess::get_result_type() {
 }
 
 bool FieldAccess::check() {
-    /// TODO: add check for this/super, etc
+    // TODO: This is not complete, we need to add checking the symbol table
+    // to check whether field is in base, if base exists. This is done before the next line
+
+    // need to make sure if were accessing a class member, it must be in class scope
+    if (base && !Sym_table_t::shared().is_class_scope()) {
+        ReportError::inaccessible_field(field, base->get_result_type());
+        return false;
+    }
+
     return field->check();
 }
 

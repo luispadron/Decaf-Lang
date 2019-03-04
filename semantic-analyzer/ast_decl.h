@@ -53,6 +53,8 @@ public:
     ClassDecl(Identifier *name, NamedType *extends, 
               List<NamedType*> *implements, List<Decl*> *members);
 
+    Identifier* get_id() { return name; }
+
     bool check() override;
 };
 
