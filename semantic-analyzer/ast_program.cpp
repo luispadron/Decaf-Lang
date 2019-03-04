@@ -17,22 +17,25 @@ Program::Program(List<Decl*> *d) {
  * This function should set off all the children to have them verify the semantics are valid.
  */
 bool Program::check() {
-#if DEBUG>0
-    Sym_table_t::shared().DEBUG_PRINT = false;
-#endif
+    #if DEBUG==1
+        Sym_table_t::shared().DEBUG_PRINT = false;
+    #endif
 
     try {
         // push root scope
         Sym_table_t::shared().push_scope("root");
 
 
-        // first we push all function names into global scope
+        // first we push all function/class names into global scope
         for (int i = 0; i < decls->size(); ++i) {
             auto decl = decls->get(i);
-            auto fdecl = dynamic_cast<FnDecl *>(decl);
 
+            auto fdecl = dynamic_cast<FnDecl*>(decl);
+            auto cdecl = dynamic_cast<ClassDecl*>(decl);
             if (fdecl) {
                 Sym_table_t::shared().insert_symbol(fdecl->get_name(), fdecl);
+            } else if (cdecl) {
+                Sym_table_t::shared().insert_symbol(cdecl->get_id()->get_name(), cdecl);
             }
         }
 
@@ -40,12 +43,6 @@ bool Program::check() {
         for (int i = 0; i < decls->size(); ++i) {
             auto decl = decls->get(i);
             decl->check();
-
-#if DEBUG>0
-            cout << endl;
-            Sym_table_t::shared().debug_print();
-            cout << endl;
-#endif
         }
     } catch (const Symbol_table_exception &e) {
         cout << e.what() << endl;

@@ -212,8 +212,10 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
 
 Type* FieldAccess::get_result_type() {
     // need to find the type of this field in the symbol table
-    // TODO: add checking for class scope
-    if (Sym_table_t::shared().is_symbol(field->get_name())) {
+
+    if (base) {
+
+    } else if (Sym_table_t::shared().is_symbol(field->get_name())) {
         auto decl = dynamic_cast<VarDecl*>(Sym_table_t::shared().get_symbol(field->get_name()));
         if (decl) return decl->get_type();
     }
@@ -222,12 +224,17 @@ Type* FieldAccess::get_result_type() {
 }
 
 bool FieldAccess::check() {
-    // TODO: This is not complete, we need to add checking the symbol table
-    // to check whether field is in base, if base exists. This is done before the next line
-
-    // need to make sure if were accessing a class member, it must be in class scope
-    if (base && !Sym_table_t::shared().is_class_scope()) {
-        ReportError::inaccessible_field(field, base->get_result_type());
+    auto named_base = base ? dynamic_cast<NamedType*>(base->get_result_type()) : nullptr;
+    if (named_base) {
+        if (!Sym_table_t::shared().is_symbol_in_class(named_base->get_id()->get_name(), field->get_name())) {
+            ReportError::field_not_found_in_base(field, base->get_result_type());
+            return false;
+        } else if (!Sym_table_t::shared().is_class_scope()) {
+            ReportError::inaccessible_field(field, base->get_result_type());
+            return false;
+        }
+    } else if (base) { // not a class type yet using . syntax, this is invalid
+        ReportError::field_not_found_in_base(field, base->get_result_type());
         return false;
     }
 

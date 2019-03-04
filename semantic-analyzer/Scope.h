@@ -117,11 +117,23 @@ Value& Scope<Key, Value>::get_symbol(const Key &k) {
 
 template <typename Key, typename Value>
 typename Scope<Key, Value>::Symbol_iter Scope<Key, Value>::get_symbol_iter(const Key &k) {
+    // first search through this scope
     auto scope_ptr = this;
     for (; scope_ptr; scope_ptr = scope_ptr->parent_ptr) {
         auto it = scope_ptr->symbols.find(k);
         if (it != scope_ptr->symbols.end()) {
             return it;
+        }
+    }
+
+    // if not found, go to super scope if possible and check there
+    if (super_ptr) {
+        scope_ptr = super_ptr;
+        for (; scope_ptr; scope_ptr = scope_ptr->parent_ptr) {
+            auto it = scope_ptr->symbols.find(k);
+            if (it != scope_ptr->symbols.end()) {
+                return it;
+            }
         }
     }
 

@@ -49,7 +49,12 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
 }
 
 bool ClassDecl::check() {
-    Sym_table_t::shared().insert_symbol(name->get_name(), this);
+    // push class scope and call check on children
+    // TODO: add handling for inheritance
+
+    Sym_table_t::shared().push_class_scope(name->get_name(), name->get_name());
+    members->check_all();
+    Sym_table_t::shared().pop_scope();
     return true;
 }
 

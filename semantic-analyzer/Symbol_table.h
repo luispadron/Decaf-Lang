@@ -33,13 +33,16 @@ public:
     }
 
     /// whether to print debug messages or not
-    bool DEBUG_PRINT = false;
+    bool DEBUG_PRINT = true;
 
     /// cleans up any associated memory
     ~Symbol_table();
 
     /// pushes a new scope to the symbol table
-    void push_scope(const std::string &name);
+    void push_scope(const std::string &debug_name);
+
+    /// pushes a new class scope to the symbol table
+    void push_class_scope(const std::string &key, const std::string &debug_name);
 
     /// pops the current scope to be the parent scope
     void pop_scope();
@@ -50,6 +53,9 @@ public:
 
     /// returns whether or not given symbol is defined in current scope (or parent scopes)
     bool is_symbol(const Key& k) const;
+
+    /// returns whether or not the given symbol is defined in the given class scope
+    bool is_symbol_in_class(const std::string &class_key, const Key& k) const;
 
     /// returns whether the current scope is within a class
     bool is_class_scope() const;
@@ -70,6 +76,9 @@ private:
 
     /// all possible scopes added to the symbol table, used to clean up memory, etc
     std::vector<Scope<Key, Value>*> scopes;
+
+    /// the scopes relating to a class, organized by string, Scope
+    std::map<std::string, Scope<Key, Value>*> class_scopes;
 };
 
 
@@ -85,40 +94,66 @@ Symbol_table<Key, Value>::~Symbol_table() {
 }
 
 template <typename Key, typename Value>
-void Symbol_table<Key, Value>::push_scope(const std::string &name) {
-    if (DEBUG_PRINT) { std::cout << "pushing scope: " << name << std::endl; }
-
-    auto new_scope = new Scope<Key, Value>(name);
+void Symbol_table<Key, Value>::push_scope(const std::string &debug_name) {
+    auto new_scope = new Scope<Key, Value>(debug_name);
     new_scope->parent_ptr = scope_ptr;
+    new_scope->super_ptr = scope_ptr ? scope_ptr->super_ptr : nullptr;
+    new_scope->this_ptr = scope_ptr ? scope_ptr->this_ptr : nullptr;
     scopes.push_back(new_scope);
     scope_ptr = new_scope;
+
+    if (DEBUG_PRINT) { std::cout << "pushing scope: " << debug_name << std::endl; debug_print(); }
+}
+
+template <typename Key, typename Value>
+void Symbol_table<Key, Value>::push_class_scope(const std::string &key, const std::string &debug_name) {
+    auto new_scope = new Scope<Key, Value>(debug_name);
+    new_scope->parent_ptr = scope_ptr;
+    new_scope->this_ptr = new_scope;
+    scopes.push_back(new_scope);
+    class_scopes.insert({key, new_scope});
+    scope_ptr = new_scope;
+
+    if (DEBUG_PRINT) { std::cout << "pushing class scope: " << debug_name << std::endl; debug_print(); }
 }
 
 template <typename Key, typename Value>
 void Symbol_table<Key, Value>::pop_scope() {
-    if (DEBUG_PRINT) { std::cout << "popping scope " << scope_ptr->name << std::endl; }
-
     if (!scope_ptr) return;
     scope_ptr = scope_ptr->parent_ptr;
+
+    if (DEBUG_PRINT) { std::cout << "popping scope " << scope_ptr->name << std::endl; debug_print(); }
 }
 
 template <typename Key, typename Value>
 void Symbol_table<Key, Value>::insert_symbol(const Key& k, const Value& v) {
-    if (DEBUG_PRINT) {
-        std::cout << "inserting symbol '" << k << "' in scope: " << scope_ptr->name << std::endl;
-    }
-
     if (!scope_ptr) {
         throw Symbol_table_exception{"error (Symbol_table::insert_symbol) no scopes available."};
     }
 
     scope_ptr->insert_symbol(k, v);
+
+    if (DEBUG_PRINT) {
+        std::cout << "inserting symbol '" << k << "' in scope: " << scope_ptr->name << std::endl;
+        debug_print();
+    }
 }
 
 template <typename Key, typename Value>
 bool Symbol_table<Key, Value>::is_symbol(const Key &k) const {
     return scope_ptr->is_symbol(k);
 }
+
+template <typename Key, typename Value>
+bool Symbol_table<Key, Value>::is_symbol_in_class(const std::string &class_key, const Key &k) const {
+    auto class_scope_it = class_scopes.find(class_key);
+    if (class_scope_it == class_scopes.end()) {
+        return false;
+    } else {
+        return class_scope_it->second->is_symbol(k);
+    }
+}
+
 
 template <typename Key, typename Value>
 bool Symbol_table<Key, Value>::is_class_scope() const {
