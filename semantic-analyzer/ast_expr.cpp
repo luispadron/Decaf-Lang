@@ -79,7 +79,7 @@ Type* CompoundExpr::get_rhs_type() {
 
 bool CompoundExpr::check() {
     // simply checks that symbols are in table
-    bool lcheck = true, rcheck = true;
+    bool lcheck, rcheck;
     lcheck = left ? left->check() : true;
     rcheck = right->check();
     return lcheck && rcheck;

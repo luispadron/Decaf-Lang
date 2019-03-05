@@ -33,7 +33,10 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
 }
 
 bool ConditionalStmt::check() {
-    return test->check() && body->check();
+    bool testCheck, bodyCheck;
+    testCheck = test->check();
+    bodyCheck = body->check();
+    return testCheck && bodyCheck;
 }
 
 
@@ -49,8 +52,18 @@ ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
 }
 
 bool ForStmt::check() {
-    return init->check() && test->check() &&
-           step->check() && body->check();
+    bool initCheck, testCheck, stepCheck, bodyCheck;
+    initCheck = init->check();
+    testCheck = test->check();
+    stepCheck = step->check();
+    bodyCheck = body->check();
+
+    if (test->get_result_type() != Type::boolType) {
+        ReportError::test_not_boolean(test);
+        return false;
+    }
+
+    return initCheck && testCheck && stepCheck && bodyCheck;
 }
 
 
@@ -66,9 +79,11 @@ IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) {
 }
 
 bool IfStmt::check() {
-    bool ret = ConditionalStmt::check();
-    ret = ret && elseBody ? elseBody->check() : true;
-    return ret;
+    bool testCheck, thenCheck, elseCheck;
+    testCheck = test->check();
+    thenCheck = body->check();
+    elseCheck = elseBody ? elseBody->check() : true;
+    return testCheck && thenCheck && elseCheck;
 }
 
 
