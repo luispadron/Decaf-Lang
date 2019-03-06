@@ -19,6 +19,7 @@
 
 class Identifier;
 class Stmt;
+class Expr;
 
 class Decl : public Node {
 protected:
@@ -27,11 +28,12 @@ protected:
 public:
     explicit Decl(Identifier *name);
     friend std::ostream& operator<<(std::ostream& out, Decl *d) { return out << d->id; }
+
+    Identifier * get_id() { return id; }
 };
 
 class VarDecl : public Decl {
 protected:
-    Identifier *ident;
     Type *type;
     
 public:
@@ -44,7 +46,6 @@ public:
 
 class ClassDecl : public Decl {
 protected:
-    Identifier* name;
     List<Decl*> *members;
     NamedType *extends;
     List<NamedType*> *implements;
@@ -52,8 +53,6 @@ protected:
 public:
     ClassDecl(Identifier *name, NamedType *extends, 
               List<NamedType*> *implements, List<Decl*> *members);
-
-    Identifier* get_id() { return name; }
 
     bool check() override;
 };
@@ -70,7 +69,6 @@ public:
 
 class FnDecl : public Decl {
 protected:
-    Identifier *ident;
     List<VarDecl*> *formals;
     Type *returnType;
     Stmt *body;
@@ -80,9 +78,12 @@ public:
 
     void set_function_body(Stmt *b);
 
-    const char * get_name() const noexcept { return ident->get_name(); }
-
     Type * get_return_type() { return returnType; }
+
+    /// checks that the given parameters match the functions formals.
+    /// if there is an error, the correct message is printed and false is returned, otherwise
+    /// nothing is printed and true is returned.
+    bool check_params_match(Identifier *call_id, List<Expr *> *params) const;
 
     bool check() override;
 };

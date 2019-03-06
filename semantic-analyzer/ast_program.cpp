@@ -26,17 +26,10 @@ bool Program::check() {
         Sym_table_t::shared().push_scope("root");
 
 
-        // first we push all function/class names into global scope
+        // first we push all declarations into global scope
         for (int i = 0; i < decls->size(); ++i) {
             auto decl = decls->get(i);
-
-            auto fdecl = dynamic_cast<FnDecl*>(decl);
-            auto cdecl = dynamic_cast<ClassDecl*>(decl);
-            if (fdecl) {
-                Sym_table_t::shared().insert_symbol(fdecl->get_name(), fdecl);
-            } else if (cdecl) {
-                Sym_table_t::shared().insert_symbol(cdecl->get_id()->get_name(), cdecl);
-            }
+            Sym_table_t::shared().insert_symbol(decl->get_id()->get_str(), decl);
         }
 
         // now we can traverse the AST

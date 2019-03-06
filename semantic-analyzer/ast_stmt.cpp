@@ -18,6 +18,13 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
 bool StmtBlock::check() {
     // push scope and call children check method
     Sym_table_t::shared().push_scope("block");
+
+    // insert all the declarations into sym table
+    for (int i = 0; i < decls->size(); ++i) {
+        auto decl = decls->get(i);
+        Sym_table_t::shared().insert_symbol(decl->get_id()->get_str(), decl);
+    }
+
     decls->check_all();
     stmts->check_all();
     Sym_table_t::shared().pop_scope();

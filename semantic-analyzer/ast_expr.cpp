@@ -217,8 +217,8 @@ Type* FieldAccess::get_result_type() {
 
     if (base) {
 
-    } else if (Sym_table_t::shared().is_symbol(field->get_name())) {
-        auto decl = dynamic_cast<VarDecl*>(Sym_table_t::shared().get_symbol(field->get_name()));
+    } else if (Sym_table_t::shared().is_symbol(field->get_str())) {
+        auto decl = dynamic_cast<VarDecl*>(Sym_table_t::shared().get_symbol(field->get_str()));
         if (decl) return decl->get_type();
     }
 
@@ -228,7 +228,7 @@ Type* FieldAccess::get_result_type() {
 bool FieldAccess::check() {
     auto named_base = base ? dynamic_cast<NamedType*>(base->get_result_type()) : nullptr;
     if (named_base) {
-        if (!Sym_table_t::shared().is_symbol_in_class(named_base->get_id()->get_name(), field->get_name())) {
+        if (!Sym_table_t::shared().is_symbol_in_class(named_base->get_id()->get_str(), field->get_str())) {
             ReportError::field_not_found_in_base(field, base->get_result_type());
             return false;
         } else if (!Sym_table_t::shared().is_class_scope()) {
@@ -256,8 +256,8 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
 }
 
 Type* Call::get_result_type() {
-    if (Sym_table_t::shared().is_symbol(field->get_name())) {
-        auto fn_decl = dynamic_cast<FnDecl*>(Sym_table_t::shared().get_symbol(field->get_name()));
+    if (Sym_table_t::shared().is_symbol(field->get_str())) {
+        auto fn_decl = dynamic_cast<FnDecl*>(Sym_table_t::shared().get_symbol(field->get_str()));
         if (fn_decl) return fn_decl->get_return_type();
     }
 
@@ -265,20 +265,42 @@ Type* Call::get_result_type() {
 }
 
 bool Call::check() {
-    // verify function name is in scope
-    bool ret = true;
-
     auto named_base = base ? dynamic_cast<NamedType*>(base->get_result_type()) : nullptr;
-    if (named_base && !Sym_table_t::shared().is_symbol_in_class(named_base->get_id()->get_name(), field->get_name())) {
-        ReportError::field_not_found_in_base(field, named_base);
-        ret = false;
-    } else if (!Sym_table_t::shared().is_symbol(field->get_name())) {
-        ReportError::identifier_not_found(field, Reason_e::LookingForFunction);
-        ret = false;
+    FnDecl *fn = nullptr;
+    bool param_check = true;
+
+    // we first need to verify that the given function is in scope, either in a class or global
+    // once that's verified, we need to check whether this call parameters are equal to the declaration parameters
+    if (named_base) {
+        if (!Sym_table_t::shared().is_symbol_in_class(named_base->get_id()->get_str(), field->get_str())) {
+            ReportError::field_not_found_in_base(field, named_base);
+            param_check = false;
+        } else {
+            fn = dynamic_cast<FnDecl*>(Sym_table_t::shared().get_symbol_in_class(named_base->get_id()->get_str(),
+                                                                                 field->get_str()));
+            Assert(fn);
+            // check params match
+            if (!fn->check_params_match(field, actuals)) {
+                param_check = false;
+            }
+        }
+    } else {
+        if (!Sym_table_t::shared().is_symbol(field->get_str())) {
+            ReportError::identifier_not_found(field, Reason_e::LookingForFunction);
+            param_check = false;
+        } else {
+            fn = dynamic_cast<FnDecl*>(Sym_table_t::shared().get_symbol(field->get_str()));
+            Assert(fn);
+            // check params match
+            if (!fn->check_params_match(field, actuals)) {
+                param_check = false;
+            }
+        }
     }
 
     bool acheck = actuals->check_all();
-    return ret && acheck;
+
+    return param_check && acheck;
 }
 
 

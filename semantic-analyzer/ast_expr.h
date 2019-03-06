@@ -39,6 +39,8 @@ public:
 class EmptyExpr : public Expr {
 public:
     bool check() override { return true; }
+
+    Type * get_result_type() override { return Type::voidType; }
 };
 
 

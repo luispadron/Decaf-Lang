@@ -81,7 +81,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, Identifier *id) { return out << id->name; }
 
-    const char * get_name() const { return name; }
+    const char * get_str() const { return name; }
 
     bool check() override;
 };

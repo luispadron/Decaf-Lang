@@ -64,6 +64,9 @@ public:
     /// if no such symbol exists, exception is thrown
     Value& get_symbol(const Key& k);
 
+    /// returns the value of the symbol with given key in the given class scope
+    Value& get_symbol_in_class(const std::string &class_key, const Key& k) const;
+
     /// prints the symbol table for debugging purposes
     void debug_print() const;
 
@@ -163,6 +166,16 @@ bool Symbol_table<Key, Value>::is_class_scope() const {
 template <typename Key, typename Value>
 Value& Symbol_table<Key, Value>::get_symbol(const Key& k) {
     return scope_ptr->get_symbol(k);
+}
+
+template <typename Key, typename Value>
+Value& Symbol_table<Key, Value>::get_symbol_in_class(const std::string &class_key, const Key &k) const {
+    auto class_scope_it = class_scopes.find(class_key);
+    if (class_scope_it == class_scopes.end()) {
+        throw Symbol_table_exception("error: cant get symbol in class, no class with given key");
+    }
+
+    return class_scope_it->second->get_symbol(k);
 }
 
 template <typename Key, typename Value>
