@@ -213,10 +213,10 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
 }
 
 Type* FieldAccess::get_result_type() {
-    // need to find the type of this field in the symbol table
-
+    // find the type of this field in the symbol table
     if (base) {
-
+        auto decl = dynamic_cast<VarDecl*>(Sym_table_t::shared().get_symbol_in_class(base->get_id()->get_str(), field->get_str()));
+        if (decl) return decl->get_type();
     } else if (Sym_table_t::shared().is_symbol(field->get_str())) {
         auto decl = dynamic_cast<VarDecl*>(Sym_table_t::shared().get_symbol(field->get_str()));
         if (decl) return decl->get_type();

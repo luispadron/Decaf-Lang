@@ -108,7 +108,15 @@ bool FnDecl::check_params_match(Identifier *call_id, List<Expr *> *params) const
 bool FnDecl::check() {
     // push scope and call check for children
     Sym_table_t::shared().push_scope(id->get_str());
+
+    // add formals to symbol table
+    for (int i = 0; i < formals->size(); ++i) {
+        auto formal = formals->get(i);
+        Sym_table_t::shared().insert_symbol(formal->get_id()->get_str(), formal);
+    }
+
     formals->check_all();
+
     body->check();
     Sym_table_t::shared().pop_scope();
     return true;

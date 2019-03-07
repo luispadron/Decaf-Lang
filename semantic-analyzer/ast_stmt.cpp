@@ -119,7 +119,6 @@ bool ReturnStmt::check() {
     auto fn_decl = dynamic_cast<FnDecl*>(find_if([](Node *node) {
        return dynamic_cast<FnDecl*>(node) != nullptr;
     }));
-
     Assert(fn_decl);
 
     if (!expr->get_result_type()->is_equal_to(fn_decl->get_return_type())) {
