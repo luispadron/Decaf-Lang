@@ -13,7 +13,7 @@ protected:
 public:
     explicit Program(List<Decl*> *declList);
 
-    bool check() override;
+    void check() override;
 };
 
 

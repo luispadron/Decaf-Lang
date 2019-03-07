@@ -61,7 +61,7 @@ public:
     /// returns whether this type can get the other type assigned to it
     virtual bool can_perform_assignment_with(const Type *other) const;
 
-    bool check() override;
+    void check() override;
 };
 
 
@@ -84,7 +84,7 @@ public:
     /// returns whether two named types can perform equality, i.e must be same type or one or both must be null
     bool can_perform_equality_with(const Type *other) const override;
 
-    bool check() override;
+    void check() override;
 };
 
 class ArrayType : public Type {
@@ -100,7 +100,7 @@ public:
 
     bool can_perform_assignment_with(const Type* other) const override;
 
-    bool check() override;
+    void check() override;
 };
 
  

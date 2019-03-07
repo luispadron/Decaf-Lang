@@ -34,13 +34,13 @@ public:
     ~Symbol_table();
 
     /// pushes a new scope to the symbol table
-    void push_scope(const std::string &debug_name);
+    void enter_scope(const std::string &debug_name);
 
     /// pushes a new class scope to the symbol table
-    void push_class_scope(const std::string &key, const std::string &debug_name);
+    void enter_class_scope(const std::string &key, const std::string &debug_name);
 
     /// pops the current scope to be the parent scope
-    void pop_scope();
+    void leave_scope();
 
     /// inserts a symbol into the current scope
     /// if no scope exists, exception is thrown

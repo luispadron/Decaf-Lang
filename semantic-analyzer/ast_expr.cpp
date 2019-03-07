@@ -16,7 +16,7 @@ IntConstant::IntConstant(yyltype loc, int val) : Expr(loc) {
     value = val;
 }
 
-bool IntConstant::check() {
+void IntConstant::check() {
 
 }
 
@@ -25,7 +25,7 @@ DoubleConstant::DoubleConstant(yyltype loc, double val) : Expr(loc) {
     value = val;
 }
 
-bool DoubleConstant::check() {
+void DoubleConstant::check() {
 
 }
 
@@ -34,7 +34,7 @@ BoolConstant::BoolConstant(yyltype loc, bool val) : Expr(loc) {
     value = val;
 }
 
-bool BoolConstant::check() {
+void BoolConstant::check() {
 
 }
 
@@ -44,11 +44,11 @@ StringConstant::StringConstant(yyltype loc, const char *val) : Expr(loc) {
     value = strdup(val);
 }
 
-bool NullConstant::check() {
+void NullConstant::check() {
 
 }
 
-bool StringConstant::check() {
+void StringConstant::check() {
 
 }
 
@@ -58,7 +58,7 @@ Operator::Operator(yyltype loc, const char *tok) : Node(loc) {
     strncpy(tokenString, tok, sizeof(tokenString));
 }
 
-bool Operator::check() {
+void Operator::check() {
 
 }
 
@@ -79,47 +79,37 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r)
     (right = r)->set_parent(this);
 }
 
-Type* CompoundExpr::get_lhs_type() {
-    if (!left) return nullptr;
-    return left->get_result_type();
-}
-
-Type* CompoundExpr::get_rhs_type() {
-    if (!right) return nullptr;
-    return right->get_result_type();
-}
-
-bool CompoundExpr::check() {
+void CompoundExpr::check() {
 
 }
 
 
-bool ArithmeticExpr::check() {
+void ArithmeticExpr::check() {
 
 }
 
 
-bool RelationalExpr::check() {
+void RelationalExpr::check() {
 
 }
 
 
-bool EqualityExpr::check() {
+void EqualityExpr::check() {
 
 }
 
 
-bool LogicalExpr::check() {
+void LogicalExpr::check() {
 
 }
 
 
-bool AssignExpr::check() {
+void AssignExpr::check() {
 
 }
 
 
-bool This::check() {
+void This::check() {
 
 }
 
@@ -129,7 +119,7 @@ ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
     (subscript = s)->set_parent(this);
 }
 
-bool ArrayAccess::check() {
+void ArrayAccess::check() {
 
 }
 
@@ -142,21 +132,7 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
     (field = f)->set_parent(this);
 }
 
-Type* FieldAccess::get_result_type() {
-    // find the type of this field in the symbol table
-    if (base) {
-        auto decl = dynamic_cast<VarDecl*>(Sym_table_t::shared().get_symbol_in_class(base->get_id()->get_name(),
-                                                                                     field->get_name()));
-        if (decl) return decl->get_type();
-    } else if (Sym_table_t::shared().is_symbol(field->get_name())) {
-        auto decl = dynamic_cast<VarDecl*>(Sym_table_t::shared().get_symbol(field->get_name()));
-        if (decl) return decl->get_type();
-    }
-
-    return nullptr;
-}
-
-bool FieldAccess::check() {
+void FieldAccess::check() {
 
 }
 
@@ -169,16 +145,8 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     (actuals = a)->set_parent_all(this);
 }
 
-Type* Call::get_result_type() {
-    if (Sym_table_t::shared().is_symbol(field->get_name())) {
-        auto fn_decl = dynamic_cast<FnDecl*>(Sym_table_t::shared().get_symbol(field->get_name()));
-        if (fn_decl) return fn_decl->get_return_type();
-    }
 
-    return nullptr;
-}
-
-bool Call::check() {
+void Call::check() {
 
 }
 
@@ -188,7 +156,7 @@ NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) {
     (cType = c)->set_parent(this);
 }
 
-bool NewExpr::check() {
+void NewExpr::check() {
 
 }
 
@@ -199,16 +167,16 @@ NewArrayExpr::NewArrayExpr(yyltype loc, Expr *sz, Type *et) : Expr(loc) {
     (elemType = et)->set_parent(this);
 }
 
-bool NewArrayExpr::check() {
+void NewArrayExpr::check() {
 
 }
 
 
-bool ReadIntegerExpr::check() {
+void ReadIntegerExpr::check() {
 
 }
 
 
-bool ReadLineExpr::check() {
+void ReadLineExpr::check() {
 
 }

@@ -24,7 +24,7 @@ VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
     (type = t)->set_parent(this);
 }
 
-bool VarDecl::check() {
+void VarDecl::check() {
 
 }
   
@@ -38,7 +38,7 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
     (members = m)->set_parent_all(this);
 }
 
-bool ClassDecl::check() {
+void ClassDecl::check() {
 
 }
 
@@ -48,7 +48,7 @@ InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
     (members = m)->set_parent_all(this);
 }
 
-bool InterfaceDecl::check() {
+void InterfaceDecl::check() {
 
 }
 
@@ -64,11 +64,7 @@ void FnDecl::set_function_body(Stmt *b) {
     (body = b)->set_parent(this);
 }
 
-bool FnDecl::check_params_match(Identifier *call_id, List<Expr *> *params) const {
-
-}
-
-bool FnDecl::check() {
+void FnDecl::check() {
 
 }
 

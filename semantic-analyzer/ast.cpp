@@ -18,15 +18,16 @@ Node::Node() {
     location = nullptr;
     parent = nullptr;
 }
-	 
+
+void Node::check() { /* do nothing */ }
+
+Type* Node::type_check() { return Type::errorType; }
+
+
 Identifier::Identifier(yyltype loc, const char *n) : Node(loc) {
     name = strdup(n);
 }
 
-bool Identifier::check() {
-
-}
-
-bool Error::check() {
-
+void Identifier::check() {
+    // simply check this id is in the symbol table
 }

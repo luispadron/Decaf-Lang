@@ -36,7 +36,7 @@ protected:
 public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
 
-    bool check() override;
+    void check() override;
 };
 
   
@@ -48,7 +48,7 @@ protected:
 public:
     ConditionalStmt(Expr *testExpr, Stmt *body);
 
-    bool check() override;
+    void check() override;
 };
 
 
@@ -56,7 +56,7 @@ class LoopStmt : public ConditionalStmt {
 public:
     LoopStmt(Expr *testExpr, Stmt *body) : ConditionalStmt(testExpr, body) {}
 
-    bool check() override;
+    void check() override;
 };
 
 
@@ -68,7 +68,7 @@ protected:
 public:
     ForStmt(Expr *init, Expr *test, Expr *step, Stmt *body);
 
-    bool check() override;
+    void check() override;
 };
 
 
@@ -76,7 +76,7 @@ class WhileStmt : public LoopStmt {
 public:
     WhileStmt(Expr *test, Stmt *body) : LoopStmt(test, body) {}
 
-    bool check() override;
+    void check() override;
 };
 
 
@@ -87,7 +87,7 @@ protected:
 public:
     IfStmt(Expr *test, Stmt *thenBody, Stmt *elseBody);
 
-    bool check() override;
+    void check() override;
 };
 
 
@@ -95,7 +95,7 @@ class BreakStmt : public Stmt {
 public:
     explicit BreakStmt(yyltype loc) : Stmt(loc) {}
 
-    bool check() override;
+    void check() override;
 };
 
 
@@ -106,7 +106,7 @@ protected:
 public:
     ReturnStmt(yyltype loc, Expr *expr);
 
-    bool check() override;
+    void check() override;
 };
 
 
@@ -117,7 +117,7 @@ protected:
 public:
     explicit PrintStmt(List<Expr*> *arguments);
 
-    bool check() override;
+    void check() override;
 };
 
 

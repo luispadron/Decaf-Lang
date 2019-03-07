@@ -15,7 +15,7 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     (stmts = s)->set_parent_all(this);
 }
 
-bool StmtBlock::check() {
+void StmtBlock::check() {
 
 }
 
@@ -26,12 +26,12 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
     (body = b)->set_parent(this);
 }
 
-bool ConditionalStmt::check() {
+void ConditionalStmt::check() {
 
 }
 
 
-bool LoopStmt::check() {
+void LoopStmt::check() {
 
 }
 
@@ -42,12 +42,12 @@ ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
     (step = s)->set_parent(this);
 }
 
-bool ForStmt::check() {
+void ForStmt::check() {
 
 }
 
 
-bool WhileStmt::check() {
+void WhileStmt::check() {
 
 }
 
@@ -58,12 +58,12 @@ IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) {
     if (elseBody) elseBody->set_parent(this);
 }
 
-bool IfStmt::check() {
+void IfStmt::check() {
 
 }
 
 
-bool BreakStmt::check() {
+void BreakStmt::check() {
 
 }
 
@@ -73,7 +73,7 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
     (expr = e)->set_parent(this);
 }
 
-bool ReturnStmt::check() {
+void ReturnStmt::check() {
 
 }
 
@@ -83,6 +83,6 @@ PrintStmt::PrintStmt(List<Expr*> *a) {
     (args = a)->set_parent_all(this);
 }
 
-bool PrintStmt::check() {
+void PrintStmt::check() {
 
 }

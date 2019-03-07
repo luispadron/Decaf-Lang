@@ -10,7 +10,7 @@ Symbol_table::~Symbol_table() {
     }
 }
 
-void Symbol_table::push_scope(const std::string &debug_name) {
+void Symbol_table::enter_scope(const std::string &debug_name) {
     auto new_scope = new Scope(debug_name);
     new_scope->parent_ptr = scope_ptr;
     new_scope->super_ptr = scope_ptr ? scope_ptr->super_ptr : nullptr;
@@ -21,7 +21,7 @@ void Symbol_table::push_scope(const std::string &debug_name) {
     if (DEBUG_PRINT) { std::cout << "pushing scope: " << debug_name << std::endl; debug_print(); }
 }
 
-void Symbol_table::push_class_scope(const std::string &key, const std::string &debug_name) {
+void Symbol_table::enter_class_scope(const std::string &key, const std::string &debug_name) {
     auto new_scope = new Scope(debug_name);
     new_scope->parent_ptr = scope_ptr;
     new_scope->this_ptr = new_scope;
@@ -32,7 +32,7 @@ void Symbol_table::push_class_scope(const std::string &key, const std::string &d
     if (DEBUG_PRINT) { std::cout << "pushing class scope: " << debug_name << std::endl; debug_print(); }
 }
 
-void Symbol_table::pop_scope() {
+void Symbol_table::leave_scope() {
     if (!scope_ptr) return;
     scope_ptr = scope_ptr->parent_ptr;
 

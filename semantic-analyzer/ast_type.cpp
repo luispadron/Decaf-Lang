@@ -65,7 +65,7 @@ bool Type::can_perform_assignment_with(const Type *other) const {
     return is_equal_to(other);
 }
 
-bool Type::check() {
+void Type::check() {
 
 }
 
@@ -85,7 +85,7 @@ bool NamedType::can_perform_equality_with(const Type *other) const {
     return other == nullType || is_equal_to(other); // types must be same or comparing to null
 }
 
-bool NamedType::check() {
+void NamedType::check() {
 
 }
 
@@ -111,7 +111,7 @@ bool ArrayType::can_perform_assignment_with(const Type *other) const {
     }
 }
 
-bool ArrayType::check() {
+void ArrayType::check() {
 
 }
 

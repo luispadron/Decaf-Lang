@@ -54,21 +54,9 @@ public:
     void set_parent(Node *p)  { parent = p; }
     Node *get_parent()        { return parent; }
 
-    /// this method gives any Node in the AST the ability to check that
-    /// they are semantically correct, if an error is found implementations should return false
-    virtual bool check() = 0;
+    virtual void check();
 
-    /// traverses the AST upwards, at each step calling the given function
-    /// with the current node, if the function predicate returns true this function returns the current node.
-    /// if predicate never returns true, nullptr is returned.
-    template <typename Fn>
-    Node * find_parent_if(Fn pred) {
-        for (auto curr = this; curr; curr = curr->get_parent()) {
-            if (pred(curr)) return curr;
-        }
-
-        return nullptr;
-    }
+    virtual Type* type_check();
 };
    
 
@@ -83,7 +71,7 @@ public:
 
     const char * get_name() const { return name; }
 
-    bool check() override;
+    void check() override;
 };
 
 
@@ -95,8 +83,6 @@ public:
 class Error : public Node {
 public:
     Error() : Node() {}
-
-    bool check() override;
 };
 
 #endif
