@@ -13,9 +13,9 @@
 #include <string>
 #include <sstream>
 
-// forward declare Symbol_table
-template<typename K, typename V>
+// forward declare Symbol_table and Type
 class Symbol_table;
+class Type;
 
 /**
  * Scope
@@ -24,10 +24,7 @@ class Symbol_table;
  *
  * A scope is made up of identifier (key) -> value definitions.
  * Scopes have pointers to their parent scope, as well as "super" and "this" for OOP languages.
- * @tparam Key
- * @tparam Value
  */
-template<typename Key, typename Value>
 class Scope {
 
 public:
@@ -39,19 +36,19 @@ public:
     explicit Scope(std::string name_) : name{name_} { }
 
     /// declares Symbol_table class as a friend
-    friend class Symbol_table<Key, Value>;
+    friend class Symbol_table;
 
     /// inserts a new entry this scope
     /// if symbol with given key already exists, exception is thrown
-    void insert_symbol(const Key& k, const Value& v);
+    void insert_symbol(const std::string& k, Type* type);
 
     /// returns whether or not the given symbol is in the given scope
     /// searches this scope and any parent scopes that are above this scope
-    bool is_symbol(const Key& k);
+    bool is_symbol(const std::string& k);
 
     /// returns the first value for given key in this scope or any parent scope
     /// if does not exist, exception is thrown
-    Value& get_symbol(const Key& k);
+    Type* get_symbol(const std::string& k);
 
     /// prints a representation of this current scope and any of its parent scopes
     void debug_print() const;
@@ -59,10 +56,10 @@ public:
 private:
 
     /// typedef for map of symbols
-    using Symbols = std::map<Key, Value>;
+    using Symbols = std::map<std::string, Type*>;
 
     /// typedef for iterator of symbol type
-    using Symbol_iter = typename std::map<Key, Value>::iterator;
+    using Symbol_iter = typename std::map<std::string, Type*>::iterator;
 
     /// the name of the scope, used for debugging purposes
     std::string name;
@@ -81,85 +78,7 @@ private:
 
     // helper functions //
 
-    Symbol_iter get_symbol_iter(const Key &k);
+    Symbol_iter get_symbol_iter(const std::string &k);
 };
-
-
-////////////// Implementation //////////////
-
-
-template <typename Key, typename Value>
-void Scope<Key, Value>::insert_symbol(const Key &k, const Value &v) {
-    auto it = symbols.find(k);
-
-    if (it != symbols.end()) {
-        throw Symbol_table_exception{"error (insert_symbol) called with duplicate key"};
-    } else {
-        symbols.insert({k, v});
-    }
-}
-
-template <typename Key, typename Value>
-bool Scope<Key, Value>::is_symbol(const Key &k) {
-    return get_symbol_iter(k) != symbols.end();
-}
-
-template <typename Key, typename Value>
-Value& Scope<Key, Value>::get_symbol(const Key &k) {
-    auto it = get_symbol_iter(k);
-
-    if (it == symbols.end()) {
-        throw Symbol_table_exception{"error (get_symbol) no symbol exists for given key"};
-    }
-
-    return it->second;
-}
-
-template <typename Key, typename Value>
-typename Scope<Key, Value>::Symbol_iter Scope<Key, Value>::get_symbol_iter(const Key &k) {
-    // first search through this scope
-    auto scope_ptr = this;
-    for (; scope_ptr; scope_ptr = scope_ptr->parent_ptr) {
-        auto it = scope_ptr->symbols.find(k);
-        if (it != scope_ptr->symbols.end()) {
-            return it;
-        }
-    }
-
-    // if not found, go to super scope if possible and check there
-    if (super_ptr) {
-        scope_ptr = super_ptr;
-        for (; scope_ptr; scope_ptr = scope_ptr->parent_ptr) {
-            auto it = scope_ptr->symbols.find(k);
-            if (it != scope_ptr->symbols.end()) {
-                return it;
-            }
-        }
-    }
-
-    return symbols.end();
-}
-
-template <typename Key, typename Value>
-void Scope<Key, Value>::debug_print() const {
-    auto scope_ptr = this;
-    std::stack<std::string> pstack; // used to print in reverse since we go current->parent
-
-    for (; scope_ptr; scope_ptr = scope_ptr->parent_ptr) {
-        std::stringstream ss;
-        ss << "------- " << scope_ptr->name << " scope -------" << std::endl;
-        for (auto symbol : scope_ptr->symbols) {
-            ss << symbol.first << std::endl;
-        }
-
-        ss << std::endl;
-        pstack.push(ss.str());
-    }
-
-    // print in reverse, thus prints in the current order from root->children
-    for (; !pstack.empty(); pstack.pop()) {
-        std::cout << pstack.top();
-    }
-}
 
 #endif //SYMBOLTABLE_SCOPE_H

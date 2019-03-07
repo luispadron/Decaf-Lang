@@ -16,20 +16,7 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
 }
 
 bool StmtBlock::check() {
-    // push scope and call children check method
-    Sym_table_t::shared().push_scope("block");
 
-    // insert all the declarations into sym table
-    for (int i = 0; i < decls->size(); ++i) {
-        auto decl = decls->get(i);
-        Sym_table_t::shared().insert_symbol(decl->get_id()->get_str(), decl);
-    }
-
-    decls->check_all();
-    stmts->check_all();
-    Sym_table_t::shared().pop_scope();
-
-    return true;
 }
 
 
@@ -40,15 +27,12 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
 }
 
 bool ConditionalStmt::check() {
-    bool testCheck, bodyCheck;
-    testCheck = test->check();
-    bodyCheck = body->check();
-    return testCheck && bodyCheck;
+
 }
 
 
 bool LoopStmt::check() {
-    return ConditionalStmt::check();
+
 }
 
 
@@ -59,23 +43,12 @@ ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
 }
 
 bool ForStmt::check() {
-    bool initCheck, testCheck, stepCheck, bodyCheck;
-    initCheck = init->check();
-    testCheck = test->check();
-    stepCheck = step->check();
-    bodyCheck = body->check();
 
-    if (test->get_result_type() != Type::boolType) {
-        ReportError::test_not_boolean(test);
-        return false;
-    }
-
-    return initCheck && testCheck && stepCheck && bodyCheck;
 }
 
 
 bool WhileStmt::check() {
-    return LoopStmt::check();
+
 }
 
 
@@ -86,26 +59,12 @@ IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) {
 }
 
 bool IfStmt::check() {
-    bool testCheck, thenCheck, elseCheck;
-    testCheck = test->check();
-    thenCheck = body->check();
-    elseCheck = elseBody ? elseBody->check() : true;
-    return testCheck && thenCheck && elseCheck;
+
 }
 
 
 bool BreakStmt::check() {
-    // check that the break stmt is within a loop stmt
-    auto loop_stmt = find_if([](Node *node) {
-       return dynamic_cast<LoopStmt*>(node) != nullptr;
-    });
 
-    if (!loop_stmt) {
-        ReportError::break_outside_loop(this);
-        return false;
-    }
-
-    return true;
 }
 
 
@@ -115,18 +74,7 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
 }
 
 bool ReturnStmt::check() {
-    // verify return statement is within function and expr type is equal to return type
-    auto fn_decl = dynamic_cast<FnDecl*>(find_if([](Node *node) {
-       return dynamic_cast<FnDecl*>(node) != nullptr;
-    }));
-    Assert(fn_decl);
 
-    if (!expr->get_result_type()->is_equal_to(fn_decl->get_return_type())) {
-        ReportError::return_mismatch(this, expr->get_result_type(), fn_decl->get_return_type());
-        return false;
-    }
-
-    return expr->check();
 }
 
 
@@ -136,17 +84,5 @@ PrintStmt::PrintStmt(List<Expr*> *a) {
 }
 
 bool PrintStmt::check() {
-    // check all types in the print function are printable
-    for (int i = 0; i < args->size(); ++i) {
-        auto arg = args->get(i);
-        auto res_type = arg->get_result_type();
-        Assert(res_type != nullptr);
 
-        if (!res_type->is_printable()) {
-            ReportError::print_arg_mismatch(arg, i + 1, res_type);
-            return false;
-        }
-    }
-
-    return true;
 }

@@ -24,9 +24,9 @@ Identifier::Identifier(yyltype loc, const char *n) : Node(loc) {
 }
 
 bool Identifier::check() {
-    return Sym_table_t::shared().is_symbol(name);
+
 }
 
 bool Error::check() {
-    return false;
+
 }

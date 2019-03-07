@@ -39,7 +39,7 @@ class Node;
 class Decl;
 
 /// type alias for the symbol table type
-using Sym_table_t = Symbol_table<std::string, Decl*>;
+using Sym_table_t = Symbol_table;
 
 class Node {
 protected:
@@ -62,7 +62,7 @@ public:
     /// with the current node, if the function predicate returns true this function returns the current node.
     /// if predicate never returns true, nullptr is returned.
     template <typename Fn>
-    Node * find_if(Fn pred) {
+    Node * find_parent_if(Fn pred) {
         for (auto curr = this; curr; curr = curr->get_parent()) {
             if (pred(curr)) return curr;
         }
@@ -81,7 +81,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, Identifier *id) { return out << id->name; }
 
-    const char * get_str() const { return name; }
+    const char * get_name() const { return name; }
 
     bool check() override;
 };

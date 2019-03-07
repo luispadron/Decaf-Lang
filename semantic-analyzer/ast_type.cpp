@@ -66,7 +66,7 @@ bool Type::can_perform_assignment_with(const Type *other) const {
 }
 
 bool Type::check() {
-    return true; // since all fundamental types are defined
+
 }
 
 
@@ -78,7 +78,7 @@ NamedType::NamedType(Identifier *i) : Type(*i->get_location()) {
 bool NamedType::is_equal_to(const Type *other) const {
     auto named_other = dynamic_cast<const NamedType*>(other);
     if (!named_other) { return false; }
-    return std::strcmp(id->get_str(), named_other->id->get_str()) == 0;
+    return std::strcmp(id->get_name(), named_other->id->get_name()) == 0;
 }
 
 bool NamedType::can_perform_equality_with(const Type *other) const {
@@ -86,7 +86,7 @@ bool NamedType::can_perform_equality_with(const Type *other) const {
 }
 
 bool NamedType::check() {
-    return Sym_table_t::shared().is_symbol(id->get_str());
+
 }
 
 
@@ -112,7 +112,7 @@ bool ArrayType::can_perform_assignment_with(const Type *other) const {
 }
 
 bool ArrayType::check() {
-    return elemType->check();
+
 }
 
 
