@@ -40,27 +40,6 @@ public:
     /// returns whether this type is equal to another type
     virtual bool is_equal_to(const Type *other) const;
 
-    /// returns whether this type can perform arithmetic
-    bool can_perform_arithmetic() const;
-
-    /// returns whether this type can perform arithmetic with other type
-    bool can_perform_arithmetic_with(const Type *other) const;
-
-    /// returns whether this type can perform relational operations with another type (<, > <=, >=)
-    bool can_perform_relational_with(const Type *other) const;
-
-    /// returns whether this type can perform an equality operation with another type (==, !=)
-    virtual bool can_perform_equality_with(const Type *other) const;
-
-    /// returns whether this type can perform logic operations (||, !, &&)
-    bool can_perform_logical() const;
-
-    /// returns whether this type can perform logic operations with another type (||, !, &&)
-    bool can_perform_logical_with(const Type *other) const;
-
-    /// returns whether this type can get the other type assigned to it
-    virtual bool can_perform_assignment_with(const Type *other) const;
-
     void check() override;
 };
 
@@ -74,15 +53,8 @@ public:
     
     void print_to(std::ostream &out) override { out << id; }
 
-    /// returns the identifier of the NamedType, the id in this case is the name.
-    /// Example: dog x; id = "dog"
-    Identifier* get_id() { return id; }
-
     /// returns whether two named types are equal to each other (same identifier)
     bool is_equal_to(const Type *other) const override;
-
-    /// returns whether two named types can perform equality, i.e must be same type or one or both must be null
-    bool can_perform_equality_with(const Type *other) const override;
 
     void check() override;
 };
@@ -97,8 +69,6 @@ public:
     void print_to(std::ostream &out) override { out << elemType << "[]"; }
 
     bool is_equal_to(const Type *other) const override;
-
-    bool can_perform_assignment_with(const Type* other) const override;
 
     void check() override;
 };

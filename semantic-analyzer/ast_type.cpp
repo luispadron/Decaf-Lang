@@ -37,34 +37,6 @@ bool Type::is_equal_to(const Type *other) const {
     return this == other;
 }
 
-bool Type::can_perform_arithmetic() const {
-    return this == intType || this == doubleType;
-}
-
-bool Type::can_perform_arithmetic_with(const Type *other) const {
-    return can_perform_arithmetic() && is_equal_to(other);
-}
-
-bool Type::can_perform_relational_with(const Type *other) const {
-    return (this == intType || this == doubleType) && is_equal_to(other);
-}
-
-bool Type::can_perform_equality_with(const Type *other) const {
-    return is_equal_to(other);
-}
-
-bool Type::can_perform_logical() const {
-    return this == boolType;
-}
-
-bool Type::can_perform_logical_with(const Type *other) const {
-    return this == boolType && other == boolType;
-}
-
-bool Type::can_perform_assignment_with(const Type *other) const {
-    return is_equal_to(other);
-}
-
 void Type::check() {
 
 }
@@ -81,10 +53,6 @@ bool NamedType::is_equal_to(const Type *other) const {
     return std::strcmp(id->get_name(), named_other->id->get_name()) == 0;
 }
 
-bool NamedType::can_perform_equality_with(const Type *other) const {
-    return other == nullType || is_equal_to(other); // types must be same or comparing to null
-}
-
 void NamedType::check() {
 
 }
@@ -99,16 +67,6 @@ bool ArrayType::is_equal_to(const Type *other) const {
     auto array_other = dynamic_cast<const ArrayType*>(other);
     if (!array_other) { return false; }
     return elemType->is_equal_to(array_other->elemType);
-}
-
-bool ArrayType::can_perform_assignment_with(const Type *other) const {
-    // the element type and rhs type must be equal
-    auto array_type = dynamic_cast<const ArrayType*>(other);
-    if (array_type) {
-        return elemType->is_equal_to(array_type->elemType);
-    } else {
-        return elemType->is_equal_to(other);
-    }
 }
 
 void ArrayType::check() {
