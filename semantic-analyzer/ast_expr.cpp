@@ -384,11 +384,11 @@ Type* NewArrayExpr::type_check() {
 }
 
 
-void ReadIntegerExpr::check() {
-
+Type* ReadIntegerExpr::type_check() {
+    return Type::intType;
 }
 
 
-void ReadLineExpr::check() {
-
+Type* ReadLineExpr::type_check() {
+    return Type::stringType;
 }

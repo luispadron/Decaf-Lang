@@ -1,0 +1,18 @@
+// tests ReadLine and ReadInteger
+
+void main() {
+    int x;
+    string s;
+    double d;
+
+    x = ReadInteger();
+    s = ReadLine();
+
+    d = ReadInteger(); // error
+    d = ReadLine(); // error
+    s = ReadInteger(); // error
+    x = ReadLine(); // error
+
+    x = ReadInteger() + ReadInteger();
+    d = 1.2 + ReadInteger(); // error
+}

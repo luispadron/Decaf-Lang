@@ -268,7 +268,7 @@ class ReadIntegerExpr : public Expr {
 public:
     explicit ReadIntegerExpr(yyltype loc) : Expr(loc) {}
 
-    void check() override;
+    Type * type_check() override;
 };
 
 
@@ -276,7 +276,7 @@ class ReadLineExpr : public Expr {
 public:
     explicit ReadLineExpr(yyltype loc) : Expr (loc) {}
 
-    void check() override;
+    Type * type_check() override;
 };
 
     

@@ -1,0 +1,30 @@
+
+*** Error line 11.
+    d = ReadInteger(); // error
+      ^
+*** Incompatible operands: double = int
+
+
+*** Error line 12.
+    d = ReadLine(); // error
+      ^
+*** Incompatible operands: double = string
+
+
+*** Error line 13.
+    s = ReadInteger(); // error
+      ^
+*** Incompatible operands: string = int
+
+
+*** Error line 14.
+    x = ReadLine(); // error
+      ^
+*** Incompatible operands: int = string
+
+
+*** Error line 17.
+    d = 1.2 + ReadInteger(); // error
+            ^
+*** Incompatible operands: double + int
+
