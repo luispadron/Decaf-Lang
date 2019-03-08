@@ -2,9 +2,11 @@
 
 void main() {
     int[] nums;
+    int[][] numnums;
     double[] floats;
     int x;
 
+    numnums[0][nums[0]];
     x = nums[0] + nums[2];
     x[2.3];
 }

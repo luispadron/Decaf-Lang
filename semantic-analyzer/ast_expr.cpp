@@ -177,7 +177,7 @@ void ArrayAccess::check() {
 
     subscript->check();
 
-    if (subscript->type_check() != Type::intType) {
+    if (!subscript->type_check()->can_perform_array_access()) {
         ReportError::subscript_not_integer(subscript);
     }
 }
