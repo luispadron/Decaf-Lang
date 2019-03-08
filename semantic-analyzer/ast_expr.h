@@ -156,12 +156,16 @@ public:
 
 
 class LogicalExpr : public CompoundExpr {
+    bool validate();
+
 public:
     LogicalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 
     LogicalExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
 
     void check() override;
+
+    Type * type_check() override;
 };
 
 
