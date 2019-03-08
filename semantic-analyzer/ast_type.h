@@ -37,11 +37,29 @@ public:
     /// returns whether given type is printable or not
     bool is_printable() const;
 
-    /// returns whether type is int or double
-    bool is_number() const;
-
     /// returns whether this type is equal to another type
     virtual bool is_equal_to(const Type *other) const;
+
+    /// returns whether this type can perform arithmetic
+    bool can_perform_arithmetic() const;
+
+    /// returns whether this type can perform arithmetic with other type
+    bool can_perform_arithmetic_with(const Type *other) const;
+
+    /// returns whether this type can perform relational operations with another type (<, > <=, >=)
+    bool can_perform_relational_with(const Type *other) const;
+
+    /// returns whether this type can perform an equality operation with another type (==, !=)
+    virtual bool can_perform_equality_with(const Type *other) const;
+
+    /// returns whether this type can perform logic operations (||, !, &&)
+    bool can_perform_logical() const;
+
+    /// returns whether this type can perform logic operations with another type (||, !, &&)
+    bool can_perform_logical_with(const Type *other) const;
+
+    /// returns whether this type can get the other type assigned to it
+    virtual bool can_perform_assignment_with(const Type *other) const;
 
     Type* type_check() override;
 };
@@ -61,6 +79,10 @@ public:
     /// returns whether two named types are equal to each other (same identifier)
     bool is_equal_to(const Type *other) const override;
 
+
+    /// returns whether two named types can perform equality, i.e must be same type or one or both must be null
+    bool can_perform_equality_with(const Type *other) const override;
+
     void check() override;
 
     Type* type_check() override;
@@ -76,6 +98,9 @@ public:
     void print_to(std::ostream &out) override { out << elemType << "[]"; }
 
     bool is_equal_to(const Type *other) const override;
+
+    ///
+    bool can_perform_assignment_with(const Type* other) const override;
 
     void check() override;
 

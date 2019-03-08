@@ -76,10 +76,6 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r)
     (right = r)->set_parent(this);
 }
 
-bool CompoundExpr::validate() {
-    return true;
-}
-
 void CompoundExpr::check() {
     if (left) left->check();
     right->check();
@@ -88,16 +84,8 @@ void CompoundExpr::check() {
 
 bool ArithmeticExpr::validate() {
     auto rtype = right->type_check();
-
-    // types must be both numbers (int/double) and both of same type
-    if (left) {
-        auto ltype = left->type_check();
-        if (!ltype->is_number() || !ltype->is_equal_to(rtype)) {
-            return false;
-        }
-    }
-
-    return rtype->is_number();
+    if (left) return left->type_check()->can_perform_arithmetic_with(rtype);
+    return rtype->can_perform_arithmetic();
 }
 
 void ArithmeticExpr::check() {
@@ -123,8 +111,26 @@ Type* ArithmeticExpr::type_check() {
 }
 
 
-void RelationalExpr::check() {
+bool RelationalExpr::validate() {
+    return left->type_check()->can_perform_relational_with(right->type_check());
+}
 
+void RelationalExpr::check() {
+    CompoundExpr::check();
+
+    Type *ltype = left->type_check(), *rtype = right->type_check();
+
+    if (!validate() && ltype != Type::errorType && rtype != Type::errorType) {
+        ReportError::incompatible_operands(op, ltype, rtype);
+    }
+}
+
+Type* RelationalExpr::type_check() {
+    if (!validate()) {
+        return Type::errorType;
+    } else {
+        return Type::boolType;
+    }
 }
 
 
