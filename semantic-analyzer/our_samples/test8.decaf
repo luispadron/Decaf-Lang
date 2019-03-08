@@ -9,4 +9,9 @@ void main() {
     numnums[0][nums[0]];
     x = nums[0] + nums[2];
     x[2.3];
+
+    nums = NewArray(1, int);
+    nums = NewArray(1.2, int);
+    nums = NewArray(1, string);
+    nums = NewArray(1, Undef);
 }

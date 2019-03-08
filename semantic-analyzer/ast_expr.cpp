@@ -183,7 +183,11 @@ void ArrayAccess::check() {
 }
 
 Type * ArrayAccess::type_check() {
-    return base->type_check();
+    if (!base->type_check()->is_array_type() || !subscript->type_check()->can_perform_array_access()) {
+        return Type::errorType;
+    } else {
+        return base->type_check();
+    }
 }
 
 
@@ -277,10 +281,23 @@ NewArrayExpr::NewArrayExpr(yyltype loc, Expr *sz, Type *et) : Expr(loc) {
     Assert(sz != nullptr && et != nullptr);
     (size = sz)->set_parent(this);
     (elemType = et)->set_parent(this);
+    arrayType = new ArrayType(loc, et);
 }
 
 void NewArrayExpr::check() {
+    if (size->type_check() != Type::intType) {
+        ReportError::new_array_size_not_integer(size);
+    }
 
+    elemType->check();
+}
+
+Type* NewArrayExpr::type_check() {
+    if (size->type_check() != Type::intType || elemType->type_check() == Type::errorType) {
+        return Type::errorType;
+    } else {
+        return arrayType;
+    }
 }
 
 

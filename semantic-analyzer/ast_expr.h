@@ -246,11 +246,14 @@ class NewArrayExpr : public Expr {
 protected:
     Expr *size;
     Type *elemType;
+    ArrayType *arrayType;
     
 public:
     NewArrayExpr(yyltype loc, Expr *sizeExpr, Type *elemType);
 
     void check() override;
+
+    Type * type_check() override;
 };
 
 
