@@ -1,0 +1,30 @@
+
+*** Error line 11.
+    x[2.3];
+    ^
+*** [] can only be applied to arrays
+
+
+*** Error line 11.
+    x[2.3];
+      ^^^
+*** Array subscript must be an integer
+
+
+*** Error line 14.
+    nums = NewArray(1.2, int);
+                    ^^^
+*** Size for NewArray must be an integer
+
+
+*** Error line 15.
+    nums = NewArray(1, string);
+         ^
+*** Incompatible operands: int[] = string[]
+
+
+*** Error line 16.
+    nums = NewArray(1, Undef);
+                       ^^^^^
+*** No declaration found for type 'Undef'
+

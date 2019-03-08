@@ -25,6 +25,8 @@ void StmtBlock::check() {
     }
 
     stmts->check_all();
+
+    Sym_tbl_t::shared().leave_scope();
 }
 
 

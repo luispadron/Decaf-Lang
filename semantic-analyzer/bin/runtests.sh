@@ -7,12 +7,11 @@ echo "building"
 make clean > /dev/null
 make > /dev/null
 
+echo ""
 echo "running sample_tests"
 echo ""
-# run sample tests
-printf 'samples\nsample_tests/ours\ndcc' | ./bin/gentests.sh
+printf 'samples\nsample_tests/ours\ndcc' | ./bin/gentests.sh > /dev/null
 
-set -e
 ERROR=false
 PASSED=0
 TOTAL=0
@@ -42,34 +41,35 @@ do
     TOTAL=$((TOTAL+1))
 done
 
-#echo "running our_tests"
-#echo ""
-#printf 'our_tests/input\nour_tests/correct\nsolution/dcc' | ./bin/gen_tests.sh > /dev/null
-#printf 'our_tests/input\nour_tests/output\ndcc' | ./bin/gen_tests.sh > /dev/null
-#
-#for file in our_tests/correct/*
-#do
-#    filename="${file##*/}"
-#    filename="${filename%.*}"
-#    {
-#        diff -w $file our_tests/output/$filename.txt > our_tests/diffs/$filename.diff
-#    } || {
-#        echo "test failed for file: $filename ❗️"
-#        ERROR=true
-#    }
-#
-#    if $ERROR;
-#    then
-#        echo "check diff: our_tests/diffs/$filename.diff"
-#        echo "--------------------------------------------------"
-#    else
-#        PASSED=$((PASSED+1))
-#        echo "test passed for file: $filename ✅"
-#        echo "--------------------------------------------------"
-#    fi
-#
-#    ERROR=false
-#    TOTAL=$((TOTAL+1))
-#done
+echo ""
+echo "running our_samples"
+echo ""
+printf 'our_samples/in\nour_samples/correct\nsolution/dcc-mac' | ./bin/gentests.sh > /dev/null
+printf 'our_samples/in\nour_samples/out\ndcc' | ./bin/gentests.sh > /dev/null
+
+for file in our_samples/correct/*
+do
+    filename="${file##*/}"
+    filename="${filename%.*}"
+    {
+        diff -w $file our_samples/out/$filename.txt > our_samples/diff/$filename.diff
+    } || {
+        echo "test failed for file: $filename ❗️"
+        ERROR=true
+    }
+
+    if $ERROR;
+    then
+        echo "check diff: our_samples/diff/$filename.diff"
+        echo "--------------------------------------------------"
+    else
+        PASSED=$((PASSED+1))
+        echo "test passed for file: $filename ✅"
+        echo "--------------------------------------------------"
+    fi
+
+    ERROR=false
+    TOTAL=$((TOTAL+1))
+done
 
 echo "passed $PASSED / $TOTAL tests"

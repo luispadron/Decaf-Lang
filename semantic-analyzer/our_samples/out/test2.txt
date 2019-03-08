@@ -1,0 +1,6 @@
+
+*** Error line 8.
+    -s; // this should error
+    ^
+*** Incompatible operand: - string
+

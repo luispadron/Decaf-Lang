@@ -286,7 +286,7 @@ void Call::check() {
         ReportError::identifier_not_found(field, Reason_e::LookingForFunction);
         return;
     } else {
-        // found field, but declaration of field needs to be a variable
+        // found field, but declaration of field needs to be a function
         auto decl = Sym_tbl_t::shared().get_declaration(field->get_name());
         if (decl->get_decl_type() != DeclType::Function) {
             ReportError::identifier_not_found(field, Reason_e::LookingForFunction);

@@ -1,0 +1,18 @@
+
+*** Error line 12.
+	d.age; // error
+          ^^^
+*** dog field 'age' only accessible within class scope
+
+
+*** Error line 13.
+	d.x; // error
+          ^
+*** dog has no such field 'x'
+
+
+*** Error line 16.
+	x.d; // error
+          ^
+*** int has no such field 'd'
+

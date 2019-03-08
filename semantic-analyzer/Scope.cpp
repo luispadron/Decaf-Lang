@@ -37,13 +37,11 @@ Scope::Symbol_iter Scope::get_symbol_iter(const string &k) {
     }
 
     // if not found, go to super scope if possible and check there
-    if (super_ptr) {
-        scope_ptr = super_ptr;
-        for (; scope_ptr; scope_ptr = scope_ptr->parent_ptr) {
-            auto it = scope_ptr->symbols.find(k);
-            if (it != scope_ptr->symbols.end()) {
-                return it;
-            }
+    scope_ptr = super_ptr;
+    for (; scope_ptr; scope_ptr = scope_ptr->parent_ptr) {
+        auto it = scope_ptr->symbols.find(k);
+        if (it != scope_ptr->symbols.end()) {
+            return it;
         }
     }
 

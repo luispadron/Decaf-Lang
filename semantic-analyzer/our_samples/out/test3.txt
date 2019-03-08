@@ -1,0 +1,42 @@
+
+*** Error line 13.
+    x + z; // error
+        ^
+*** No declaration found for variable 'z'
+
+
+*** Error line 17.
+    x + d1; // error
+      ^
+*** Incompatible operands: int + double
+
+
+*** Error line 19.
+    t + d1; // error
+      ^
+*** Incompatible operands: bool + double
+
+
+*** Error line 21.
+    UNKWN + d;
+    ^^^^^
+*** No declaration found for variable 'UNKWN'
+
+
+*** Error line 21.
+    UNKWN + d;
+            ^
+*** No declaration found for variable 'd'
+
+
+*** Error line 22.
+    UNKWN + UNKWN;
+    ^^^^^
+*** No declaration found for variable 'UNKWN'
+
+
+*** Error line 22.
+    UNKWN + UNKWN;
+            ^^^^^
+*** No declaration found for variable 'UNKWN'
+

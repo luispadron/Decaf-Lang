@@ -1,0 +1,12 @@
+
+*** Error line 8.
+    -s; // this should error
+    ^
+*** Incompatible operand: - string
+
+
+*** Error line 10.
+    return d + x; // this should error
+             ^
+*** Incompatible operands: double + int
+

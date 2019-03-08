@@ -10,6 +10,8 @@ int test(int x, int y) {
     x + y;
 }
 
+void bark(int x) { }
+
 void main() {
 	dog d;
 
@@ -17,6 +19,9 @@ void main() {
 
 	d.bark();
 	d.bark("bad"); // error
+
+	bark(); // error
+	bark(1);
 
 	test(1, 1);
 	test(1.2, 1); // error

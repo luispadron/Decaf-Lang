@@ -1,0 +1,18 @@
+
+*** Error line 5.
+        this.age + this.age;
+             ^^^
+*** error has no such field 'age'
+
+
+*** Error line 5.
+        this.age + this.age;
+                        ^^^
+*** error has no such field 'age'
+
+
+*** Error line 14.
+    this.help; // error
+         ^^^^
+*** error has no such field 'help'
+

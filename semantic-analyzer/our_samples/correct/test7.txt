@@ -1,0 +1,6 @@
+
+*** Error line 14.
+    this.help; // error
+    ^^^^
+*** 'this' is only valid within class scope
+

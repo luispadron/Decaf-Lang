@@ -1,0 +1,6 @@
+
+*** Error line 6.
+   a = 10 + main;
+            ^^^^
+*** No declaration found for variable 'main'
+
