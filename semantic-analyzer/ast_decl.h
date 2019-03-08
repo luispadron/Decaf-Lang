@@ -20,6 +20,7 @@
 class Identifier;
 class Stmt;
 class Expr;
+class Call;
 
 /// Declares the different types of decls
 enum class DeclType { Variable, Class, Function, Interface };
@@ -91,6 +92,8 @@ public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
 
     void set_function_body(Stmt *b);
+
+    void check_parameters(Call *expr, Identifier *fn_ident, List<Expr*> *actuals);
 
     DeclType get_decl_type() const override { return DeclType::Function; }
 

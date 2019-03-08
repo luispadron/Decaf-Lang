@@ -98,11 +98,39 @@ void FnDecl::set_function_body(Stmt *b) {
     (body = b)->set_parent(this);
 }
 
+void FnDecl::check_parameters(Call *call, Identifier *fn_ident, List<Expr *> *actuals) {
+    // if sizes dont match, error
+    if (formals->size() != actuals->size()) {
+        ReportError::num_args_mismatch(fn_ident, formals->size(), actuals->size());
+        return;
+    }
+
+    // check that actuals match formals
+    for (int i = 0; i < formals->size(); ++i) {
+        auto formal = formals->get(i);
+        auto actual = actuals->get(i);
+        auto ftype = formal->type_check();
+        auto atype = actual->type_check();
+
+        if (!ftype->is_equal_to(atype)) {
+            ReportError::arg_mismatch(call, i + 1, atype, ftype);
+        }
+    }
+}
+
 void FnDecl::check() {
     Sym_tbl_t::shared().enter_scope(id->get_name());
 
     returnType->check();
+
+    // push all formals into scope
+    for (int i = 0; i < formals->size(); ++i) {
+        auto formal = formals->get(i);
+        Sym_tbl_t::shared().insert_declaration(formal->get_id()->get_name(), formal);
+    }
+
     formals->check_all();
+
     if (body) body->check();
 
     Sym_tbl_t::shared().leave_scope();

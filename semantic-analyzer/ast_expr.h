@@ -228,6 +228,8 @@ public:
     Call(yyltype loc, Expr *base, Identifier *field, List<Expr*> *args);
 
     void check() override;
+
+    Type * type_check() override;
 };
 
 

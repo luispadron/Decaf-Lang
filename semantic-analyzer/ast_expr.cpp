@@ -263,7 +263,66 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
 
 
 void Call::check() {
+    FnDecl *fn_decl = nullptr;
 
+    if (base) {
+        auto btype = base->type_check();
+
+        // field is not found in the scope of the base, error
+        if (!Sym_tbl_t::shared().is_declared_in_class(btype->get_type_name(), field->get_name())) {
+            ReportError::field_not_found_in_base(field, btype);
+            return;
+        }
+
+        auto decl = Sym_tbl_t::shared().get_declaration_in_class(btype->get_type_name(), field->get_name());
+        if (decl->get_decl_type() != DeclType::Function) {
+            ReportError::field_not_found_in_base(field, btype);
+            return;
+        }
+        // good to go, now just need to verify signature is correct
+        fn_decl = dynamic_cast<FnDecl*>(decl);
+    } else if (!Sym_tbl_t::shared().is_declared(field->get_name())) {
+        // didn't find the field at all
+        ReportError::identifier_not_found(field, Reason_e::LookingForFunction);
+        return;
+    } else {
+        // found field, but declaration of field needs to be a variable
+        auto decl = Sym_tbl_t::shared().get_declaration(field->get_name());
+        if (decl->get_decl_type() != DeclType::Function) {
+            ReportError::identifier_not_found(field, Reason_e::LookingForFunction);
+            return;
+        }
+        // good to go, now just need to verify signature is correct
+        fn_decl = dynamic_cast<FnDecl*>(decl);
+    }
+
+    Assert(fn_decl);
+    fn_decl->check_parameters(this, field, actuals);
+}
+
+Type* Call::type_check() {
+    if (base) {
+        auto btype = base->type_check();
+        // only named types can use . syntax
+        if (!btype->is_named_type()) { return Type::errorType; }
+        // not found, thus this field doesnt exist in class
+        if (!Sym_tbl_t::shared().is_declared_in_class(btype->get_type_name(), field->get_name())) { return Type::errorType; }
+        // found in sym table, simply return the type of the decl, if its a function decl
+        auto decl = Sym_tbl_t::shared().get_declaration_in_class(btype->get_type_name(), field->get_name());
+        // if not a function decl, this is an error
+        if (decl->get_decl_type() != DeclType::Function) { return Type::errorType; }
+        // everything is good, return type of decl
+        return decl->type_check();
+    } else {
+        // field not found in current scope, error
+        if (!field->is_defined()) { return Type::errorType; }
+        // found in sym table, simply return the type of the decl, if its a function decl
+        auto decl = Sym_tbl_t::shared().get_declaration(field->get_name());
+        // if not a function decl, this is an error
+        if (decl->get_decl_type() != DeclType::Function) { return Type::errorType; }
+        // everything is good, return type of decl
+        return decl->type_check();
+    }
 }
 
 
