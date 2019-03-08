@@ -21,7 +21,7 @@
 
 class Type : public Node {
 protected:
-    char *typeName;
+    const char *typeName;
 
 public:
     static Type *intType, *doubleType, *boolType, *voidType,
@@ -34,11 +34,17 @@ public:
 
     virtual void print_to(std::ostream &out) { out << typeName; }
 
+    /// returns the type name of the given type
+    virtual const char * get_type_name() { return typeName; }
+
     /// returns whether given type is printable or not
     bool is_printable() const;
 
     /// returns whether this type is equal to another type
     virtual bool is_equal_to(const Type *other) const;
+
+    /// returns whether the current type is a named type, that is, not an array or primative
+    virtual bool is_named_type() const { return false; }
 
     /// returns whether this type can perform arithmetic
     bool can_perform_arithmetic() const;
@@ -74,7 +80,13 @@ public:
     
     void print_to(std::ostream &out) override { out << id; }
 
+    const char * get_type_name() override { return id->get_name(); }
+
+    /// returns the id of this type
     Identifier * get_id() { return id; }
+
+    /// returns that this type is in fact a named type
+    bool is_named_type() const override { return true; }
 
     /// returns whether two named types are equal to each other (same identifier)
     bool is_equal_to(const Type *other) const override;
@@ -95,6 +107,8 @@ public:
     ArrayType(yyltype loc, Type *elemType);
     
     void print_to(std::ostream &out) override { out << elemType << "[]"; }
+
+    const char * get_type_name() override { return elemType->get_type_name(); }
 
     bool is_equal_to(const Type *other) const override;
 

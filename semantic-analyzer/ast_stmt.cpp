@@ -21,7 +21,7 @@ void StmtBlock::check() {
     // add declarations to scope
     for (int i = 0; i < decls->size(); ++i) {
         auto decl = decls->get(i);
-        Sym_tbl_t::shared().insert_symbol(decl->get_id()->get_name(), decl->type_check());
+        Sym_tbl_t::shared().insert_declaration(decl->get_id()->get_name(), decl);
     }
 
     stmts->check_all();

@@ -56,7 +56,14 @@ void ClassDecl::check() {
         }
     }
 
-    Sym_tbl_t::shared().enter_scope(id->get_name());
+    Sym_tbl_t::shared().enter_class_scope(id->get_name());
+
+    // insert all decls into class scope
+
+    for (int i = 0; i < members->size(); ++i) {
+        auto decl = members->get(i);
+        Sym_tbl_t::shared().insert_declaration(decl->get_id()->get_name(), decl);
+    }
 
     members->check_all();
 

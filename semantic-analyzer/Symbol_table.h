@@ -37,30 +37,30 @@ public:
     void enter_scope(const std::string &debug_name);
 
     /// pushes a new class scope to the symbol table
-    void enter_class_scope(const std::string &key, const std::string &debug_name);
+    void enter_class_scope(const std::string &key);
 
     /// pops the current scope to be the parent scope
     void leave_scope();
 
     /// inserts a symbol into the current scope
     /// if no scope exists, exception is thrown
-    void insert_symbol(const std::string& k, Type* v);
+    void insert_declaration(const std::string &k, Decl *d);
 
     /// returns whether or not given symbol is defined in current scope (or parent scopes)
-    bool is_symbol(const std::string& k) const;
+    bool is_declared(const std::string &k) const;
 
     /// returns whether or not the given symbol is defined in the given class scope
-    bool is_symbol_in_class(const std::string &class_key, const std::string& k) const;
+    bool is_declared_in_class(const std::string &class_key, const std::string &k) const;
 
     /// returns whether the current scope is within a class
     bool is_class_scope() const;
 
     /// returns the value of the symbol with given key
     /// if no such symbol exists, exception is thrown
-    Type* get_symbol(const std::string& k);
+    Decl * get_declaration(const std::string &k);
 
     /// returns the value of the symbol with given key in the given class scope
-    Type* get_symbol_in_class(const std::string &class_key, const std::string& k) const;
+    Decl * get_declaration_in_class(const std::string &class_key, const std::string &k) const;
 
     /// prints the symbol table for debugging purposes
     void debug_print() const;

@@ -31,5 +31,5 @@ Identifier::Identifier(yyltype loc, const char *n) : Node(loc) {
 void Identifier::check() { /* we don't want to print error out here, other classes will */ }
 
 bool Identifier::is_defined() {
-    return Sym_tbl_t::shared().is_symbol(name);
+    return Sym_tbl_t::shared().is_declared(name);
 }

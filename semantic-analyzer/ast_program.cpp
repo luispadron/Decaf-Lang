@@ -27,7 +27,7 @@ void Program::check() {
     // go through each decl and push it's identifier into root scope
     for (int i = 0; i < decls->size(); ++i) {
         auto decl = decls->get(i);
-        Sym_tbl_t::shared().insert_symbol(decl->get_id()->get_name(), decl->type_check());
+        Sym_tbl_t::shared().insert_declaration(decl->get_id()->get_name(), decl);
     }
 
     // check all declarations

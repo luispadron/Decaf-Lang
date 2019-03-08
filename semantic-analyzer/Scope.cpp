@@ -2,21 +2,21 @@
 
 using namespace std;
 
-void Scope::insert_symbol(const string &k, Type* v) {
+void Scope::insert_symbol(const string &k, Decl *decl) {
     auto it = symbols.find(k);
 
     if (it != symbols.end()) {
         throw Symbol_table_exception{"error (insert_symbol) called with duplicate key"};
     } else {
-        symbols.insert({k, v});
+        symbols.insert({k, decl});
     }
 }
 
-bool Scope::is_symbol(const string &k) {
+bool Scope::is_declared(const string &k) {
     return get_symbol_iter(k) != symbols.end();
 }
 
-Type* Scope::get_symbol(const string &k) {
+Decl * Scope::get_declaration(const string &k) {
     auto it = get_symbol_iter(k);
 
     if (it == symbols.end()) {

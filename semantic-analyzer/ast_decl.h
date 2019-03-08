@@ -21,16 +21,22 @@ class Identifier;
 class Stmt;
 class Expr;
 
+/// Declares the different types of decls
+enum class DeclType { Variable, Class, Function, Interface };
+
 class Decl : public Node {
 protected:
     Type *type;
     Identifier *id;
   
 public:
+
     explicit Decl(Identifier *name);
     friend std::ostream& operator<<(std::ostream& out, Decl *d) { return out << d->id; }
 
     Identifier * get_id() { return id; }
+
+    virtual DeclType get_decl_type() const = 0;
 
     Type* type_check() override;
 };
@@ -39,6 +45,8 @@ public:
 class VarDecl : public Decl {
 public:
     VarDecl(Identifier *name, Type *type);
+
+    DeclType get_decl_type() const override { return DeclType::Variable; }
 
     void check() override;
 };
@@ -54,6 +62,8 @@ public:
     ClassDecl(Identifier *name, NamedType *extends, 
               List<NamedType*> *implements, List<Decl*> *members);
 
+    DeclType get_decl_type() const override { return DeclType::Class; }
+
     void check() override;
 };
 
@@ -64,6 +74,8 @@ protected:
     
 public:
     InterfaceDecl(Identifier *name, List<Decl*> *members);
+
+    DeclType get_decl_type() const override { return DeclType::Interface; }
 
     void check() override;
 };
@@ -79,6 +91,8 @@ public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
 
     void set_function_body(Stmt *b);
+
+    DeclType get_decl_type() const override { return DeclType::Function; }
 
     void check() override;
 };

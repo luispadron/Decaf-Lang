@@ -98,7 +98,7 @@ Type* NamedType::type_check() {
     if (!id->is_defined()) {
         return Type::errorType;
     } else {
-        return Sym_tbl_t::shared().get_symbol(id->get_name());
+        return Sym_tbl_t::shared().get_declaration(id->get_name())->type_check();
     }
 }
 

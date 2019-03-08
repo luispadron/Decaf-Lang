@@ -1,0 +1,17 @@
+// tests field access
+
+class dog {
+	int age;
+	void test() { }
+}
+
+void main() {
+	dog d;
+	int x;
+
+	d.age; // error
+	d.x; // error
+	d.test();
+
+	x.d; // error
+}

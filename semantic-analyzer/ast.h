@@ -36,7 +36,7 @@
 #include <iostream>
 
 class Node;
-class Decl;
+class Type;
 
 /// type alias for the symbol table type
 using Sym_tbl_t = Symbol_table;

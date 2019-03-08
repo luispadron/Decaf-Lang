@@ -15,7 +15,7 @@
 
 // forward declare Symbol_table and Type
 class Symbol_table;
-class Type;
+class Decl;
 
 /**
  * Scope
@@ -40,15 +40,15 @@ public:
 
     /// inserts a new entry this scope
     /// if symbol with given key already exists, exception is thrown
-    void insert_symbol(const std::string& k, Type* type);
+    void insert_symbol(const std::string &k, Decl *decl);
 
     /// returns whether or not the given symbol is in the given scope
     /// searches this scope and any parent scopes that are above this scope
-    bool is_symbol(const std::string& k);
+    bool is_declared(const std::string &k);
 
     /// returns the first value for given key in this scope or any parent scope
     /// if does not exist, exception is thrown
-    Type* get_symbol(const std::string& k);
+    Decl * get_declaration(const std::string &k);
 
     /// prints a representation of this current scope and any of its parent scopes
     void debug_print() const;
@@ -56,10 +56,10 @@ public:
 private:
 
     /// typedef for map of symbols
-    using Symbols = std::map<std::string, Type*>;
+    using Symbols = std::map<std::string, Decl*>;
 
     /// typedef for iterator of symbol type
-    using Symbol_iter = typename std::map<std::string, Type*>::iterator;
+    using Symbol_iter = typename std::map<std::string, Decl*>::iterator;
 
     /// the name of the scope, used for debugging purposes
     std::string name;
