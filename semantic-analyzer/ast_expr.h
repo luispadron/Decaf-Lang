@@ -234,6 +234,9 @@ public:
 
 
 class NewExpr : public Expr {
+private:
+    bool validate();
+
 protected:
     NamedType *cType;
     
@@ -241,6 +244,8 @@ public:
     NewExpr(yyltype loc, NamedType *clsType);
 
     void check() override;
+
+    Type * type_check() override;
 };
 
 

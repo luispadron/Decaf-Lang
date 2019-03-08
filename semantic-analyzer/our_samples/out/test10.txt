@@ -1,0 +1,12 @@
+
+*** Error line 13.
+    d = New(Animal); // error
+            ^^^^^^
+*** No declaration found for class 'Animal'
+
+
+*** Error line 14.
+    d = New(Unkwn); // error
+            ^^^^^
+*** No declaration found for class 'Unkwn'
+

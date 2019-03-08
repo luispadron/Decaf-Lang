@@ -331,8 +331,32 @@ NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) {
     (cType = c)->set_parent(this);
 }
 
-void NewExpr::check() {
+bool NewExpr::validate() {
+    // check that the named type is in the symbol table, and its decl type is class type
+    if (!cType->get_id()->is_defined()) {
+        return false;
+    }
 
+    auto decl = Sym_tbl_t::shared().get_declaration(cType->get_id()->get_name());
+    if (decl->get_decl_type() != DeclType::Class) {
+        return false;
+    }
+
+    return true;
+}
+
+void NewExpr::check() {
+    if (!validate()) {
+        ReportError::identifier_not_found(cType->get_id(), Reason_e::LookingForClass);
+    }
+}
+
+Type* NewExpr::type_check() {
+    if (!validate()) {
+        return Type::errorType;
+    } else {
+        return cType;
+    }
 }
 
 

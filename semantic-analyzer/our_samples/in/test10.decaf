@@ -1,0 +1,15 @@
+// tests new class creation
+
+class Dog { }
+
+interface Animal { }
+
+void main() {
+    Dog d;
+    Dog[] dogs;
+
+    d = New(Dog);
+    dogs[0] = New(Dog);
+    d = New(Animal); // error
+    d = New(Unkwn); // error
+}
