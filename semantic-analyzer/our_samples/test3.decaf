@@ -18,14 +18,6 @@ int main() {
 
     t + d1; // error
 
-    if (t && !f) {
-        if (d1) { } // error
-        if (x + y) { } // error
-        if (x) { } // error
-        if (!x) { } // error
-    }
-
-    if (d1 == d2) {
-        if (d1 == x) { }  // error
-    }
+    UNKWN + d;
+    UNKWN + UNKWN;
 }

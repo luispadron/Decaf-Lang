@@ -16,7 +16,15 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
 }
 
 void StmtBlock::check() {
+    Sym_tbl_t::shared().enter_scope("block");
 
+    // add declarations to scope
+    for (int i = 0; i < decls->size(); ++i) {
+        auto decl = decls->get(i);
+        Sym_tbl_t::shared().insert_symbol(decl->get_id()->get_name(), decl->type_check());
+    }
+
+    stmts->check_all();
 }
 
 

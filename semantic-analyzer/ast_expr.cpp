@@ -16,8 +16,8 @@ IntConstant::IntConstant(yyltype loc, int val) : Expr(loc) {
     value = val;
 }
 
-void IntConstant::check() {
-
+Type* IntConstant::type_check() {
+    return Type::intType;
 }
 
 
@@ -25,8 +25,8 @@ DoubleConstant::DoubleConstant(yyltype loc, double val) : Expr(loc) {
     value = val;
 }
 
-void DoubleConstant::check() {
-
+Type* DoubleConstant::type_check() {
+    return Type::doubleType;
 }
 
 
@@ -34,8 +34,8 @@ BoolConstant::BoolConstant(yyltype loc, bool val) : Expr(loc) {
     value = val;
 }
 
-void BoolConstant::check() {
-
+Type* BoolConstant::type_check() {
+    return Type::boolType;
 }
 
 
@@ -44,22 +44,19 @@ StringConstant::StringConstant(yyltype loc, const char *val) : Expr(loc) {
     value = strdup(val);
 }
 
-void NullConstant::check() {
-
+Type* StringConstant::type_check() {
+    return Type::stringType;
 }
 
-void StringConstant::check() {
 
+Type* NullConstant::type_check() {
+    return Type::nullType;
 }
 
 
 Operator::Operator(yyltype loc, const char *tok) : Node(loc) {
     Assert(tok != nullptr);
     strncpy(tokenString, tok, sizeof(tokenString));
-}
-
-void Operator::check() {
-
 }
 
 
@@ -79,13 +76,50 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r)
     (right = r)->set_parent(this);
 }
 
-void CompoundExpr::check() {
+bool CompoundExpr::validate() {
+    return true;
+}
 
+void CompoundExpr::check() {
+    if (left) left->check();
+    right->check();
 }
 
 
-void ArithmeticExpr::check() {
+bool ArithmeticExpr::validate() {
+    auto rtype = right->type_check();
 
+    // types must be both numbers (int/double) and both of same type
+    if (left) {
+        auto ltype = left->type_check();
+        if (!ltype->is_number() || !ltype->is_equal_to(rtype)) {
+            return false;
+        }
+    }
+
+    return rtype->is_number();
+}
+
+void ArithmeticExpr::check() {
+    CompoundExpr::check();
+
+    // if we arent a valid arithmetic expression, only print error if both left/right are NOT errorType
+    // this is because we dont want to continue printing errors if either of the operands is in error.
+    if (!validate()) {
+        if (left && left->type_check() != Type::errorType && right->type_check() != Type::errorType) {
+            ReportError::incompatible_operands(op, left->type_check(), right->type_check());
+        } else if (right->type_check() != Type::errorType) {
+            ReportError::incompatible_operand(op, right->type_check());
+        }
+    }
+}
+
+Type* ArithmeticExpr::type_check() {
+    if (!validate()) {
+        return Type::errorType;
+    } else {
+        return right->type_check();
+    }
 }
 
 
@@ -133,7 +167,19 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
 }
 
 void FieldAccess::check() {
+    // TODO: add class lookup
+    if (!field->is_defined()) {
+        ReportError::identifier_not_found(field, Reason_e::LookingForVariable);
+    }
+}
 
+Type* FieldAccess::type_check() {
+    // TODO: add class lookup
+    if (field->is_defined()) {
+        return Sym_tbl_t::shared().get_symbol(field->get_name());
+    } else {
+        return Type::errorType;
+    }
 }
 
 

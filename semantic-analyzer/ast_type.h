@@ -37,6 +37,9 @@ public:
     /// returns whether given type is printable or not
     bool is_printable() const;
 
+    /// returns whether type is int or double
+    bool is_number() const;
+
     /// returns whether this type is equal to another type
     virtual bool is_equal_to(const Type *other) const;
 

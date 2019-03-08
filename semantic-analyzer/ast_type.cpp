@@ -33,6 +33,10 @@ bool Type::is_printable() const {
     return this == intType || this == boolType || this == stringType;
 }
 
+bool Type::is_number() const {
+    return this == intType || this == doubleType;
+}
+
 bool Type::is_equal_to(const Type *other) const {
     return this == other;
 }

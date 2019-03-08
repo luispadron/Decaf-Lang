@@ -49,7 +49,7 @@ protected:
 public:
     IntConstant(yyltype loc, int val);
 
-    void check() override;
+    Type * type_check() override;
 };
 
 
@@ -60,7 +60,7 @@ protected:
 public:
     DoubleConstant(yyltype loc, double val);
 
-    void check() override;
+    Type * type_check() override;
 };
 
 
@@ -71,7 +71,7 @@ protected:
 public:
     BoolConstant(yyltype loc, bool val);
 
-    void check() override;
+    Type * type_check() override;
 };
 
 
@@ -82,7 +82,7 @@ protected:
 public:
     StringConstant(yyltype loc, const char *val);
 
-    void check() override;
+    Type * type_check() override;
 };
 
 
@@ -90,7 +90,7 @@ class NullConstant: public Expr {
 public:
     explicit NullConstant(yyltype loc) : Expr(loc) { }
 
-    void check() override;
+    Type * type_check() override;
 };
 
 
@@ -102,8 +102,6 @@ public:
     Operator(yyltype loc, const char *tok);
 
     friend std::ostream& operator<<(std::ostream& out, Operator *o) { return out << o->tokenString; }
-
-    void check() override;
  };
 
 
@@ -111,6 +109,8 @@ class CompoundExpr : public Expr {
 protected:
     Operator *op;
     Expr *left, *right; // left will be NULL if unary
+
+    bool validate();
     
 public:
     CompoundExpr(Expr *lhs, Operator *op, Expr *rhs);  // for binary
@@ -121,11 +121,14 @@ public:
 
 
 class ArithmeticExpr : public CompoundExpr {
+    bool validate();
 public:
     ArithmeticExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     ArithmeticExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
 
     void check() override;
+
+    Type * type_check() override;
 };
 
 
@@ -202,6 +205,8 @@ public:
     FieldAccess(Expr *base, Identifier *field); //ok to pass NULL base
 
     void check() override;
+
+    Type * type_check() override;
 };
 
 
