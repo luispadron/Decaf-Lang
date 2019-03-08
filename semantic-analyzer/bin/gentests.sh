@@ -21,10 +21,7 @@ for file in $IN_DIR/*.decaf
 do
     filename="${file##*/}"
     filename="${filename%.*}"
-    {
-        ./$EXEC < $file &> $OUT_DIR/$filename.txt
-    } || {
-        echo "crash when running $filename"
-    }
+    echo "generating output for: $filename"
+    ./$EXEC < $file &> $OUT_DIR/$filename.txt
 
 done

@@ -10,7 +10,7 @@ make > /dev/null
 echo "running sample_tests"
 echo ""
 # run sample tests
-printf 'samples\nsample_tests/ours\ndcc' | ./bin/gentests.sh > /dev/null
+printf 'samples\nsample_tests/ours\ndcc' | ./bin/gentests.sh
 
 set -e
 ERROR=false

@@ -21,7 +21,7 @@
 
 class Type : public Node {
 protected:
-    std::string typeName;
+    char *typeName;
 
 public:
     static Type *intType, *doubleType, *boolType, *voidType,
@@ -79,7 +79,6 @@ public:
     /// returns whether two named types are equal to each other (same identifier)
     bool is_equal_to(const Type *other) const override;
 
-
     /// returns whether two named types can perform equality, i.e must be same type or one or both must be null
     bool can_perform_equality_with(const Type *other) const override;
 
@@ -98,9 +97,6 @@ public:
     void print_to(std::ostream &out) override { out << elemType << "[]"; }
 
     bool is_equal_to(const Type *other) const override;
-
-    ///
-    bool can_perform_assignment_with(const Type* other) const override;
 
     void check() override;
 

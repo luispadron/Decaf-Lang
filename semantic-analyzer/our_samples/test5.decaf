@@ -1,0 +1,7 @@
+// file tests a weird crash
+
+void main()
+{
+  int a;
+   a = 10 + main;
+}

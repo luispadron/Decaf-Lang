@@ -24,12 +24,6 @@ class Expr : public Stmt {
 public:
     explicit Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
-
-    /// returns the identifier associated with the given expression
-    virtual Identifier * get_id() const { return nullptr; }
-
-    /// returns the type of the result of performing some expression
-    virtual Type * get_result_type() { return nullptr; };
 };
 
 
@@ -110,6 +104,8 @@ protected:
     Operator *op;
     Expr *left, *right; // left will be NULL if unary
 
+    virtual bool validate() { return false; } // TODO: make this pure
+
 public:
     CompoundExpr(Expr *lhs, Operator *op, Expr *rhs);  // for binary
     CompoundExpr(Operator *op, Expr *rhs);             // for unary
@@ -119,13 +115,12 @@ public:
 
 
 class ArithmeticExpr : public CompoundExpr {
-    bool validate();
+protected:
+    bool validate() override;
 
 public:
     ArithmeticExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     ArithmeticExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
-
-    void check() override;
 
     Type * type_check() override;
 };
@@ -137,43 +132,42 @@ class RelationalExpr : public CompoundExpr {
 public:
     RelationalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 
-    void check() override;
-
     Type * type_check() override;
 };
 
 
 class EqualityExpr : public CompoundExpr {
-    bool validate();
+protected:
+    bool validate() override;
 
 public:
     EqualityExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
-
-    void check() override;
 
     Type * type_check() override;
 };
 
 
 class LogicalExpr : public CompoundExpr {
-    bool validate();
+protected:
+    bool validate() override;
 
 public:
     LogicalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 
     LogicalExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
 
-    void check() override;
-
     Type * type_check() override;
 };
 
 
 class AssignExpr : public CompoundExpr {
+protected:
+    bool validate() override;
+
 public:
     AssignExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 
-    void check() override;
+    Type * type_check() override;
 };
 
 
@@ -199,6 +193,8 @@ public:
     ArrayAccess(yyltype loc, Expr *base, Expr *subscript);
 
     void check() override;
+
+    Type * type_check() override;
 };
 
 

@@ -23,7 +23,7 @@ class Expr;
 
 class Decl : public Node {
 protected:
-    Type *type = Type::errorType;
+    Type *type;
     Identifier *id;
   
 public:

@@ -79,26 +79,20 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r)
 void CompoundExpr::check() {
     if (left) left->check();
     right->check();
+
+    if (!validate()) {
+        if (left) {
+            ReportError::incompatible_operands(op, left->type_check(), right->type_check());
+        } else {
+            ReportError::incompatible_operand(op, right->type_check());
+        }
+    }
 }
 
 
 bool ArithmeticExpr::validate() {
     if (left) return left->type_check()->can_perform_arithmetic_with(right->type_check());
     return right->type_check()->can_perform_arithmetic();
-}
-
-void ArithmeticExpr::check() {
-    CompoundExpr::check();
-
-    // if we arent a valid arithmetic expression, only print error if both left/right are NOT errorType
-    // this is because we dont want to continue printing errors if either of the operands is in error.
-    if (!validate()) {
-        if (left && left->type_check() != Type::errorType && right->type_check() != Type::errorType) {
-            ReportError::incompatible_operands(op, left->type_check(), right->type_check());
-        } else if (right->type_check() != Type::errorType) {
-            ReportError::incompatible_operand(op, right->type_check());
-        }
-    }
 }
 
 Type* ArithmeticExpr::type_check() {
@@ -114,15 +108,6 @@ bool RelationalExpr::validate() {
     return left->type_check()->can_perform_relational_with(right->type_check());
 }
 
-void RelationalExpr::check() {
-    CompoundExpr::check();
-
-    Type *ltype = left->type_check(), *rtype = right->type_check();
-
-    if (!validate() && ltype != Type::errorType && rtype != Type::errorType) {
-        ReportError::incompatible_operands(op, ltype, rtype);
-    }
-}
 
 Type* RelationalExpr::type_check() {
     if (!validate()) {
@@ -137,16 +122,6 @@ bool EqualityExpr::validate() {
     return left->type_check()->can_perform_equality_with(right->type_check());
 }
 
-void EqualityExpr::check() {
-    CompoundExpr::check();
-
-    Type *ltype = left->type_check(), *rtype = right->type_check();
-
-    if (!validate() && ltype != Type::errorType && rtype != Type::errorType) {
-        ReportError::incompatible_operands(op, ltype, rtype);
-    }
-}
-
 Type* EqualityExpr::type_check() {
     if (!validate()) {
         return Type::errorType;
@@ -157,22 +132,8 @@ Type* EqualityExpr::type_check() {
 
 
 bool LogicalExpr::validate() {
-    if (left) return left->type_check()->can_perform_equality_with(right->type_check());
+    if (left) return left->type_check()->can_perform_logical_with(right->type_check());
     return right->type_check()->can_perform_logical();
-}
-
-void LogicalExpr::check() {
-    CompoundExpr::check();
-
-    // if we arent a valid arithmetic expression, only print error if both left/right are NOT errorType
-    // this is because we dont want to continue printing errors if either of the operands is in error.
-    if (!validate()) {
-        if (left && left->type_check() != Type::errorType && right->type_check() != Type::errorType) {
-            ReportError::incompatible_operands(op, left->type_check(), right->type_check());
-        } else if (right->type_check() != Type::errorType) {
-            ReportError::incompatible_operand(op, right->type_check());
-        }
-    }
 }
 
 Type* LogicalExpr::type_check() {
@@ -184,8 +145,16 @@ Type* LogicalExpr::type_check() {
 }
 
 
-void AssignExpr::check() {
+bool AssignExpr::validate() {
+    return left->type_check()->can_perform_assignment_with(right->type_check());
+}
 
+Type * AssignExpr::type_check() {
+    if (!validate()) {
+        return Type::errorType;
+    } else {
+        return right->type_check();
+    }
 }
 
 
@@ -201,6 +170,10 @@ ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
 
 void ArrayAccess::check() {
 
+}
+
+Type * ArrayAccess::type_check() {
+    return base->type_check();
 }
 
 

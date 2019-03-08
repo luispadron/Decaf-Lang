@@ -30,15 +30,15 @@ Type::Type(const char *n) {
 }
 
 bool Type::is_printable() const {
-    return this == intType || this == boolType || this == stringType;
+    return this == intType || this == boolType || this == stringType || this == errorType;
 }
 
 bool Type::is_equal_to(const Type *other) const {
-    return this == other;
+    return this == other || other == errorType;
 }
 
 bool Type::can_perform_arithmetic() const {
-    return this == intType || this == doubleType;
+    return this == intType || this == doubleType || this == errorType;
 }
 
 bool Type::can_perform_arithmetic_with(const Type *other) const {
@@ -46,7 +46,7 @@ bool Type::can_perform_arithmetic_with(const Type *other) const {
 }
 
 bool Type::can_perform_relational_with(const Type *other) const {
-    return (this == intType || this == doubleType) && is_equal_to(other);
+    return (this == intType || this == doubleType || this == errorType) && is_equal_to(other);
 }
 
 bool Type::can_perform_equality_with(const Type *other) const {
@@ -54,11 +54,11 @@ bool Type::can_perform_equality_with(const Type *other) const {
 }
 
 bool Type::can_perform_logical() const {
-    return this == boolType;
+    return this == boolType || this == errorType;
 }
 
 bool Type::can_perform_logical_with(const Type *other) const {
-    return this == boolType && other == boolType;
+    return can_perform_logical() && other->can_perform_logical();
 }
 
 bool Type::can_perform_assignment_with(const Type *other) const {
@@ -76,6 +76,8 @@ NamedType::NamedType(Identifier *i) : Type(*i->get_location()) {
 }
 
 bool NamedType::is_equal_to(const Type *other) const {
+    if (other == errorType) return true;
+
     auto named_other = dynamic_cast<const NamedType*>(other);
     if (!named_other) { return false; }
     return std::strcmp(id->get_name(), named_other->id->get_name()) == 0;
@@ -107,18 +109,13 @@ ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
 }
 
 bool ArrayType::is_equal_to(const Type *other) const {
-    auto array_other = dynamic_cast<const ArrayType*>(other);
-    if (!array_other) { return false; }
-    return elemType->is_equal_to(array_other->elemType);
-}
+    if (other == errorType) { return true; }
 
-bool ArrayType::can_perform_assignment_with(const Type *other) const {
-    // the element type and rhs type must be equal
-    auto array_type = dynamic_cast<const ArrayType*>(other);
-    if (array_type) {
-        return elemType->is_equal_to(array_type->elemType);
-    } else {
+    auto array_other = dynamic_cast<const ArrayType*>(other);
+    if (!array_other) {
         return elemType->is_equal_to(other);
+    } else {
+        return elemType->is_equal_to(array_other->elemType);
     }
 }
 

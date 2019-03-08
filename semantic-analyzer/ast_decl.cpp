@@ -8,12 +8,10 @@
 #include "ast_stmt.h"
 #include "errors.h"
 
-#include <iostream>
-
 using namespace std;
         
          
-Decl::Decl(Identifier *n) : Node(*n->get_location()) {
+Decl::Decl(Identifier *n) : Node(*n->get_location()), type(Type::errorType) {
     Assert(n != nullptr);
     (id = n)->set_parent(this);
 }
@@ -83,10 +81,10 @@ void InterfaceDecl::check() {
 	
 FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
     Assert(n != nullptr && r != nullptr && d != nullptr);
-    type = returnType;
     (returnType = r)->set_parent(this);
     (formals = d)->set_parent_all(this);
     body = nullptr;
+    type = returnType;
 }
 
 void FnDecl::set_function_body(Stmt *b) {
