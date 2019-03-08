@@ -134,8 +134,26 @@ Type* RelationalExpr::type_check() {
 }
 
 
-void EqualityExpr::check() {
+bool EqualityExpr::validate() {
+    return left->type_check()->can_perform_equality_with(right->type_check());
+}
 
+void EqualityExpr::check() {
+    CompoundExpr::check();
+
+    Type *ltype = left->type_check(), *rtype = right->type_check();
+
+    if (!validate() && ltype != Type::errorType && rtype != Type::errorType) {
+        ReportError::incompatible_operands(op, ltype, rtype);
+    }
+}
+
+Type* EqualityExpr::type_check() {
+    if (!validate()) {
+        return Type::errorType;
+    } else {
+        return Type::boolType;
+    }
 }
 
 

@@ -109,7 +109,7 @@ class CompoundExpr : public Expr {
 protected:
     Operator *op;
     Expr *left, *right; // left will be NULL if unary
-    
+
 public:
     CompoundExpr(Expr *lhs, Operator *op, Expr *rhs);  // for binary
     CompoundExpr(Operator *op, Expr *rhs);             // for unary
@@ -144,10 +144,14 @@ public:
 
 
 class EqualityExpr : public CompoundExpr {
+    bool validate();
+
 public:
     EqualityExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 
     void check() override;
+
+    Type * type_check() override;
 };
 
 
