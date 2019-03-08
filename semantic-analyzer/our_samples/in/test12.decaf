@@ -1,0 +1,25 @@
+// file tests usage of "this"
+
+class Dog {
+    int age;
+
+    int get_age() {
+        this.age;
+    }
+
+    int get_age_again() {
+        this.get_age();
+    }
+}
+
+void main() {
+    int x;
+    Dog d;
+
+    x = d.get_age();
+
+    this.x = 3; // error
+    this.d = New(Dog); // error
+    x = 3 + this.x; // error
+    this.get_age(); // error
+}

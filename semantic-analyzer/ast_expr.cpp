@@ -159,7 +159,31 @@ Type * AssignExpr::type_check() {
 
 
 void This::check() {
+    if (type_check() == Type::errorType) {
+        ReportError::this_outside_class_scope(this);
+    }
+}
 
+Type* This::type_check() {
+    // if not in class scope, error
+    if (!Sym_tbl_t::shared().is_class_scope()) {
+        return Type::errorType;
+    }
+
+    // find name of class, then look up the symbol and return its type
+    auto class_name = Sym_tbl_t::shared().get_class_scope_name();
+
+    if (!Sym_tbl_t::shared().is_declared(class_name)) {
+        return Type::errorType;
+    }
+
+    auto decl = Sym_tbl_t::shared().get_declaration(class_name);
+    // if the decl isn't a class this is invalid
+    if (decl->get_decl_type() != DeclType::Class) {
+        return Type::errorType;
+    } else {
+        return decl->type_check();
+    }
 }
 
   
@@ -201,7 +225,9 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
 
 void FieldAccess::check() {
     if (base) {
+        base->check();
         auto btype = base->type_check();
+        if (btype == Type::errorType) { return; }
 
         // field is not found in the scope of the base, error
         if (!Sym_tbl_t::shared().is_declared_in_class(btype->get_type_name(), field->get_name())) {
@@ -210,8 +236,8 @@ void FieldAccess::check() {
         }
 
         auto decl = Sym_tbl_t::shared().get_declaration_in_class(btype->get_type_name(), field->get_name());
-        // variables only accessible within class scope
-        if (decl->get_decl_type() == DeclType::Variable) {
+        // variables only accessible within class scope, unless using "this"
+        if (decl->get_decl_type() == DeclType::Variable && !base->is_this_expr()) {
             ReportError::inaccessible_field(field, btype);
             return;
         }
@@ -266,7 +292,9 @@ void Call::check() {
     FnDecl *fn_decl = nullptr;
 
     if (base) {
+        base->check();
         auto btype = base->type_check();
+        if (btype == Type::errorType) { return; }
 
         // field is not found in the scope of the base, error
         if (!Sym_tbl_t::shared().is_declared_in_class(btype->get_type_name(), field->get_name())) {

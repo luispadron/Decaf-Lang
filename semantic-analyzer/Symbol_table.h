@@ -62,6 +62,10 @@ public:
     /// returns the value of the symbol with given key in the given class scope
     Decl * get_declaration_in_class(const std::string &class_key, const std::string &k) const;
 
+    /// returns the name of the class with current scope (for use with "this")
+    /// if not in class scope, exception is thrown
+    const std::string & get_class_scope_name() const;
+
     /// prints the symbol table for debugging purposes
     void debug_print() const;
 

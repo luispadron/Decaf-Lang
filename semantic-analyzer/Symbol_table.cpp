@@ -82,6 +82,11 @@ Decl * Symbol_table::get_declaration_in_class(const std::string &class_key, cons
     return class_scope_it->second->get_declaration(k);
 }
 
+const std::string& Symbol_table::get_class_scope_name() const {
+    if (!is_class_scope()) { throw Symbol_table_exception("error: cant get class scope name, not in class scope"); }
+    return scope_ptr->this_ptr->name;
+}
+
 void Symbol_table::debug_print() const {
     scope_ptr->debug_print();
 }

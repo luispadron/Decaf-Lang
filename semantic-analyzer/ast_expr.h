@@ -24,6 +24,8 @@ class Expr : public Stmt {
 public:
     explicit Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
+
+    virtual bool is_this_expr() const { return false; }
 };
 
 
@@ -178,7 +180,11 @@ class This : public Expr {
 public:
     explicit This(yyltype loc) : Expr(loc) {}
 
+    bool is_this_expr() const override { return true; }
+
     void check() override;
+
+    Type * type_check() override;
 };
 
 

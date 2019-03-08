@@ -38,7 +38,7 @@ bool Type::is_equal_to(Type *other) {
     if (other->is_array_type() || other->is_named_type()) {
         return other->is_equal_to(this);
     } else {
-        return this == other || other == errorType;
+        return this == other || this == errorType || other == errorType;
     }
 }
 

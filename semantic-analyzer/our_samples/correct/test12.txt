@@ -1,0 +1,24 @@
+
+*** Error line 21.
+    this.x = 3; // error
+    ^^^^
+*** 'this' is only valid within class scope
+
+
+*** Error line 22.
+    this.d = New(Dog); // error
+    ^^^^
+*** 'this' is only valid within class scope
+
+
+*** Error line 23.
+    x = 3 + this.x; // error
+            ^^^^
+*** 'this' is only valid within class scope
+
+
+*** Error line 24.
+    this.get_age(); // error
+    ^^^^
+*** 'this' is only valid within class scope
+
