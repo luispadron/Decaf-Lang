@@ -114,12 +114,10 @@ public:
     }
 
     /// calls the `Check` function for all Nodes in the list
-    bool check_all() {
-        bool res = true;
+    void check_all() {
         for (int i = 0; i < size(); ++i) {
-            res = get(i)->check() && res;
+            get(i)->check();
         }
-        return res;
     }
 };
 

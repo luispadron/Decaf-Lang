@@ -18,7 +18,12 @@ Program::Program(List<Decl*> *d) {
  */
 void Program::check() {
     #if DEBUG==1
-        Sym_table_t::shared().DEBUG_PRINT = true;
+        Sym_tbl_t::shared().DEBUG_PRINT = true;
     #endif
 
+    // push root scope
+    Sym_tbl_t::shared().enter_scope("root");
+
+    // check all declarations
+    decls->check_all();
 }

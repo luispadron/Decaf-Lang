@@ -21,5 +21,10 @@ for file in $IN_DIR/*.decaf
 do
     filename="${file##*/}"
     filename="${filename%.*}"
-    ./$EXEC < $file &> $OUT_DIR/$filename.txt
+    {
+        ./$EXEC < $file &> $OUT_DIR/$filename.txt
+    } || {
+        echo "crash when running $filename"
+    }
+
 done

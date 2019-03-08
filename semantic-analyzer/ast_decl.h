@@ -23,26 +23,24 @@ class Expr;
 
 class Decl : public Node {
 protected:
+    Type *type = Type::errorType;
     Identifier *id;
   
 public:
     explicit Decl(Identifier *name);
     friend std::ostream& operator<<(std::ostream& out, Decl *d) { return out << d->id; }
 
-    Identifier * get_id() { return id; }
+    Type* type_check() override;
 };
 
+
 class VarDecl : public Decl {
-protected:
-    Type *type;
-    
 public:
     VarDecl(Identifier *name, Type *type);
 
-    Type * get_type() { return type; }
-
     void check() override;
 };
+
 
 class ClassDecl : public Decl {
 protected:
@@ -57,6 +55,7 @@ public:
     void check() override;
 };
 
+
 class InterfaceDecl : public Decl {
 protected:
     List<Decl*> *members;
@@ -66,6 +65,7 @@ public:
 
     void check() override;
 };
+
 
 class FnDecl : public Decl {
 protected:

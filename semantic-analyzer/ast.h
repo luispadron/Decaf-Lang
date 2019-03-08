@@ -39,7 +39,7 @@ class Node;
 class Decl;
 
 /// type alias for the symbol table type
-using Sym_table_t = Symbol_table;
+using Sym_tbl_t = Symbol_table;
 
 class Node {
 protected:
@@ -72,6 +72,9 @@ public:
     const char * get_name() const { return name; }
 
     void check() override;
+
+    /// returns whether or not this identifier is in the symbol table
+    bool is_defined();
 };
 
 

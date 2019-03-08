@@ -40,7 +40,7 @@ public:
     /// returns whether this type is equal to another type
     virtual bool is_equal_to(const Type *other) const;
 
-    void check() override;
+    Type* type_check() override;
 };
 
 
@@ -52,6 +52,8 @@ public:
     explicit NamedType(Identifier *i);
     
     void print_to(std::ostream &out) override { out << id; }
+
+    Identifier * get_id() { return id; }
 
     /// returns whether two named types are equal to each other (same identifier)
     bool is_equal_to(const Type *other) const override;

@@ -37,8 +37,8 @@ bool Type::is_equal_to(const Type *other) const {
     return this == other;
 }
 
-void Type::check() {
-
+Type* Type::type_check() {
+    return this;
 }
 
 
@@ -54,7 +54,9 @@ bool NamedType::is_equal_to(const Type *other) const {
 }
 
 void NamedType::check() {
-
+    if (!id->is_defined()) {
+        ReportError::identifier_not_found(id, Reason_e::LookingForType);
+    }
 }
 
 
@@ -70,7 +72,7 @@ bool ArrayType::is_equal_to(const Type *other) const {
 }
 
 void ArrayType::check() {
-
+    elemType->check();
 }
 
 

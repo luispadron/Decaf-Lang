@@ -5,7 +5,7 @@
 echo "building"
 
 make clean > /dev/null
-make CFLAGS=-DDEBUG=1 > /dev/null
+make > /dev/null
 
 echo "running sample_tests"
 echo ""
