@@ -30,6 +30,8 @@ public:
     explicit Decl(Identifier *name);
     friend std::ostream& operator<<(std::ostream& out, Decl *d) { return out << d->id; }
 
+    Identifier * get_id() { return id; }
+
     Type* type_check() override;
 };
 

@@ -31,9 +31,6 @@ VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
 void VarDecl::check() {
     // check type
     type->check();
-
-    // push id into symbol table
-    Sym_tbl_t::shared().insert_symbol(id->get_name(), type);
 }
 
 
@@ -48,9 +45,6 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
 }
 
 void ClassDecl::check() {
-    // push id into symbol table
-    Sym_tbl_t::shared().insert_symbol(id->get_name(), type);
-
     // verify that superclass exists
     if (extends && !extends->get_id()->is_defined()) {
         ReportError::identifier_not_found(extends->get_id(), Reason_e::LookingForClass);
@@ -79,7 +73,6 @@ InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
 }
 
 void InterfaceDecl::check() {
-    Sym_tbl_t::shared().insert_symbol(id->get_name(), type);
     Sym_tbl_t::shared().enter_scope(id->get_name());
 
     members->check_all();
@@ -101,7 +94,6 @@ void FnDecl::set_function_body(Stmt *b) {
 }
 
 void FnDecl::check() {
-    Sym_tbl_t::shared().insert_symbol(id->get_name(), type);
     Sym_tbl_t::shared().enter_scope(id->get_name());
 
     returnType->check();
