@@ -59,6 +59,8 @@ public:
     bool is_equal_to(const Type *other) const override;
 
     void check() override;
+
+    Type* type_check() override;
 };
 
 class ArrayType : public Type {
@@ -73,6 +75,8 @@ public:
     bool is_equal_to(const Type *other) const override;
 
     void check() override;
+
+    Type* type_check() override;
 };
 
  

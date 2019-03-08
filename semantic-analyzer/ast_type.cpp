@@ -59,6 +59,15 @@ void NamedType::check() {
     }
 }
 
+Type* NamedType::type_check() {
+    // if id is in sym table, return that otherwise, errorType
+    if (!id->is_defined()) {
+        return Type::errorType;
+    } else {
+        return Sym_tbl_t::shared().get_symbol(id->get_name());
+    }
+}
+
 
 ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
     Assert(et != nullptr);
@@ -73,6 +82,10 @@ bool ArrayType::is_equal_to(const Type *other) const {
 
 void ArrayType::check() {
     elemType->check();
+}
+
+Type* ArrayType::type_check() {
+    return elemType->type_check();
 }
 
 
