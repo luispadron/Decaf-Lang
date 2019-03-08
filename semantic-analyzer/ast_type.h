@@ -38,34 +38,37 @@ public:
     virtual const char * get_type_name() { return typeName; }
 
     /// returns whether given type is printable or not
-    bool is_printable() const;
+    bool is_printable();
 
     /// returns whether this type is equal to another type
-    virtual bool is_equal_to(const Type *other) const;
+    virtual bool is_equal_to(Type *other);
 
     /// returns whether the current type is a named type, that is, not an array or primative
-    virtual bool is_named_type() const { return false; }
+    virtual bool is_named_type() { return false; }
+
+    /// returns whether the current type is an array type or not
+    virtual bool is_array_type() { return false; }
 
     /// returns whether this type can perform arithmetic
-    bool can_perform_arithmetic() const;
+    bool can_perform_arithmetic();
 
     /// returns whether this type can perform arithmetic with other type
-    bool can_perform_arithmetic_with(const Type *other) const;
+    bool can_perform_arithmetic_with(Type *other);
 
     /// returns whether this type can perform relational operations with another type (<, > <=, >=)
-    bool can_perform_relational_with(const Type *other) const;
+    bool can_perform_relational_with(Type *other);
 
     /// returns whether this type can perform an equality operation with another type (==, !=)
-    virtual bool can_perform_equality_with(const Type *other) const;
+    virtual bool can_perform_equality_with(Type *other);
 
     /// returns whether this type can perform logic operations (||, !, &&)
-    bool can_perform_logical() const;
+    bool can_perform_logical();
 
     /// returns whether this type can perform logic operations with another type (||, !, &&)
-    bool can_perform_logical_with(const Type *other) const;
+    bool can_perform_logical_with(Type *other);
 
     /// returns whether this type can get the other type assigned to it
-    virtual bool can_perform_assignment_with(const Type *other) const;
+    virtual bool can_perform_assignment_with(Type *other);
 
     Type* type_check() override;
 };
@@ -86,13 +89,13 @@ public:
     Identifier * get_id() { return id; }
 
     /// returns that this type is in fact a named type
-    bool is_named_type() const override { return true; }
+    bool is_named_type() override { return true; }
 
     /// returns whether two named types are equal to each other (same identifier)
-    bool is_equal_to(const Type *other) const override;
+    bool is_equal_to(Type *other) override;
 
     /// returns whether two named types can perform equality, i.e must be same type or one or both must be null
-    bool can_perform_equality_with(const Type *other) const override;
+    bool can_perform_equality_with(Type *other) override;
 
     void check() override;
 
@@ -110,7 +113,9 @@ public:
 
     const char * get_type_name() override { return elemType->get_type_name(); }
 
-    bool is_equal_to(const Type *other) const override;
+    bool is_array_type() override { return true; }
+
+    bool is_equal_to(Type *other) override;
 
     void check() override;
 

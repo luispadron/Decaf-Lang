@@ -1,0 +1,10 @@
+// test array access stuff
+
+void main() {
+    int[] nums;
+    double[] floats;
+    int x;
+
+    x = nums[0] + nums[2];
+    x[2.3];
+}

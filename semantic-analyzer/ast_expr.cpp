@@ -169,7 +169,17 @@ ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
 }
 
 void ArrayAccess::check() {
+    base->check();
 
+    if (!base->type_check()->is_array_type()) {
+        ReportError::brackets_on_non_array(base);
+    }
+
+    subscript->check();
+
+    if (subscript->type_check() != Type::intType) {
+        ReportError::subscript_not_integer(subscript);
+    }
 }
 
 Type * ArrayAccess::type_check() {

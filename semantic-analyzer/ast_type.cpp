@@ -7,7 +7,7 @@
 #include "errors.h"
 
 #include <cstring>
- 
+
 /* Class constants
  * ---------------
  * These are public constants for the built-in base types (int, double, etc.)
@@ -29,39 +29,47 @@ Type::Type(const char *n) {
     typeName = strdup(n);
 }
 
-bool Type::is_printable() const {
-    return this == intType || this == boolType || this == stringType || this == errorType;
+bool Type::is_printable() {
+    auto type = type_check();
+    return type == intType || type == boolType || type == stringType || type == errorType;
 }
 
-bool Type::is_equal_to(const Type *other) const {
-    return this == other || other == errorType;
+bool Type::is_equal_to(Type *other) {
+    if (other->is_array_type() || other->is_named_type()) {
+        return other->is_equal_to(this);
+    } else {
+        return this == other || other == errorType;
+    }
 }
 
-bool Type::can_perform_arithmetic() const {
-    return this == intType || this == doubleType || this == errorType;
+bool Type::can_perform_arithmetic()  {
+    auto type = type_check();
+    return type == intType || type == doubleType || type == errorType;
 }
 
-bool Type::can_perform_arithmetic_with(const Type *other) const {
+bool Type::can_perform_arithmetic_with(Type *other) {
     return can_perform_arithmetic() && is_equal_to(other);
 }
 
-bool Type::can_perform_relational_with(const Type *other) const {
-    return (this == intType || this == doubleType || this == errorType) && is_equal_to(other);
+bool Type::can_perform_relational_with(Type *other) {
+    auto type = type_check();
+    return (type == intType || type == doubleType || type == errorType) && is_equal_to(other);
 }
 
-bool Type::can_perform_equality_with(const Type *other) const {
+bool Type::can_perform_equality_with(Type *other) {
     return is_equal_to(other);
 }
 
-bool Type::can_perform_logical() const {
-    return this == boolType || this == errorType;
+bool Type::can_perform_logical() {
+    auto type = type_check();
+    return type == boolType || type == errorType;
 }
 
-bool Type::can_perform_logical_with(const Type *other) const {
+bool Type::can_perform_logical_with(Type *other) {
     return can_perform_logical() && other->can_perform_logical();
 }
 
-bool Type::can_perform_assignment_with(const Type *other) const {
+bool Type::can_perform_assignment_with(Type *other) {
     return is_equal_to(other);
 }
 
@@ -75,15 +83,15 @@ NamedType::NamedType(Identifier *i) : Type(*i->get_location()) {
     (id = i)->set_parent(this);
 }
 
-bool NamedType::is_equal_to(const Type *other) const {
+bool NamedType::is_equal_to(Type *other) {
     if (other == errorType) return true;
 
-    auto named_other = dynamic_cast<const NamedType*>(other);
+    auto named_other = dynamic_cast<NamedType*>(other);
     if (!named_other) { return false; }
     return std::strcmp(id->get_name(), named_other->id->get_name()) == 0;
 }
 
-bool NamedType::can_perform_equality_with(const Type *other) const {
+bool NamedType::can_perform_equality_with(Type *other) {
     return other == nullType || is_equal_to(other); // types must be same or comparing to null
 }
 
@@ -108,10 +116,10 @@ ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
     (elemType = et)->set_parent(this);
 }
 
-bool ArrayType::is_equal_to(const Type *other) const {
+bool ArrayType::is_equal_to(Type *other) {
     if (other == errorType) { return true; }
 
-    auto array_other = dynamic_cast<const ArrayType*>(other);
+    auto array_other = dynamic_cast<ArrayType*>(other);
     if (!array_other) {
         return elemType->is_equal_to(other);
     } else {

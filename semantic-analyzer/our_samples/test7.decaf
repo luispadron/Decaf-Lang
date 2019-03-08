@@ -1,0 +1,17 @@
+class dog {
+    int age;
+
+    int get_age() {
+        this.age + this.age;
+    }
+}
+
+void main() {
+    int ages;
+    dog d1;
+    dog d2;
+
+    this.help; // error
+
+    ages = d1.get_age() + d2.get_age();
+}
