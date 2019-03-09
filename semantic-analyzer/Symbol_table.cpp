@@ -32,6 +32,18 @@ void Symbol_table::enter_class_scope(const std::string &key) {
     if (DEBUG_PRINT) { std::cout << "pushing class scope: " << key << std::endl; debug_print(); }
 }
 
+void Symbol_table::set_super_class(const std::string &super_class_key) {
+    if (!is_class_scope()) { throw Symbol_table_exception("error: not in class scope, cannot set super"); }
+
+    // find the scope of the super class with given key
+    auto class_it = class_scopes.find(super_class_key);
+    if (class_it == class_scopes.end()) {
+        throw Symbol_table_exception("error: cannot set super class, no class exists.");
+    }
+
+    scope_ptr->super_ptr = class_it->second;
+}
+
 void Symbol_table::leave_scope() {
     if (!scope_ptr) return;
     scope_ptr = scope_ptr->parent_ptr;

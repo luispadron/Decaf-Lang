@@ -43,9 +43,16 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
 }
 
 void ClassDecl::check() {
+    Sym_tbl_t::shared().enter_class_scope(id->get_name());
+
     // verify that superclass exists
-    if (extends && !extends->get_id()->is_defined()) {
-        ReportError::identifier_not_found(extends->get_id(), Reason_e::LookingForClass);
+    if (extends) {
+        if (!extends->get_id()->is_defined()) {
+            ReportError::identifier_not_found(extends->get_id(), Reason_e::LookingForClass);
+        } else {
+            // set super class
+            Sym_tbl_t::shared().set_super_class(extends->get_id()->get_name());
+        }
     }
 
     // verify interfaces exist
@@ -55,8 +62,6 @@ void ClassDecl::check() {
             ReportError::identifier_not_found(imp->get_id(), Reason_e::LookingForInterface);
         }
     }
-
-    Sym_tbl_t::shared().enter_class_scope(id->get_name());
 
     // insert all decls into class scope
 

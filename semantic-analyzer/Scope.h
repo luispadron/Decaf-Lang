@@ -68,13 +68,13 @@ private:
     Symbols symbols;
 
     /// the parent scope of this current scope
-    Scope* parent_ptr;
+    Scope* parent_ptr = nullptr;
 
     /// the scope of the "super" class, only applies to classes
-    Scope* super_ptr;
+    Scope* super_ptr = nullptr;
 
     /// the scope of the "this" class, only applies to classes
-    Scope* this_ptr;
+    Scope* this_ptr = nullptr;
 
     // helper functions //
 

@@ -39,6 +39,10 @@ public:
     /// pushes a new class scope to the symbol table
     void enter_class_scope(const std::string &key);
 
+    /// sets the super pointer for the current class scope
+    /// if not in a class scope, throws error
+    void set_super_class(const std::string &super_class_key);
+
     /// pops the current scope to be the parent scope
     void leave_scope();
 
