@@ -24,6 +24,9 @@ void Program::check() {
     // push root scope
     Sym_tbl_t::shared().enter_scope("root");
 
+    // add declaration for global nullptr symbol
+    Sym_tbl_t::shared().insert_declaration("nullptr", new VarDecl(new Identifier(yyltype(), "nullptr"), Type::nullType));
+
     // go through each decl and push it's identifier into root scope
     for (int i = 0; i < decls->size(); ++i) {
         auto decl = decls->get(i);

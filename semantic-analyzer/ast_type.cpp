@@ -85,6 +85,7 @@ NamedType::NamedType(Identifier *i) : Type(*i->get_location()) {
 
 bool NamedType::is_equal_to(Type *other) {
     if (other == errorType) return true;
+    if (other == nullType) return true;
 
     auto named_other = dynamic_cast<NamedType*>(other);
     if (!named_other) { return false; }
