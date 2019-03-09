@@ -42,13 +42,13 @@
 
 
 *** Error line 17.
-    Print(dog, dog); // error 
+    Print(dog, dog); // error
           ^^^
 *** Incompatible argument 1: Dog given, int/bool/string expected
 
 
 *** Error line 17.
-    Print(dog, dog); // error 
+    Print(dog, dog); // error
                ^^^
 *** Incompatible argument 2: Dog given, int/bool/string expected
 

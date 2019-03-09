@@ -325,7 +325,7 @@ void Call::check() {
     }
 
     Assert(fn_decl);
-    fn_decl->check_parameters(this, field, actuals);
+    fn_decl->check_parameters(field, actuals);
 }
 
 Type* Call::type_check() {

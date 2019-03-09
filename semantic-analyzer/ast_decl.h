@@ -93,7 +93,7 @@ public:
 
     void set_function_body(Stmt *b);
 
-    void check_parameters(Call *expr, Identifier *fn_ident, List<Expr*> *actuals);
+    void check_parameters(Identifier *fn_ident, List<Expr*> *actuals);
 
     DeclType get_decl_type() const override { return DeclType::Function; }
 

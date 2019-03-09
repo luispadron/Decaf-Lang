@@ -98,7 +98,7 @@ void FnDecl::set_function_body(Stmt *b) {
     (body = b)->set_parent(this);
 }
 
-void FnDecl::check_parameters(Call *call, Identifier *fn_ident, List<Expr *> *actuals) {
+void FnDecl::check_parameters(Identifier *fn_ident, List<Expr *> *actuals) {
     // if sizes dont match, error
     if (formals->size() != actuals->size()) {
         ReportError::num_args_mismatch(fn_ident, formals->size(), actuals->size());
@@ -113,7 +113,7 @@ void FnDecl::check_parameters(Call *call, Identifier *fn_ident, List<Expr *> *ac
         auto atype = actual->type_check();
 
         if (!ftype->is_equal_to(atype)) {
-            ReportError::arg_mismatch(call, i + 1, atype, ftype);
+            ReportError::arg_mismatch(actual, i + 1, atype, ftype);
         }
     }
 }

@@ -109,6 +109,8 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
 }
 
 void ReturnStmt::check() {
+    expr->check();
+
     // find function decl
     FnDecl *fn = nullptr;
     for (auto p = parent; p; p = p->get_parent()) {
