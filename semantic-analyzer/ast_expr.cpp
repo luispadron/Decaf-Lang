@@ -210,7 +210,12 @@ Type * ArrayAccess::type_check() {
     if (!base->type_check()->is_array_type() || !subscript->type_check()->can_perform_array_access()) {
         return Type::errorType;
     } else {
-        return base->type_check();
+        auto type = base->type_check();
+        if (type->is_array_type()) {
+            return type->type_check();
+        } else {
+            return type;
+        }
     }
 }
 

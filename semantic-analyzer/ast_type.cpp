@@ -132,7 +132,7 @@ void ArrayType::check() {
 }
 
 Type* ArrayType::type_check() {
-    return elemType->type_check();
+    return elemType;
 }
 
 
