@@ -1,0 +1,27 @@
+// tests nullptr symbol
+
+class Dog { }
+interface Animal { }
+
+void main() {
+    Animal a;
+    Dog d;
+    int x;
+    string s;
+    double dl;
+
+    x = null; // error
+    s = null; // error
+    dl = null; // error
+
+    a = null;
+    d = null;
+
+    a = New(Dog);
+    a = null;
+    if (a == null) {
+        a = New(Dog);
+    }
+
+    if (null) { }  // error
+}

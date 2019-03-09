@@ -89,7 +89,7 @@ bool NamedType::is_equal_to(Type *other) {
 
     auto named_other = dynamic_cast<NamedType*>(other);
     if (!named_other) { return false; }
-    return std::strcmp(id->get_name(), named_other->id->get_name()) == 0;
+    return id->is_equal_to(named_other->id);
 }
 
 bool NamedType::can_perform_equality_with(Type *other) {

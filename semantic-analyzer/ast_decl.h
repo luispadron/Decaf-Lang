@@ -17,6 +17,8 @@
 #include "ast_type.h"
 #include "list.h"
 
+#include <vector>
+
 class Identifier;
 class Stmt;
 class Expr;
@@ -53,17 +55,23 @@ public:
 };
 
 
-class ClassDecl : public Decl {
+class FnDecl : public Decl {
 protected:
-    List<Decl*> *members;
-    NamedType *extends;
-    List<NamedType*> *implements;
+    List<VarDecl*> *formals;
+    Type *returnType;
+    Stmt *body;
 
 public:
-    ClassDecl(Identifier *name, NamedType *extends, 
-              List<NamedType*> *implements, List<Decl*> *members);
+    FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
 
-    DeclType get_decl_type() const override { return DeclType::Class; }
+    void set_function_body(Stmt *b);
+
+    void check_parameters(Identifier *fn_ident, List<Expr*> *actuals) const;
+
+    /// returns whether this function has equal signature to anotehr function
+    bool has_equal_signature(FnDecl* other) const;
+
+    DeclType get_decl_type() const override { return DeclType::Function; }
 
     void check() override;
 };
@@ -78,24 +86,27 @@ public:
 
     DeclType get_decl_type() const override { return DeclType::Interface; }
 
+    std::vector<FnDecl*> get_fn_decls();
+
     void check() override;
 };
 
 
-class FnDecl : public Decl {
+class ClassDecl : public Decl {
+private:
+    /// verifies that the class conforms to a given interface and outputs errors if needed
+    bool verify_interface_conformance(InterfaceDecl *interface, NamedType *intf_type);
+
 protected:
-    List<VarDecl*> *formals;
-    Type *returnType;
-    Stmt *body;
-    
+    List<Decl*> *members;
+    NamedType *extends;
+    List<NamedType*> *implements;
+
 public:
-    FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
+    ClassDecl(Identifier *name, NamedType *extends,
+              List<NamedType*> *implements, List<Decl*> *members);
 
-    void set_function_body(Stmt *b);
-
-    void check_parameters(Identifier *fn_ident, List<Expr*> *actuals);
-
-    DeclType get_decl_type() const override { return DeclType::Function; }
+    DeclType get_decl_type() const override { return DeclType::Class; }
 
     void check() override;
 };

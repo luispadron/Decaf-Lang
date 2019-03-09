@@ -74,7 +74,10 @@ public:
     void check() override;
 
     /// returns whether or not this identifier is in the symbol table
-    bool is_defined();
+    bool is_defined() const;
+
+    // returns whether or not this identifier is equal to another (compares names)
+    bool is_equal_to(Identifier *other) const;
 };
 
 

@@ -1,0 +1,36 @@
+
+*** Error line 13.
+    x = null; // error
+      ^
+*** Incompatible operands: int = null
+
+
+*** Error line 14.
+    s = null; // error
+      ^
+*** Incompatible operands: string = null
+
+
+*** Error line 15.
+    dl = null; // error
+       ^
+*** Incompatible operands: double = null
+
+
+*** Error line 20.
+    a = New(Dog);
+      ^
+*** Incompatible operands: Animal = Dog
+
+
+*** Error line 23.
+        a = New(Dog);
+          ^
+*** Incompatible operands: Animal = Dog
+
+
+*** Error line 26.
+    if (null) { }  // error
+        ^^^^
+*** Test expression must have boolean type
+
