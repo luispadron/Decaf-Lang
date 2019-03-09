@@ -73,7 +73,16 @@ IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) {
 }
 
 void IfStmt::check() {
+    test->check();
+    if (!test->type_check()->is_equal_to(Type::boolType)) {
+        ReportError::test_not_boolean(test);
+    }
 
+    body->check();
+
+    if (elseBody) {
+        elseBody->check();
+    }
 }
 
 

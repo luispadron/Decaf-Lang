@@ -1,0 +1,35 @@
+// tests if statement
+
+void main() {
+    int x;
+    bool b;
+
+    if (unkwn) { // error
+        int x;
+        x + z; // error
+    }
+
+    if (x) { // error
+        ReadInteger();
+    } else {
+        x + x;
+        x + z; // error
+    }
+
+    if (ReadInteger() < 0) {
+
+    } else {
+        x + x;
+    }
+
+    if (b) {
+        b = false;
+        b = 1; // error
+    }
+
+    if (1 + 1) { // error
+        b = false;
+    } else {
+      b = true;
+    }
+}

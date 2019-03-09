@@ -1,0 +1,36 @@
+
+*** Error line 7.
+    if (unkwn) { // error
+        ^^^^^
+*** No declaration found for variable 'unkwn'
+
+
+*** Error line 9.
+        x + z; // error
+            ^
+*** No declaration found for variable 'z'
+
+
+*** Error line 12.
+    if (x) { // error
+        ^
+*** Test expression must have boolean type
+
+
+*** Error line 16.
+        x + z; // error
+            ^
+*** No declaration found for variable 'z'
+
+
+*** Error line 27.
+        b = 1; // error
+          ^
+*** Incompatible operands: bool = int
+
+
+*** Error line 30.
+    if (1 + 1) { // error
+        ^^^^^
+*** Test expression must have boolean type
+
