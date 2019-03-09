@@ -1,0 +1,28 @@
+// test interface conformance checking
+
+interface Animal {
+    int get_age();
+    void make_noise();
+}
+
+// error
+class Dog implements Animal {
+
+}
+
+// error
+class Cat implements Animal {
+    int get_age() { unkwn x; }
+}
+
+// error
+class Frog implements Animal {
+    int get_age() { return 3; }
+    int make_noise() { return 69; }
+}
+
+class Final implements Animal {
+    int get_age() { }
+    void make_noise() { }
+}
+

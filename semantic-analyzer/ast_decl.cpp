@@ -161,9 +161,10 @@ bool ClassDecl::verify_interface_conformance(InterfaceDecl *interface, NamedType
         });
 
         if (fn != functions.end()) {
-            ++implemented_fns;
             if (!(*fn)->has_equal_signature(infn)) {
                 ReportError::override_mismatch(*fn);
+            } else {
+                ++implemented_fns;
             }
         }
     }

@@ -1,0 +1,30 @@
+
+*** Error line 9.
+class Dog implements Animal {
+                     ^^^^^^
+*** Class 'Dog' does not implement entire interface 'Animal'
+
+
+*** Error line 14.
+class Cat implements Animal {
+                     ^^^^^^
+*** Class 'Cat' does not implement entire interface 'Animal'
+
+
+*** Error line 15.
+    int get_age() { unkwn x; }
+                    ^^^^^
+*** No declaration found for type 'unkwn'
+
+
+*** Error line 19.
+class Frog implements Animal {
+                      ^^^^^^
+*** Class 'Frog' does not implement entire interface 'Animal'
+
+
+*** Error line 21.
+    int make_noise() { return 69; }
+        ^^^^^^^^^^
+*** Method 'make_noise' must match inherited type signature
+
