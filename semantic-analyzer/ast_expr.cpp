@@ -299,12 +299,14 @@ void Call::check() {
         // field is not found in the scope of the base, error
         if (!Sym_tbl_t::shared().is_declared_in_class(btype->get_type_name(), field->get_name())) {
             ReportError::field_not_found_in_base(field, btype);
+            actuals->check_all();
             return;
         }
 
         auto decl = Sym_tbl_t::shared().get_declaration_in_class(btype->get_type_name(), field->get_name());
         if (decl->get_decl_type() != DeclType::Function) {
             ReportError::field_not_found_in_base(field, btype);
+            actuals->check_all();
             return;
         }
         // good to go, now just need to verify signature is correct
@@ -312,12 +314,14 @@ void Call::check() {
     } else if (!Sym_tbl_t::shared().is_declared(field->get_name())) {
         // didn't find the field at all
         ReportError::identifier_not_found(field, Reason_e::LookingForFunction);
+        actuals->check_all();
         return;
     } else {
         // found field, but declaration of field needs to be a function
         auto decl = Sym_tbl_t::shared().get_declaration(field->get_name());
         if (decl->get_decl_type() != DeclType::Function) {
             ReportError::identifier_not_found(field, Reason_e::LookingForFunction);
+            actuals->check_all();
             return;
         }
         // good to go, now just need to verify signature is correct
@@ -325,6 +329,8 @@ void Call::check() {
     }
 
     Assert(fn_decl);
+
+    actuals->check_all();
     fn_decl->check_parameters(field, actuals);
 }
 
