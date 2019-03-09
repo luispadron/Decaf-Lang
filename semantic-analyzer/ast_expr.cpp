@@ -292,6 +292,13 @@ void Call::check() {
     FnDecl *fn_decl = nullptr;
 
     if (base) {
+        // handle special case for length function of array types
+        if (strcmp(field->get_name(), "length") == 0) {
+            if (base->type_check()->is_array_type() && actuals->size() == 0) {
+                return;
+            }
+        }
+
         base->check();
         auto btype = base->type_check();
         if (btype == Type::errorType) { return; }

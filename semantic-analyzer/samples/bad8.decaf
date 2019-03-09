@@ -5,7 +5,7 @@ class Car {
 
 class Honda extends Car {
   int trunk;
-   bool Park() { return trunk == wheels;}
+   bool Park() { return trunk == this.wheels;}
 }
 
 class Boat {}
