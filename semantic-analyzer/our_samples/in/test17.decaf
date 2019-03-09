@@ -1,0 +1,27 @@
+// tests break statement
+
+void main() {
+    int i;
+
+    break; //error
+
+    for (i = 0; i < 10; i = i + 1) {
+        break;
+        if (true) {
+            break;
+        }
+    }
+
+    while(true) {
+        break;
+        if(true) {
+            break;
+        }
+    }
+
+    if (true) {
+        break; // error
+    } else {
+        break; // error
+    }
+}

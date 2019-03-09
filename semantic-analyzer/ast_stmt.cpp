@@ -87,7 +87,19 @@ void IfStmt::check() {
 
 
 void BreakStmt::check() {
+    // check that we're in a loop stmt, which means to traverse up the AST
+    // until we find a node that's a loop statement
+    bool is_in_loop = false;
+    for (auto p = parent; p; p = p->get_parent()) {
+        if (dynamic_cast<LoopStmt*>(p)) {
+            is_in_loop = true;
+            break; // lol
+        }
+    }
 
+    if (!is_in_loop) {
+        ReportError::break_outside_loop(this);
+    }
 }
 
 

@@ -1,0 +1,18 @@
+
+*** Error line 6.
+    break; //error
+    ^^^^^
+*** break is only allowed inside a loop
+
+
+*** Error line 23.
+        break; // error
+        ^^^^^
+*** break is only allowed inside a loop
+
+
+*** Error line 25.
+        break; // error
+        ^^^^^
+*** break is only allowed inside a loop
+
