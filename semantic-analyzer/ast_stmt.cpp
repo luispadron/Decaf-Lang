@@ -18,6 +18,8 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
 void StmtBlock::check() {
     Sym_tbl_t::shared().enter_scope("block");
 
+    decls->check_all();
+
     // add declarations to scope
     for (int i = 0; i < decls->size(); ++i) {
         auto decl = decls->get(i);

@@ -98,16 +98,27 @@ bool NamedType::can_perform_equality_with(Type *other) {
 void NamedType::check() {
     if (!id->is_defined()) {
         ReportError::identifier_not_found(id, Reason_e::LookingForType);
+    } else {
+        // need to make sure that the identifier is used for a class/interface decl
+        auto decl = Sym_tbl_t::shared().get_declaration(id->get_name());
+        if (decl->get_decl_type() != DeclType::Class && decl->get_decl_type() != DeclType::Interface) {
+            ReportError::identifier_not_found(id, Reason_e::LookingForType);
+        }
     }
 }
 
 Type* NamedType::type_check() {
-    // if id is in sym table, return that otherwise, errorType
     if (!id->is_defined()) {
         return Type::errorType;
     } else {
-        return Sym_tbl_t::shared().get_declaration(id->get_name())->type_check();
+        // need to make sure that the identifier is used for a class/interface decl
+        auto decl = Sym_tbl_t::shared().get_declaration(id->get_name());
+        if (decl->get_decl_type() != DeclType::Class && decl->get_decl_type() != DeclType::Interface) {
+            return Type::errorType;
+        }
     }
+
+    return Sym_tbl_t::shared().get_declaration(id->get_name())->type_check();
 }
 
 

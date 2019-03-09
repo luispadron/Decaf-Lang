@@ -50,8 +50,14 @@ void ClassDecl::check() {
         if (!extends->get_id()->is_defined()) {
             ReportError::identifier_not_found(extends->get_id(), Reason_e::LookingForClass);
         } else {
-            // set super class
-            Sym_tbl_t::shared().set_super_class(extends->get_id()->get_name());
+            auto decl = Sym_tbl_t::shared().get_declaration(extends->get_id()->get_name());
+            if (decl->get_decl_type() != DeclType::Class) {
+                // decl needs to be of type class, otherwise error
+                ReportError::identifier_not_found(extends->get_id(), Reason_e::LookingForClass);
+            } else {
+                // set super class
+                Sym_tbl_t::shared().set_super_class(extends->get_id()->get_name());
+            }
         }
     }
 
@@ -60,6 +66,12 @@ void ClassDecl::check() {
         auto imp = implements->get(i);
         if (!imp->get_id()->is_defined()) {
             ReportError::identifier_not_found(imp->get_id(), Reason_e::LookingForInterface);
+        } else {
+            auto decl = Sym_tbl_t::shared().get_declaration(imp->get_id()->get_name());
+            if (decl->get_decl_type() != DeclType::Interface) {
+                // decl needs to be of type interface, otherwise error
+                ReportError::identifier_not_found(imp->get_id(), Reason_e::LookingForInterface);
+            }
         }
     }
 
