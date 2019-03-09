@@ -1,0 +1,34 @@
+// tests return statement
+
+double get_age() {
+    return 1.2 + 0.0;
+}
+
+class Dog {
+    int age;
+
+    int get_age() {
+        return this.age;
+    }
+}
+
+int err() {
+    return "error"; // error
+}
+
+int err2() {
+    return; // error
+}
+
+void main() {
+    int dogage;
+    double dubage;
+    Dog d;
+
+    dogage = d.get_age();
+    dubage = get_age();
+
+    dogage = 1 + err2();
+    dogage = 1 + err();
+}
+

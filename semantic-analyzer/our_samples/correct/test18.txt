@@ -1,0 +1,12 @@
+
+*** Error line 16.
+    return "error"; // error
+           ^^^^^^^
+*** Incompatible return: string given, int expected
+
+
+*** Error line 20.
+    return; // error
+    ^^^^^^
+*** Incompatible return: void given, int expected
+

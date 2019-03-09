@@ -1,0 +1,18 @@
+// tests print function
+
+class Dog {  }
+
+void main() {
+    int x;
+    double d;
+    bool b;
+    string s;
+    Dog dog;
+
+    Print(x, d, s);
+    Print(x + 1, d, s);
+    Print(x + 1.1); // error
+    Print(x + d, s + x, unknwn); // error
+    Print(unkwn); // error
+    Print(dog, dog); // error
+}

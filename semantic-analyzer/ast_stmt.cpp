@@ -109,7 +109,20 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
 }
 
 void ReturnStmt::check() {
+    // find function decl
+    FnDecl *fn = nullptr;
+    for (auto p = parent; p; p = p->get_parent()) {
+        fn = dynamic_cast<FnDecl*>(p);
+        if (fn) { break; }
+    }
 
+    // return always need to be in a function or else stuff went wrong?
+    Assert(fn);
+
+    // check return types match
+    if (!fn->type_check()->is_equal_to(expr->type_check())) {
+        ReportError::return_mismatch(this, expr->type_check(), fn->type_check());
+    }
 }
 
 
@@ -119,5 +132,12 @@ PrintStmt::PrintStmt(List<Expr*> *a) {
 }
 
 void PrintStmt::check() {
-
+    // check all args are printable
+    for (int i = 0; i < args->size(); ++i) {
+        auto arg = args->get(i);
+        arg->check();
+        if (!arg->type_check()->is_printable()) {
+            ReportError::print_arg_mismatch(arg, i + 1, arg->type_check());
+        }
+    }
 }

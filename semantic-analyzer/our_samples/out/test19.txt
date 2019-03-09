@@ -1,0 +1,54 @@
+
+*** Error line 12.
+    Print(x, d, s);
+             ^
+*** Incompatible argument 2: double given, int/bool/string expected
+
+
+*** Error line 13.
+    Print(x + 1, d, s);
+                 ^
+*** Incompatible argument 2: double given, int/bool/string expected
+
+
+*** Error line 14.
+    Print(x + 1.1); // error
+            ^
+*** Incompatible operands: int + double
+
+
+*** Error line 15.
+    Print(x + d, s + x, unknwn); // error
+            ^
+*** Incompatible operands: int + double
+
+
+*** Error line 15.
+    Print(x + d, s + x, unknwn); // error
+                   ^
+*** Incompatible operands: string + int
+
+
+*** Error line 15.
+    Print(x + d, s + x, unknwn); // error
+                        ^^^^^^
+*** No declaration found for variable 'unknwn'
+
+
+*** Error line 16.
+    Print(unkwn); // error
+          ^^^^^
+*** No declaration found for variable 'unkwn'
+
+
+*** Error line 17.
+    Print(dog, dog); // error 
+          ^^^
+*** Incompatible argument 1: Dog given, int/bool/string expected
+
+
+*** Error line 17.
+    Print(dog, dog); // error 
+               ^^^
+*** Incompatible argument 2: Dog given, int/bool/string expected
+
