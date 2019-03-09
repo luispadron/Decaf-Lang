@@ -50,7 +50,7 @@ public:
     virtual bool is_array_type() { return false; }
 
     /// returns whether type can be used to perform array access
-    bool can_perform_array_access() { return type_check() == Type::intType; }
+    bool can_perform_array_access() { return type_check()->is_equal_to(Type::intType); }
 
     /// returns whether this type can perform arithmetic
     bool can_perform_arithmetic();
