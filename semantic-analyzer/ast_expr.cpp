@@ -258,6 +258,9 @@ Type* FieldAccess::type_check() {
         auto btype = base->type_check();
         // only named types can use . syntax
         if (!btype->is_named_type()) { return Type::errorType; }
+        // perform another type check on the named type, since we need to make sure name is defined
+        if (btype->type_check() == Type::errorType) { return Type::errorType; }
+
         // not found, thus this field doesnt exist in class
         if (!Sym_tbl_t::shared().is_declared_in_class(btype->get_type_name(), field->get_name())) { return Type::errorType; }
         // found in sym table, simply return the type of the decl, if its a var decl
@@ -301,7 +304,9 @@ void Call::check() {
 
         base->check();
         auto btype = base->type_check();
+        // dont check further if type is error
         if (btype == Type::errorType) { return; }
+        if (btype->is_named_type() && btype->type_check() == Type::errorType) { return; }
 
         // field is not found in the scope of the base, error
         if (!Sym_tbl_t::shared().is_declared_in_class(btype->get_type_name(), field->get_name())) {
