@@ -1,0 +1,48 @@
+
+*** Error line 9.
+        x = "error";
+          ^
+*** Incompatible operands: int = string
+
+
+*** Error line 10.
+        x = New(Dog);
+                ^^^
+*** No declaration found for class 'Dog'
+
+
+*** Error line 18.
+    x = y + 3; // error
+        ^
+*** No declaration found for variable 'y'
+
+
+*** Error line 21.
+        this.x = 3; // error
+        ^^^^
+*** 'this' is only valid within class scope
+
+
+*** Error line 25.
+    for (unkwn = 0; 3 + 3; true) { // error
+         ^^^^^
+*** No declaration found for variable 'unkwn'
+
+
+*** Error line 25.
+    for (unkwn = 0; 3 + 3; true) { // error
+                    ^^^^^
+*** Test expression must have boolean type
+
+
+*** Error line 26.
+        unkwn = 0;
+        ^^^^^
+*** No declaration found for variable 'unkwn'
+
+
+*** Error line 29.
+    for (z = 0; this.x; z = z +1) {
+                ^^^^
+*** 'this' is only valid within class scope
+

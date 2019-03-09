@@ -1,0 +1,11 @@
+// really dumb difference between for and while
+
+void main() {
+    for (; 1 + 1;) {
+        z = "error"; // shouldn't error???
+    }
+
+    while(1 + 1) {
+        z = "error"; // error
+    }
+}

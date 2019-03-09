@@ -1,0 +1,32 @@
+// tests for loop
+
+void main() {
+    int x;
+    int z;
+
+    for (x = 3; x < 5; x = x + 1) {
+        x = x + 5;
+        x = "error";
+        x = New(Dog);
+    }
+
+    for (; true;) {
+        int y;
+        y = y + 2;
+    }
+
+    x = y + 3; // error
+
+    for (z = 0; true; z = z - 1) {
+        this.x = 3; // error
+        z = z + 4;
+    }
+
+    for (unkwn = 0; 3 + 3; true) { // error
+        unkwn = 0;
+    }
+
+    for (z = 0; this.x; z = z +1) {
+
+    }
+}

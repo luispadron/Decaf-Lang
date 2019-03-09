@@ -47,16 +47,12 @@ protected:
   
 public:
     ConditionalStmt(Expr *testExpr, Stmt *body);
-
-    void check() override;
 };
 
 
 class LoopStmt : public ConditionalStmt {
 public:
     LoopStmt(Expr *testExpr, Stmt *body) : ConditionalStmt(testExpr, body) {}
-
-    void check() override;
 };
 
 

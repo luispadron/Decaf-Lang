@@ -1,0 +1,32 @@
+// tests while loop
+
+void main() {
+    int x;
+    double d;
+
+    while (d < 0.0) {
+        int y;
+        y = y + 1;
+        y = unkwn; // error
+    }
+
+    while(1.1 == 1.1) {
+
+    }
+
+    while (true) {
+
+    }
+
+    while (!false) {
+
+    }
+
+    while(this.x) {
+
+    }
+
+    while(1 + 1) { // error
+        z = "lame";
+    }
+}

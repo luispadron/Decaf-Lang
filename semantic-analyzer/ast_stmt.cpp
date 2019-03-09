@@ -36,15 +36,6 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
     (body = b)->set_parent(this);
 }
 
-void ConditionalStmt::check() {
-
-}
-
-
-void LoopStmt::check() {
-
-}
-
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) { 
     Assert(i != nullptr && t != nullptr && s != nullptr && b != nullptr);
@@ -53,12 +44,25 @@ ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
 }
 
 void ForStmt::check() {
+    init->check();
 
+    test->check();
+    if (!test->type_check()->is_equal_to(Type::boolType)) {
+        ReportError::test_not_boolean(test);
+    }
+
+    step->check();
+    body->check();
 }
 
 
 void WhileStmt::check() {
+    test->check();
+    if (!test->type_check()->is_equal_to(Type::boolType)) {
+        ReportError::test_not_boolean(test);
+    }
 
+    body->check();
 }
 
 

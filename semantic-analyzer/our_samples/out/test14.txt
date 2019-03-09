@@ -1,0 +1,24 @@
+
+*** Error line 10.
+        y = unkwn; // error
+            ^^^^^
+*** No declaration found for variable 'unkwn'
+
+
+*** Error line 25.
+    while(this.x) {
+          ^^^^
+*** 'this' is only valid within class scope
+
+
+*** Error line 29.
+    while(1 + 1) { // error
+          ^^^^^
+*** Test expression must have boolean type
+
+
+*** Error line 30.
+        z = "lame";
+        ^
+*** No declaration found for variable 'z'
+

@@ -1,0 +1,24 @@
+
+*** Error line 4.
+    for (; 1 + 1;) {
+           ^^^^^
+*** Test expression must have boolean type
+
+
+*** Error line 5.
+        z = "error"; // shouldn't error???
+        ^
+*** No declaration found for variable 'z'
+
+
+*** Error line 8.
+    while(1 + 1) {
+          ^^^^^
+*** Test expression must have boolean type
+
+
+*** Error line 9.
+        z = "error"; // error
+        ^
+*** No declaration found for variable 'z'
+
