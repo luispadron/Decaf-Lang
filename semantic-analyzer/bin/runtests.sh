@@ -32,6 +32,7 @@ do
         echo "check diff: sample_tests/diffs/$filename.diff"
         echo "--------------------------------------------------"
     else
+        rm sample_tests/diffs/$filename.diff
         PASSED=$((PASSED+1))
         echo "test passed for file: $filename ✅"
         echo "--------------------------------------------------"
