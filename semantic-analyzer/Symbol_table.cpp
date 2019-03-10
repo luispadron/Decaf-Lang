@@ -1,5 +1,7 @@
 #include "Symbol_table.h"
 
+#include <algorithm>
+
 using namespace std;
 
 /////////////// Implementation ///////////////
@@ -107,6 +109,15 @@ bool Symbol_table::is_declared_in_class(const string &class_key, const string &k
 
 bool Symbol_table::is_class_scope() const {
     return scope_ptr->this_ptr != nullptr;
+}
+
+bool Symbol_table::inherits_from(const std::string &child, const std::string &parent) const {
+    auto inh_it = inheritance_tbl.find(child);
+    if (inh_it == inheritance_tbl.end()) {
+        return false;
+    } else {
+        return find(inh_it->second.begin(), inh_it->second.end(), parent) != inh_it->second.end();
+    }
 }
 
 Decl * Symbol_table::get_declaration(const string &k) {

@@ -95,6 +95,7 @@ public:
     bool is_named_type() override { return true; }
 
     /// returns whether two named types are equal to each other (same identifier)
+    /// OR if the the given other is a super class / interface of "this"
     bool is_equal_to(Type *other) override;
 
     /// returns whether two named types can perform equality, i.e must be same type or one or both must be null

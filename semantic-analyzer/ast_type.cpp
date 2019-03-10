@@ -70,7 +70,7 @@ bool Type::can_perform_logical_with(Type *other) {
 }
 
 bool Type::can_perform_assignment_with(Type *other) {
-    return is_equal_to(other);
+    return other->is_equal_to(this);
 }
 
 Type* Type::type_check() {
@@ -89,7 +89,8 @@ bool NamedType::is_equal_to(Type *other) {
 
     auto named_other = dynamic_cast<NamedType*>(other);
     if (!named_other) { return false; }
-    return id->is_equal_to(named_other->id);
+    return id->is_equal_to(named_other->id) ||
+        Symbol_table::shared().inherits_from(id->get_name(), named_other->id->get_name()); // check for inheritance
 }
 
 bool NamedType::can_perform_equality_with(Type *other) {

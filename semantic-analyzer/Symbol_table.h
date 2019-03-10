@@ -66,6 +66,9 @@ public:
     /// returns whether the current scope is within a class
     bool is_class_scope() const;
 
+    /// returns whether given class key inherits from given interface/class name
+    bool inherits_from(const std::string &child, const std::string &parent) const;
+
     /// returns the value of the symbol with given key
     /// if no such symbol exists, exception is thrown
     Decl * get_declaration(const std::string &k);

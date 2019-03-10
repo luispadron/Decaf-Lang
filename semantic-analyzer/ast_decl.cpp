@@ -143,6 +143,8 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
 bool ClassDecl::verify_interface_conformance(InterfaceDecl *interface, NamedType *intf_type) {
     Assert(interface);
 
+    bool is_valid = true;
+
     // find functions in class
     vector<FnDecl*> functions;
     for (int i = 0; i < members->size(); ++i) {
@@ -163,6 +165,7 @@ bool ClassDecl::verify_interface_conformance(InterfaceDecl *interface, NamedType
         if (fn != functions.end()) {
             if (!(*fn)->has_equal_signature(infn)) {
                 ReportError::override_mismatch(*fn);
+                is_valid = false;
             } else {
                 ++implemented_fns;
             }
@@ -172,9 +175,10 @@ bool ClassDecl::verify_interface_conformance(InterfaceDecl *interface, NamedType
     // if the class didn't implement all the interface functions we have an error
     if (implemented_fns != interface_functions.size()) {
         ReportError::interface_not_implemented(this, intf_type);
+        is_valid = false;
     }
 
-    return true;
+    return is_valid;
 }
 
 void ClassDecl::check() {
