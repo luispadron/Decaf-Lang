@@ -8,6 +8,8 @@
 #include "Scope.h"
 
 #include <iostream>
+#include <map>
+#include <string>
 #include <vector>
 
 /**
@@ -40,8 +42,13 @@ public:
     void enter_class_scope(const std::string &key);
 
     /// sets the super pointer for the current class scope
+    /// also updates the inheritance look up table
     /// if not in a class scope, throws error
     void set_super_class(const std::string &super_class_key);
+
+    /// sets the interface inheritance relationship for the current class
+    /// if not in a class scope, throws error
+    void set_interface(const std::string &interface_key);
 
     /// pops the current scope to be the parent scope
     void leave_scope();
@@ -85,6 +92,10 @@ private:
 
     /// the scopes relating to a class, organized by string, Scope
     std::map<std::string, Scope*> class_scopes;
+
+    /// an inheritance lookup table, used for polymorphic type checking
+    /// collection is from class name -> parent names
+    std::map<std::string, std::vector<std::string>> inheritance_tbl;
 };
 
 

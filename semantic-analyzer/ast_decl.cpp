@@ -207,7 +207,9 @@ void ClassDecl::check() {
                 // decl needs to be of type interface, otherwise error
                 ReportError::identifier_not_found(imp->get_id(), Reason_e::LookingForInterface);
             } else {
-                verify_interface_conformance(dynamic_cast<InterfaceDecl*>(decl), imp);
+                if (verify_interface_conformance(dynamic_cast<InterfaceDecl*>(decl), imp)) {
+                    Sym_tbl_t::shared().set_interface(imp->get_id()->get_name());
+                }
             }
         }
     }

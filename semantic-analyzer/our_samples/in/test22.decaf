@@ -1,0 +1,12 @@
+// tests inheritance stuff
+
+class Animal {
+    void walk() { }
+}
+
+interface Furry { }
+interface Mammal { }
+
+class Dog extends Animal implements Mammal { }
+class Cat extends Animal implements Furry, Mammal { }
+class Bird extends Animal { }
