@@ -1,0 +1,25 @@
+// this tests bad overriding
+
+class Base {
+    int x;
+    double d;
+
+    int get_int() { }
+    void get_void() { }
+    double get_dbl() { }
+    void do_nothing() { }
+}
+
+class Child extends Base {
+    int x;
+
+    int get_int() {  }
+
+    double get_void() { }
+
+    string get_dbl() { }
+
+    int do_nothing() { }
+
+    Base get_base() { }
+}

@@ -92,7 +92,11 @@ void FnDecl::check() {
     // push all formals into scope
     for (int i = 0; i < formals->size(); ++i) {
         auto formal = formals->get(i);
-        Sym_tbl_t::shared().insert_declaration(formal->get_id()->get_name(), formal);
+        try {
+            Sym_tbl_t::shared().insert_declaration(formal->get_id()->get_name(), formal);
+        } catch (Duplicate_symbol_exception &de) {
+            ReportError::decl_conflict(formal, de.get_decl());
+        }
     }
 
     formals->check_all();
@@ -127,7 +131,11 @@ void InterfaceDecl::check() {
 
     for (int i = 0; i < members->size(); ++i) {
         auto decl = members->get(i);
-        Sym_tbl_t::shared().insert_declaration(decl->get_id()->get_name(), decl);
+        try {
+            Sym_tbl_t::shared().insert_declaration(decl->get_id()->get_name(), decl);
+        } catch (Duplicate_symbol_exception &de) {
+            ReportError::decl_conflict(decl, de.get_decl());
+        }
     }
 
     members->check_all();
@@ -229,7 +237,11 @@ void ClassDecl::check() {
 
     for (int i = 0; i < members->size(); ++i) {
         auto decl = members->get(i);
-        Sym_tbl_t::shared().insert_declaration(decl->get_id()->get_name(), decl);
+        try {
+            Sym_tbl_t::shared().insert_declaration(decl->get_id()->get_name(), decl);
+        } catch (Duplicate_symbol_exception &de) {
+            ReportError::decl_conflict(decl, de.get_decl());
+        }
     }
 
     members->check_all();

@@ -23,7 +23,11 @@ void StmtBlock::check() {
     // add declarations to scope
     for (int i = 0; i < decls->size(); ++i) {
         auto decl = decls->get(i);
-        Sym_tbl_t::shared().insert_declaration(decl->get_id()->get_name(), decl);
+        try {
+            Sym_tbl_t::shared().insert_declaration(decl->get_id()->get_name(), decl);
+        } catch (Duplicate_symbol_exception &de) {
+            ReportError::decl_conflict(decl, de.get_decl());
+        }
     }
 
     stmts->check_all();

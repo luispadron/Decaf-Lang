@@ -1,5 +1,6 @@
 #include "ast_program.h"
 #include "ast_decl.h"
+#include "errors.h"
 
 #include <iostream>
 #include <exception>
@@ -30,7 +31,11 @@ void Program::check() {
     // go through each decl and push it's identifier into root scope
     for (int i = 0; i < decls->size(); ++i) {
         auto decl = decls->get(i);
-        Sym_tbl_t::shared().insert_declaration(decl->get_id()->get_name(), decl);
+        try {
+            Sym_tbl_t::shared().insert_declaration(decl->get_id()->get_name(), decl);
+        } catch (Duplicate_symbol_exception &de) {
+            ReportError::decl_conflict(decl, de.get_decl());
+        }
     }
 
     // check all declarations

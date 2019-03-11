@@ -8,7 +8,7 @@ void Scope::insert_symbol(const string &k, Decl *decl) {
     auto it = symbols.find(k);
 
     if (it != symbols.end()) {
-        throw Symbol_table_exception{"error (insert_symbol) called with duplicate key"};
+        throw Duplicate_symbol_exception(it->second);
     } else {
         symbols.insert({k, decl});
     }

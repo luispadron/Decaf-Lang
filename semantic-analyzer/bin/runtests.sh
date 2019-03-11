@@ -65,6 +65,7 @@ do
         echo "--------------------------------------------------"
     else
         PASSED=$((PASSED+1))
+        rm our_samples/diff/$filename.diff
         echo "test passed for file: $filename ✅"
         echo "--------------------------------------------------"
     fi

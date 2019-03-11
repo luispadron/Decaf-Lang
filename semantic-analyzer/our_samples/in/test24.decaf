@@ -1,0 +1,35 @@
+// this tests duplicate definitions as they're not allowed
+
+int x;
+double x;
+
+void get_meme() { }
+int get_meme() { }
+
+void dupe() {}
+void dupe() {}
+
+class Base {
+    int x;
+    int x;
+
+    void get_x() {
+        int x;
+        return x;
+    }
+}
+
+class Base {
+    int x;
+    int x;
+}
+
+int main() {
+    int x;
+    int y;
+    int x;
+
+    {
+        int x;
+    }
+}

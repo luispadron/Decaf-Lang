@@ -1,0 +1,48 @@
+
+*** Error line 4.
+double x;
+       ^
+*** Declaration of 'x' here conflicts with declaration on line 3
+
+
+*** Error line 7.
+int get_meme() { }
+    ^^^^^^^^
+*** Declaration of 'get_meme' here conflicts with declaration on line 6
+
+
+*** Error line 10.
+void dupe() {}
+     ^^^^
+*** Declaration of 'dupe' here conflicts with declaration on line 9
+
+
+*** Error line 14.
+    int x;
+        ^
+*** Declaration of 'x' here conflicts with declaration on line 13
+
+
+*** Error line 18.
+        return x;
+               ^
+*** Incompatible return: int given, void expected
+
+
+*** Error line 22.
+class Base {
+      ^^^^
+*** Declaration of 'Base' here conflicts with declaration on line 12
+
+
+*** Error line 24.
+    int x;
+        ^
+*** Declaration of 'x' here conflicts with declaration on line 23
+
+
+*** Error line 30.
+    int x;
+        ^
+*** Declaration of 'x' here conflicts with declaration on line 28
+
