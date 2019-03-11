@@ -36,7 +36,7 @@ void main() {
   Animal b;
   betsy = New(Cow);
   
-  betsy.InitCow(5, nullptr, true);
+  betsy.InitCow(5, null, true);
   b = betsy;
   b.GetMom();
   Print("spots: ",betsy.IsSpottedCow(), "    height: ", b.GetHeight());

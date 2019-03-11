@@ -14,15 +14,15 @@ Symbol_table::~Symbol_table() {
     }
 }
 
-void Symbol_table::enter_scope(const string &debug_name) {
-    auto new_scope = new Scope(debug_name);
+void Symbol_table::enter_scope(const string &scope_name) {
+    auto new_scope = new Scope(scope_name);
     new_scope->parent_ptr = scope_ptr;
     new_scope->super_ptr = scope_ptr ? scope_ptr->super_ptr : nullptr;
     new_scope->this_ptr = scope_ptr ? scope_ptr->this_ptr : nullptr;
     scopes.push_back(new_scope);
     scope_ptr = new_scope;
 
-    if (DEBUG_PRINT) { cout << "pushing scope: " << debug_name << endl; debug_print(); }
+    if (DEBUG_PRINT) { cout << "pushing scope: " << scope_name << endl; debug_print(); }
 }
 
 void Symbol_table::enter_class_scope(const string &key) {
@@ -33,10 +33,17 @@ void Symbol_table::enter_class_scope(const string &key) {
     class_scopes.insert({key, new_scope});
     scope_ptr = new_scope;
 
-    // add to inheritance table
-    inheritance_tbl.insert({key, {}});
-
     if (DEBUG_PRINT) { cout << "pushing class scope: " << key << endl; debug_print(); }
+}
+
+void Symbol_table::enter_interface_scope(const std::string &key) {
+    auto new_scope = new Scope(key);
+    new_scope->parent_ptr = scope_ptr;
+    scopes.push_back(new_scope);
+    interface_scopes.insert({key, new_scope});
+    scope_ptr = new_scope;
+
+    if (DEBUG_PRINT) { cout << "pushing interface scope: " << key << endl; debug_print(); }
 }
 
 void Symbol_table::set_super_class(const string &super_class_key) {
@@ -49,36 +56,25 @@ void Symbol_table::set_super_class(const string &super_class_key) {
     }
 
     scope_ptr->super_ptr = class_it->second;
-
-    // also update inheritance table
-    auto inh_it = inheritance_tbl.find(scope_ptr->name);
-    if (inh_it == inheritance_tbl.end()) {
-        throw Symbol_table_exception("error: could not update inheritance table");
-    }
-
-    inh_it->second.push_back(super_class_key);
 }
 
 void Symbol_table::set_interface(const std::string &interface_key) {
     if (!is_class_scope()) { throw Symbol_table_exception("error: not in class scope, cannot set interface"); }
 
-    // find the scope of the super class with given key
-    if (!is_declared(interface_key)) { throw Symbol_table_exception("error: cannot set interface, it's not declared"); }
-
-    // update inheritance table
-    auto inh_it = inheritance_tbl.find(scope_ptr->name);
-    if (inh_it == inheritance_tbl.end()) {
-        throw Symbol_table_exception("error: could not update inheritance table");
+    // find the scope of the interface with given key
+    auto intf_scope = interface_scopes.find(interface_key);
+    if (intf_scope == interface_scopes.end()) {
+        throw Symbol_table_exception("error: could not set interface, no interface found for given key");
     }
 
-    inh_it->second.push_back(interface_key);
+    scope_ptr->interfaces.push_back(intf_scope->second);
 }
 
 void Symbol_table::leave_scope() {
+    if (DEBUG_PRINT) { cout << "popping scope " << scope_ptr->name << endl; debug_print(); }
+
     if (!scope_ptr) return;
     scope_ptr = scope_ptr->parent_ptr;
-
-    if (DEBUG_PRINT) { cout << "popping scope " << scope_ptr->name << endl; debug_print(); }
 }
 
 void Symbol_table::insert_declaration(const string &k, Decl *d) {
@@ -100,8 +96,13 @@ bool Symbol_table::is_declared(const string &k) const {
 
 bool Symbol_table::is_declared_in_class(const string &class_key, const string &k) const {
     auto class_scope_it = class_scopes.find(class_key);
+    auto interface_scope_it = interface_scopes.find(class_key);
     if (class_scope_it == class_scopes.end()) {
-        return false;
+        if (interface_scope_it == interface_scopes.end()) {
+            return false;
+        } else {
+            return interface_scope_it->second->is_declared(k);
+        }
     } else {
         return class_scope_it->second->is_declared(k);
     }
@@ -112,12 +113,21 @@ bool Symbol_table::is_class_scope() const {
 }
 
 bool Symbol_table::inherits_from(const std::string &child, const std::string &parent) const {
-    auto inh_it = inheritance_tbl.find(child);
-    if (inh_it == inheritance_tbl.end()) {
+    auto class_scope = class_scopes.find(child);
+    if (class_scope == class_scopes.end()) {
         return false;
-    } else {
-        return find(inh_it->second.begin(), inh_it->second.end(), parent) != inh_it->second.end();
     }
+
+    // check base classes
+    for (auto base = class_scope->second; base; base = base->super_ptr) {
+        if (base->name == parent) { return true; }
+
+        for (const auto &intf : base->interfaces) {
+            if (intf->name == parent) { return true; }
+        }
+    }
+
+    return false;
 }
 
 Decl * Symbol_table::get_declaration(const string &k) {
@@ -126,11 +136,17 @@ Decl * Symbol_table::get_declaration(const string &k) {
 
 Decl * Symbol_table::get_declaration_in_class(const string &class_key, const string &k) const {
     auto class_scope_it = class_scopes.find(class_key);
-    if (class_scope_it == class_scopes.end()) {
-        throw Symbol_table_exception("error: cant get symbol in class, no class with given key");
-    }
+    auto interface_scope_it = interface_scopes.find(class_key);
 
-    return class_scope_it->second->get_declaration(k);
+    if (class_scope_it == class_scopes.end()) {
+        if (interface_scope_it == interface_scopes.end()) {
+            throw Symbol_table_exception("error: could not get declaration, not found");
+        } else {
+            return interface_scope_it->second->get_declaration(k);
+        }
+    } else {
+        return class_scope_it->second->get_declaration(k);
+    }
 }
 
 const string& Symbol_table::get_class_scope_name() const {
@@ -140,19 +156,4 @@ const string& Symbol_table::get_class_scope_name() const {
 
 void Symbol_table::debug_print() const {
     scope_ptr->debug_print();
-    
-    // print out inheritance table
-    
-    cout << "=== Inheritance table ===" << endl;
-    for (const auto &kv : inheritance_tbl) {
-        if (!kv.second.empty()) {
-            cout << kv.first << " inherits from: " << endl;
-        } else {
-            cout << kv.first << " inherits from: nothing" << endl;
-        }
-
-        for (const auto &super_class : kv.second) {
-            cout << "\t" << super_class << endl;
-        }
-    }
 }

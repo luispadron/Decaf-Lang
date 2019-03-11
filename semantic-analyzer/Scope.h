@@ -9,9 +9,9 @@
 
 #include <iostream>
 #include <map>
-#include <stack>
 #include <string>
 #include <sstream>
+#include <vector>
 
 // forward declare Symbol_table and Type
 class Symbol_table;
@@ -61,7 +61,7 @@ private:
     /// typedef for iterator of symbol type
     using Symbol_iter = typename std::map<std::string, Decl*>::iterator;
 
-    /// the name of the scope, used for debugging purposes
+    /// the name of the scope
     std::string name;
 
     /// the symbols this scope knows about
@@ -75,6 +75,9 @@ private:
 
     /// the scope of the "this" class, only applies to classes
     Scope* this_ptr = nullptr;
+
+    /// collection of pointers to interfaces, only applies to classes
+    std::vector<Scope*> interfaces;
 
     // helper functions //
 

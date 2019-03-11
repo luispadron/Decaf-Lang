@@ -121,7 +121,14 @@ vector<FnDecl*> InterfaceDecl::get_fn_decls() {
 }
 
 void InterfaceDecl::check() {
-    Sym_tbl_t::shared().enter_scope(id->get_name());
+    Sym_tbl_t::shared().enter_interface_scope(id->get_name());
+
+    // insert all decls into interface scope
+
+    for (int i = 0; i < members->size(); ++i) {
+        auto decl = members->get(i);
+        Sym_tbl_t::shared().insert_declaration(decl->get_id()->get_name(), decl);
+    }
 
     members->check_all();
 

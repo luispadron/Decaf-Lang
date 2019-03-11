@@ -36,10 +36,13 @@ public:
     ~Symbol_table();
 
     /// pushes a new scope to the symbol table
-    void enter_scope(const std::string &debug_name);
+    void enter_scope(const std::string &scope_name);
 
     /// pushes a new class scope to the symbol table
     void enter_class_scope(const std::string &key);
+
+    /// pushes a new interface scope tot the symbol table
+    void enter_interface_scope(const std::string &key);
 
     /// sets the super pointer for the current class scope
     /// also updates the inheritance look up table
@@ -93,12 +96,11 @@ private:
     /// all possible scopes added to the symbol table, used to clean up memory, etc
     std::vector<Scope*> scopes;
 
-    /// the scopes relating to a class, organized by string, Scope
+    /// the scopes relating to a class, organized by the name of the class
     std::map<std::string, Scope*> class_scopes;
 
-    /// an inheritance lookup table, used for polymorphic type checking
-    /// collection is from class name -> parent names
-    std::map<std::string, std::vector<std::string>> inheritance_tbl;
+    /// the scopes relating to interfaces, organized by the name of the interface
+    std::map<std::string, Scope*> interface_scopes;
 };
 
 

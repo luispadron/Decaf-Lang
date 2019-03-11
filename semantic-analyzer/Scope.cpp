@@ -1,5 +1,7 @@
 #include "Scope.h"
 
+#include <stack>
+
 using namespace std;
 
 void Scope::insert_symbol(const string &k, Decl *decl) {
