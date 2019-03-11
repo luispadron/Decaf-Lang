@@ -108,6 +108,14 @@ bool Symbol_table::is_declared_in_scope(const string &scope_name, const string &
     }
 }
 
+bool Symbol_table::is_scope_named(const std::string &scope_name) const {
+    if (is_class_scope()) {
+        return scope_ptr->this_ptr->name == scope_name;
+    } else {
+        return scope_ptr->name == scope_name;
+    }
+}
+
 bool Symbol_table::is_class_scope() const {
     return scope_ptr->this_ptr != nullptr;
 }

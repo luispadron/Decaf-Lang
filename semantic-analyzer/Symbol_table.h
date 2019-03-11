@@ -66,6 +66,9 @@ public:
     /// returns whether or not the given symbol is defined in the given class scope
     bool is_declared_in_scope(const std::string &scope_name, const std::string &k) const;
 
+    /// returns whether or not the current scope is named the given name
+    bool is_scope_named(const std::string &scope_name) const;
+
     /// returns whether the current scope is within a class
     bool is_class_scope() const;
 

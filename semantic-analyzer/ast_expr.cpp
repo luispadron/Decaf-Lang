@@ -241,8 +241,10 @@ void FieldAccess::check() {
         }
 
         auto decl = Sym_tbl_t::shared().get_declaration_in_scope(btype->get_type_name(), field->get_name());
-        // variables only accessible within class scope, unless using "this"
-        if (decl->get_decl_type() == DeclType::Variable && !base->is_this_expr()) {
+        // variables only accessible within class scope, unless using "this" or in same class
+        if (decl->get_decl_type() == DeclType::Variable &&
+            !base->is_this_expr() &&
+            !Sym_tbl_t::shared().is_scope_named(btype->get_type_name())) {
             ReportError::inaccessible_field(field, btype);
             return;
         }

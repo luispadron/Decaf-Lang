@@ -1,0 +1,41 @@
+// edge cases for var
+
+int x;
+x = 3;
+
+interface Animal { }
+class Dog implements Animal { }
+
+class Square { }
+class Chonker extends Square implements Animal { }
+
+void main() {
+    Animal a;
+    Dog d;
+    Square s;
+    Chonker c;
+
+    a = New(Animal);
+    a = New(Chonker);
+    a = c;
+
+    d = New(Animal);
+    d = a;
+    d = New(Chonker);
+    d = c;
+    d = s;
+
+    s = New(Square);
+    s = s;
+    s = New(Chonker);
+    s = c;
+
+    c = a;
+    c = New(Animal);
+    c = d;
+    c = New(Dog);
+    c = s;
+    c = New(Square);
+    c = New(Chonker);
+    c = c;
+}
