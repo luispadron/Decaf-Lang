@@ -64,7 +64,7 @@ public:
     bool is_declared(const std::string &k) const;
 
     /// returns whether or not the given symbol is defined in the given class scope
-    bool is_declared_in_class(const std::string &class_key, const std::string &k) const;
+    bool is_declared_in_scope(const std::string &scope_name, const std::string &k) const;
 
     /// returns whether the current scope is within a class
     bool is_class_scope() const;
@@ -77,7 +77,7 @@ public:
     Decl * get_declaration(const std::string &k);
 
     /// returns the value of the symbol with given key in the given class scope
-    Decl * get_declaration_in_class(const std::string &class_key, const std::string &k) const;
+    Decl * get_declaration_in_scope(const std::string &scope_name, const std::string &k) const;
 
     /// returns the name of the class with current scope (for use with "this")
     /// if not in class scope, exception is thrown

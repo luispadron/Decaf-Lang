@@ -235,12 +235,12 @@ void FieldAccess::check() {
         if (btype == Type::errorType) { return; }
 
         // field is not found in the scope of the base, error
-        if (!Sym_tbl_t::shared().is_declared_in_class(btype->get_type_name(), field->get_name())) {
+        if (!Sym_tbl_t::shared().is_declared_in_scope(btype->get_type_name(), field->get_name())) {
             ReportError::field_not_found_in_base(field, btype);
             return;
         }
 
-        auto decl = Sym_tbl_t::shared().get_declaration_in_class(btype->get_type_name(), field->get_name());
+        auto decl = Sym_tbl_t::shared().get_declaration_in_scope(btype->get_type_name(), field->get_name());
         // variables only accessible within class scope, unless using "this"
         if (decl->get_decl_type() == DeclType::Variable && !base->is_this_expr()) {
             ReportError::inaccessible_field(field, btype);
@@ -267,9 +267,9 @@ Type* FieldAccess::type_check() {
         if (btype->type_check() == Type::errorType) { return Type::errorType; }
 
         // not found, thus this field doesnt exist in class
-        if (!Sym_tbl_t::shared().is_declared_in_class(btype->get_type_name(), field->get_name())) { return Type::errorType; }
+        if (!Sym_tbl_t::shared().is_declared_in_scope(btype->get_type_name(), field->get_name())) { return Type::errorType; }
         // found in sym table, simply return the type of the decl, if its a var decl
-        auto decl = Sym_tbl_t::shared().get_declaration_in_class(btype->get_type_name(), field->get_name());
+        auto decl = Sym_tbl_t::shared().get_declaration_in_scope(btype->get_type_name(), field->get_name());
         // if not a var decl, this is an error
         if (decl->get_decl_type() != DeclType::Variable) { return Type::errorType; }
         // everything is good, return type of decl
@@ -314,13 +314,13 @@ void Call::check() {
         if (btype->is_named_type() && btype->type_check() == Type::errorType) { return; }
 
         // field is not found in the scope of the base, error
-        if (!Sym_tbl_t::shared().is_declared_in_class(btype->get_type_name(), field->get_name())) {
+        if (!Sym_tbl_t::shared().is_declared_in_scope(btype->get_type_name(), field->get_name())) {
             ReportError::field_not_found_in_base(field, btype);
             actuals->check_all();
             return;
         }
 
-        auto decl = Sym_tbl_t::shared().get_declaration_in_class(btype->get_type_name(), field->get_name());
+        auto decl = Sym_tbl_t::shared().get_declaration_in_scope(btype->get_type_name(), field->get_name());
         if (decl->get_decl_type() != DeclType::Function) {
             ReportError::field_not_found_in_base(field, btype);
             actuals->check_all();
@@ -357,9 +357,9 @@ Type* Call::type_check() {
         // only named types can use . syntax
         if (!btype->is_named_type()) { return Type::errorType; }
         // not found, thus this field doesnt exist in class
-        if (!Sym_tbl_t::shared().is_declared_in_class(btype->get_type_name(), field->get_name())) { return Type::errorType; }
+        if (!Sym_tbl_t::shared().is_declared_in_scope(btype->get_type_name(), field->get_name())) { return Type::errorType; }
         // found in sym table, simply return the type of the decl, if its a function decl
-        auto decl = Sym_tbl_t::shared().get_declaration_in_class(btype->get_type_name(), field->get_name());
+        auto decl = Sym_tbl_t::shared().get_declaration_in_scope(btype->get_type_name(), field->get_name());
         // if not a function decl, this is an error
         if (decl->get_decl_type() != DeclType::Function) { return Type::errorType; }
         // everything is good, return type of decl

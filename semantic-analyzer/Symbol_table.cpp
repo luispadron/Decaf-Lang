@@ -94,9 +94,9 @@ bool Symbol_table::is_declared(const string &k) const {
     return scope_ptr->is_declared(k);
 }
 
-bool Symbol_table::is_declared_in_class(const string &class_key, const string &k) const {
-    auto class_scope_it = class_scopes.find(class_key);
-    auto interface_scope_it = interface_scopes.find(class_key);
+bool Symbol_table::is_declared_in_scope(const string &scope_name, const string &k) const {
+    auto class_scope_it = class_scopes.find(scope_name);
+    auto interface_scope_it = interface_scopes.find(scope_name);
     if (class_scope_it == class_scopes.end()) {
         if (interface_scope_it == interface_scopes.end()) {
             return false;
@@ -134,9 +134,9 @@ Decl * Symbol_table::get_declaration(const string &k) {
     return scope_ptr->get_declaration(k);
 }
 
-Decl * Symbol_table::get_declaration_in_class(const string &class_key, const string &k) const {
-    auto class_scope_it = class_scopes.find(class_key);
-    auto interface_scope_it = interface_scopes.find(class_key);
+Decl * Symbol_table::get_declaration_in_scope(const string &scope_name, const string &k) const {
+    auto class_scope_it = class_scopes.find(scope_name);
+    auto interface_scope_it = interface_scopes.find(scope_name);
 
     if (class_scope_it == class_scopes.end()) {
         if (interface_scope_it == interface_scopes.end()) {
