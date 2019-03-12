@@ -82,6 +82,8 @@ private:
     // helper functions //
 
     Symbol_iter get_symbol_iter(const std::string &k);
+
+    void insert_symbol_in_class(const std::string &k, Decl *decl);
 };
 
 #endif //SYMBOLTABLE_SCOPE_H

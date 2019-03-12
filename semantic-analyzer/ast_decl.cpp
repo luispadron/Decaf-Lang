@@ -243,9 +243,10 @@ void ClassDecl::check() {
             } else {
                 // verify overrides are correct
                 if (verify_class_overrides(dynamic_cast<ClassDecl*>(decl))) {
-                    // set super class
-                    Sym_tbl_t::shared().set_super_class(extends->get_id()->get_name());
+
                 }
+                // set super class
+                Sym_tbl_t::shared().set_super_class(extends->get_id()->get_name());
             }
         }
     }

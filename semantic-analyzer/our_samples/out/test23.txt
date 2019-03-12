@@ -1,4 +1,10 @@
 
+*** Error line 14.
+    int x;
+        ^
+*** Declaration of 'x' here conflicts with declaration on line 4
+
+
 *** Error line 18.
     double get_void() { }
            ^^^^^^^^

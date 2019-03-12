@@ -1,10 +1,13 @@
 #include "Scope.h"
+#include "ast_decl.h"
 
 #include <stack>
 
 using namespace std;
 
 void Scope::insert_symbol(const string &k, Decl *decl) {
+    if (this_ptr) { return insert_symbol_in_class(k, decl); }
+
     auto it = symbols.find(k);
 
     if (it != symbols.end()) {
@@ -12,6 +15,27 @@ void Scope::insert_symbol(const string &k, Decl *decl) {
     } else {
         symbols.insert({k, decl});
     }
+}
+
+/// handles inserting symbol in a class like scope, since duplicate declarations depend
+/// on whether base class has that symbol as well
+void Scope::insert_symbol_in_class(const std::string &k, Decl *decl) {
+    auto this_it = symbols.find(k);
+    if (this_it != symbols.end()) {
+        throw Duplicate_symbol_exception(this_it->second);
+    }
+
+    // check any base class symbols, make sure its not in there
+    for (auto b = super_ptr; b; b = b->super_ptr) {
+        auto it = b->symbols.find(k);
+
+        if (it != b->symbols.end() && it->second->get_decl_type() == DeclType::Variable) {
+            // found this symbol in this class or a base class, this is a duplicate thus error
+            throw Duplicate_symbol_exception(it->second);
+        }
+    }
+
+    symbols.insert({k, decl});
 }
 
 bool Scope::is_declared(const string &k) {
