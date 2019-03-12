@@ -1,0 +1,18 @@
+
+*** Error line 18.
+    double get_void() { }
+           ^^^^^^^^
+*** Method 'get_void' must match inherited type signature
+
+
+*** Error line 20.
+    string get_dbl() { }
+           ^^^^^^^
+*** Method 'get_dbl' must match inherited type signature
+
+
+*** Error line 22.
+    int do_nothing() { }
+        ^^^^^^^^^^
+*** Method 'do_nothing' must match inherited type signature
+

@@ -154,18 +154,22 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
     (members = m)->set_parent_all(this);
 }
 
-
-bool ClassDecl::verify_interface_conformance(InterfaceDecl *interface, NamedType *intf_type) {
-    Assert(interface);
-
-    bool is_valid = true;
-
+std::vector<FnDecl*> ClassDecl::get_fn_decls() const {
     // find functions in class
     vector<FnDecl*> functions;
     for (int i = 0; i < members->size(); ++i) {
         auto fn = dynamic_cast<FnDecl*>(members->get(i));
         if (fn) functions.push_back(fn);
     }
+    return functions;
+}
+
+bool ClassDecl::verify_interface_conformance(InterfaceDecl *interface, NamedType *intf_type) {
+    Assert(interface);
+
+    bool is_valid = true;
+
+    auto functions = get_fn_decls();
 
     // get functions in interface
     auto interface_functions = interface->get_fn_decls();
@@ -196,6 +200,34 @@ bool ClassDecl::verify_interface_conformance(InterfaceDecl *interface, NamedType
     return is_valid;
 }
 
+bool ClassDecl::verify_class_overrides(ClassDecl *base) {
+    Assert(base);
+
+    bool is_valid = true;
+
+    // find functions in class
+    auto functions = get_fn_decls();
+
+    // find functions in base
+    auto base_functions = base->get_fn_decls();
+
+    for (auto base_fn : base_functions) {
+        // find function in this class that shares name with a function in base class
+        auto overriden = find_if(functions.begin(), functions.end(), [base_fn](FnDecl *fn) {
+           return base_fn->get_id()->is_equal_to(fn->get_id());
+        });
+
+        if (overriden != functions.end()) {
+            if (!(*overriden)->has_equal_signature(base_fn)) {
+                ReportError::override_mismatch(*overriden);
+                is_valid = false;
+            }
+        }
+    }
+
+    return is_valid;
+}
+
 void ClassDecl::check() {
     Sym_tbl_t::shared().enter_class_scope(id->get_name());
 
@@ -209,8 +241,11 @@ void ClassDecl::check() {
                 // decl needs to be of type class, otherwise error
                 ReportError::identifier_not_found(extends->get_id(), Reason_e::LookingForClass);
             } else {
-                // set super class
-                Sym_tbl_t::shared().set_super_class(extends->get_id()->get_name());
+                // verify overrides are correct
+                if (verify_class_overrides(dynamic_cast<ClassDecl*>(decl))) {
+                    // set super class
+                    Sym_tbl_t::shared().set_super_class(extends->get_id()->get_name());
+                }
             }
         }
     }

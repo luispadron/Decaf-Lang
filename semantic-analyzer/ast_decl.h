@@ -94,8 +94,15 @@ public:
 
 class ClassDecl : public Decl {
 private:
+
+    /// returns all the function declarations of this class
+    std::vector<FnDecl*> get_fn_decls() const;
+
     /// verifies that the class conforms to a given interface and outputs errors if needed
     bool verify_interface_conformance(InterfaceDecl *interface, NamedType *intf_type);
+
+    /// verifies that the class overrides base class methods correctly
+    bool verify_class_overrides(ClassDecl *base);
 
 protected:
     List<Decl*> *members;
