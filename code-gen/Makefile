@@ -20,8 +20,16 @@ OBJS = y.tab.o lex.yy.o $(patsubst %.cc, %.o, $(filter %.cc,$(SRCS))) $(patsubst
 JUNK = $(OBJS) lex.yy.c dpp.yy.c y.tab.c y.tab.h *.core core $(COMPILER).purify purify.log 
 
 # Define the tools we are going to use
-CC= g++
-LD = g++
+# Define the tools we are going to use
+UNAME := $(shell uname -s)
+
+ifeq ($(UNAME), Darwin)
+	CC = g++-8
+	LD = g++-8
+else
+	CC = g++
+	LD = g++
+endif
 LEX = flex
 YACC = bison
 
