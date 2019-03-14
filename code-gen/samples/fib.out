@@ -1,0 +1,17 @@
+Loaded: /afs/umich.edu/user/o/l/olivertc/Public/spim-install/exceptions.s
+
+This program computes Fibonacci numbers (slowly.. but correctly!)
+
+Enter the fibonacci number you want: (-1 to quit) Fib(0) = 0
+
+Enter the fibonacci number you want: (-1 to quit) Fib(1) = 1
+
+Enter the fibonacci number you want: (-1 to quit) Fib(2) = 1
+
+Enter the fibonacci number you want: (-1 to quit) Fib(3) = 2
+
+Enter the fibonacci number you want: (-1 to quit) Fib(4) = 3
+
+Enter the fibonacci number you want: (-1 to quit) Fib(5) = 5
+
+Enter the fibonacci number you want: (-1 to quit) Goodbye!
