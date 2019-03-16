@@ -35,6 +35,8 @@ add_executable(semantic
         mips.cc
         tac.cc
         codegen.cc
+        SymbolTable.cpp
+        Scope.cpp
         main.cc)
 
 target_link_libraries(semantic
