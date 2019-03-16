@@ -82,7 +82,9 @@ extern int yydebug;
     T_StringConstant = 288,
     T_IntConstant = 289,
     T_DoubleConstant = 290,
-    T_BoolConstant = 291
+    T_BoolConstant = 291,
+    T_UnaryMinus = 292,
+    T_Lower_Than_Else = 293
   };
 #endif
 /* Tokens.  */
@@ -120,13 +122,15 @@ extern int yydebug;
 #define T_IntConstant 289
 #define T_DoubleConstant 290
 #define T_BoolConstant 291
+#define T_UnaryMinus 292
+#define T_Lower_Than_Else 293
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 26 "parser.y" /* yacc.c:1927  */
+#line 21 "parser.y" /* yacc.c:1927  */
 
     int integerConstant;
     bool boolConstant;
@@ -135,8 +139,19 @@ union YYSTYPE
     char identifier[MaxIdentLen+1]; // +1 for terminating null
     Decl *decl;
     List<Decl*> *declList;
+    Type *type;
+    NamedType *cType;
+    List<NamedType*> *cTypeList;
+    FnDecl *fDecl;
+    VarDecl *var;
+    List<VarDecl*> *varList;
+    Expr *expr;
+    List<Expr*> *exprList;
+    Stmt *stmt;
+    List<Stmt*> *stmtList;
+    LValue *lvalue;
 
-#line 140 "y.tab.h" /* yacc.c:1927  */
+#line 155 "y.tab.h" /* yacc.c:1927  */
 };
 
 typedef union YYSTYPE YYSTYPE;

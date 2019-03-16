@@ -34,6 +34,7 @@ add_executable(semantic
         utility.cc
         mips.cc
         tac.cc
+        codegen.cc
         main.cc)
 
 target_link_libraries(semantic

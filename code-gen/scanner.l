@@ -112,19 +112,19 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "&&"                { return T_And;         }
 "||"                { return T_Or;          }
 {OPERATOR}          { return yytext[0];     }
-    
+
 "[]"                { return T_Dims;        }
 
  /* -------------------- Constants ------------------------------ */
 "true"|"false"      { yylval.boolConstant = (yytext[0] == 't');
                          return T_BoolConstant; }
-{INTEGER}           { yylval.integerConstant = strtol(yytext, NULL, 10);
+{INTEGER}           { yylval.integerConstant = strtol(yytext, nullptr, 10);
                          return T_IntConstant; }
-{HEX_INTEGER}       { yylval.integerConstant = strtol(yytext, NULL, 16);
+{HEX_INTEGER}       { yylval.integerConstant = strtol(yytext, nullptr, 16);
                          return T_IntConstant; }
 {DOUBLE}            { yylval.doubleConstant = atof(yytext);
                          return T_DoubleConstant; }
-{STRING}            { yylval.stringConstant = strdup(yytext); 
+{STRING}            { yylval.stringConstant = strdup(yytext);
                          return T_StringConstant; }
 {BEG_STRING}        { ReportError::UntermString(&yylloc, yytext); }
 
@@ -185,12 +185,12 @@ static void DoBeforeEachAction()
  * ---------------------------
  * Returns string with contents of line numbered n or NULL if the
  * contents of that line are not available.  Our scanner copies
- * each line scanned and appends each to a list so we can later
+ * each line scanned and Appends each to a list so we can later
  * retrieve them to report the context for errors.
  */
 const char *GetLineNumbered(int num) {
-   if (num <= 0 || num > savedLines.NumElements()) return NULL;
-   return savedLines.Nth(num-1); 
+   if (num <= 0 || num > savedLines.Size()) return NULL;
+   return savedLines.Get(num-1);
 }
 
 

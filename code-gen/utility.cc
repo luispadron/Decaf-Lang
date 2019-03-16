@@ -29,8 +29,8 @@ void Failure(const char *format, ...)
 
 int IndexOf(const char *key)
 {
-   for (int i = 0; i < debugKeys.NumElements(); i++)
-      if (!strcmp(debugKeys.Nth(i), key)) return i;
+   for (int i = 0; i < debugKeys.Size(); i++)
+      if (!strcmp(debugKeys.Get(i), key)) return i;
    return -1;
 }
 
@@ -44,7 +44,7 @@ void SetDebugForKey(const char *key, bool value)
 {
   int k = IndexOf(key);
   if (!value && k != -1)
-    debugKeys.RemoveAt(k);
+    debugKeys.Remove(k);
   else if (value && k == -1)
     debugKeys.Append(key);
 }

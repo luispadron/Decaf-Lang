@@ -191,13 +191,13 @@ void CodeGenerator::GenVTable(const char *className, List<const char *> *methodL
 void CodeGenerator::DoFinalCodeGen()
 {
   if (IsDebugOn("tac")) { // if debug don't translate to mips, just print Tac
-    for (int i = 0; i < code->NumElements(); i++)
-	code->Nth(i)->Print();
+    for (int i = 0; i < code->Size(); i++)
+	code->Get(i)->Print();
    }  else {
      Mips mips;
      mips.EmitPreamble();
-     for (int i = 0; i < code->NumElements(); i++)
-	 code->Nth(i)->Emit(&mips);
+     for (int i = 0; i < code->Size(); i++)
+	 code->Get(i)->Emit(&mips);
   }
 }
 
