@@ -49,7 +49,7 @@ template <class Value> void Hashtable<Value>::Remove(const char *key, Value val)
  */
 template <class Value> Value Hashtable<Value>::Lookup(const char *key) 
 {
-  Value found = NULL;
+  Value found = nullptr;
   
   if (mmap.count(key) > 0) {
     typename std::multimap<const char *, Value>::iterator cur, last, prev;
@@ -94,6 +94,6 @@ template <class Value> Iterator<Value> Hashtable<Value>::GetIterator()
  */
 template <class Value> Value Iterator<Value>::GetNextValue()
 {
-  return (cur == end ? NULL : (*cur++).second);
+  return (cur == end ? nullptr : (*cur++).second);
 }
 

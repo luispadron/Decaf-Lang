@@ -25,7 +25,7 @@ void Instruction::Emit(Mips *mips) {
 
 LoadConstant::LoadConstant(Location *d, int v)
   : dst(d), val(v) {
-  Assert(dst != NULL);
+  Assert(dst != nullptr);
   sprintf(printed, "%s = %d", dst->GetName(), val);
 }
 void LoadConstant::EmitSpecific(Mips *mips) {
@@ -34,7 +34,7 @@ void LoadConstant::EmitSpecific(Mips *mips) {
 
 LoadStringConstant::LoadStringConstant(Location *d, const char *s)
   : dst(d) {
-  Assert(dst != NULL && s != NULL);
+  Assert(dst != nullptr && s != nullptr);
   const char *quote = (*s == '"') ? "" : "\"";
   str = new char[strlen(s) + 2*strlen(quote) + 1];
   sprintf(str, "%s%s%s", quote, s, quote);
@@ -49,7 +49,7 @@ void LoadStringConstant::EmitSpecific(Mips *mips) {
 
 LoadLabel::LoadLabel(Location *d, const char *l)
   : dst(d), label(strdup(l)) {
-  Assert(dst != NULL && label != NULL);
+  Assert(dst != nullptr && label != nullptr);
   sprintf(printed, "%s = %s", dst->GetName(), label);
 }
 void LoadLabel::EmitSpecific(Mips *mips) {
@@ -60,7 +60,7 @@ void LoadLabel::EmitSpecific(Mips *mips) {
 
 Assign::Assign(Location *d, Location *s)
   : dst(d), src(s) {
-  Assert(dst != NULL && src != NULL);
+  Assert(dst != nullptr && src != nullptr);
   sprintf(printed, "%s = %s", dst->GetName(), src->GetName());
 }
 void Assign::EmitSpecific(Mips *mips) {
@@ -71,7 +71,7 @@ void Assign::EmitSpecific(Mips *mips) {
 
 Load::Load(Location *d, Location *s, int off)
   : dst(d), src(s), offset(off) {
-  Assert(dst != NULL && src != NULL);
+  Assert(dst != nullptr && src != nullptr);
   if (offset) 
     sprintf(printed, "%s = *(%s + %d)", dst->GetName(), src->GetName(), offset);
   else
@@ -85,7 +85,7 @@ void Load::EmitSpecific(Mips *mips) {
 
 Store::Store(Location *d, Location *s, int off)
   : dst(d), src(s), offset(off) {
-  Assert(dst != NULL && src != NULL);
+  Assert(dst != nullptr && src != nullptr);
   if (offset)
     sprintf(printed, "*(%s + %d) = %s", dst->GetName(), offset, src->GetName());
   else
@@ -108,7 +108,7 @@ BinaryOp::OpCode BinaryOp::OpCodeForName(const char *name) {
 
 BinaryOp::BinaryOp(OpCode c, Location *d, Location *o1, Location *o2)
   : code(c), dst(d), op1(o1), op2(o2) {
-  Assert(dst != NULL && op1 != NULL && op2 != NULL);
+  Assert(dst != nullptr && op1 != nullptr && op2 != nullptr);
   Assert(code >= 0 && code < NumOps);
   sprintf(printed, "%s = %s %s %s", dst->GetName(), op1->GetName(), opName[code], op2->GetName());
 }
@@ -119,7 +119,7 @@ void BinaryOp::EmitSpecific(Mips *mips) {
 
 
 Label::Label(const char *l) : label(strdup(l)) {
-  Assert(label != NULL);
+  Assert(label != nullptr);
   *printed = '\0';
 }
 void Label::Print() {
@@ -132,7 +132,7 @@ void Label::EmitSpecific(Mips *mips) {
 
  
 Goto::Goto(const char *l) : label(strdup(l)) {
-  Assert(label != NULL);
+  Assert(label != nullptr);
   sprintf(printed, "Goto %s", label);
 }
 void Goto::EmitSpecific(Mips *mips) {	  

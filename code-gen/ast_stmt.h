@@ -20,20 +20,21 @@ class Decl;
 class VarDecl;
 class Expr;
 
-class Program : public Node
-{
-  protected:
+class Program : public Node {
+protected:
      List<Decl*> *decls;
 
-  public:
+public:
      explicit Program(List<Decl*> *declList);
+
      void Check();
-     void Emit();
+
+     void Emit() override;
 };
 
-class Stmt : public Node
-{
-  public:
+
+class Stmt : public Node {
+public:
      Stmt() : Node() {}
      explicit Stmt(yyltype loc) : Node(loc) {}
 };

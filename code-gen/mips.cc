@@ -22,7 +22,7 @@
 
 #include "mips.h"
 #include <stdarg.h>
-#include <string.h>
+#include <cstring>
 
 
 
@@ -284,7 +284,7 @@ void Mips::EmitParam(Location *arg)
 void Mips::EmitCallInstr(Location *result, const char *fn, bool isLabel)
 {
   Emit("%s %-15s\t# jump to function", isLabel? "jal": "jalr", fn);
-  if (result != NULL) {
+  if (result != nullptr) {
     Register reg = rd;
     Emit("move %s, %s\t\t# copy function return value from $v0",
     regs[reg].name, regs[v0].name);
@@ -334,7 +334,7 @@ void Mips::EmitPopParams(int bytes)
  */
  void Mips::EmitReturn(Location *returnVal)
 { 
-  if (returnVal != NULL) 
+  if (returnVal != nullptr)
     {
       Register reg = rd;
       FillRegister(returnVal, reg);
@@ -379,7 +379,7 @@ void Mips::EmitBeginFunction(int stackFrameSize)
 void Mips::EmitEndFunction()
 { 
   Emit("# (below handles reaching end of fn body with no explicit return)");
-  EmitReturn(NULL);
+  EmitReturn(nullptr);
 }
 
 
@@ -426,7 +426,7 @@ const char *Mips::NameForTac(BinaryOp::OpCode code)
 {
   Assert(code >=0 && code < BinaryOp::NumOps);
   const char *name = mipsName[code];
-  Assert(name != NULL);
+  Assert(name != nullptr);
   return name;
 }
 
@@ -445,38 +445,38 @@ Mips::Mips() {
   mipsName[BinaryOp::Less] = "slt";
   mipsName[BinaryOp::And] = "and";
   mipsName[BinaryOp::Or] = "or";
-  regs[zero] = (RegContents){false, NULL, "$zero", false};
-  regs[at] = (RegContents){false, NULL, "$at", false};
-  regs[v0] = (RegContents){false, NULL, "$v0", false};
-  regs[v1] = (RegContents){false, NULL, "$v1", false};
-  regs[a0] = (RegContents){false, NULL, "$a0", false};
-  regs[a1] = (RegContents){false, NULL, "$a1", false};
-  regs[a2] = (RegContents){false, NULL, "$a2", false};
-  regs[a3] = (RegContents){false, NULL, "$a3", false};
-  regs[k0] = (RegContents){false, NULL, "$k0", false};
-  regs[k1] = (RegContents){false, NULL, "$k1", false};
-  regs[gp] = (RegContents){false, NULL, "$gp", false};
-  regs[sp] = (RegContents){false, NULL, "$sp", false};
-  regs[fp] = (RegContents){false, NULL, "$fp", false};
-  regs[ra] = (RegContents){false, NULL, "$ra", false};
-  regs[t0] = (RegContents){false, NULL, "$t0", true};
-  regs[t1] = (RegContents){false, NULL, "$t1", true};
-  regs[t2] = (RegContents){false, NULL, "$t2", true};
-  regs[t3] = (RegContents){false, NULL, "$t3", true};
-  regs[t4] = (RegContents){false, NULL, "$t4", true};
-  regs[t5] = (RegContents){false, NULL, "$t5", true};
-  regs[t6] = (RegContents){false, NULL, "$t6", true};
-  regs[t7] = (RegContents){false, NULL, "$t7", true};
-  regs[t8] = (RegContents){false, NULL, "$t8", true};
-  regs[t9] = (RegContents){false, NULL, "$t9", true};
-  regs[s0] = (RegContents){false, NULL, "$s0", true};
-  regs[s1] = (RegContents){false, NULL, "$s1", true};
-  regs[s2] = (RegContents){false, NULL, "$s2", true};
-  regs[s3] = (RegContents){false, NULL, "$s3", true};
-  regs[s4] = (RegContents){false, NULL, "$s4", true};
-  regs[s5] = (RegContents){false, NULL, "$s5", true};
-  regs[s6] = (RegContents){false, NULL, "$s6", true};
-  regs[s7] = (RegContents){false, NULL, "$s7", true};
+  regs[zero] = (RegContents){false, nullptr, "$zero", false};
+  regs[at] = (RegContents){false, nullptr, "$at", false};
+  regs[v0] = (RegContents){false, nullptr, "$v0", false};
+  regs[v1] = (RegContents){false, nullptr, "$v1", false};
+  regs[a0] = (RegContents){false, nullptr, "$a0", false};
+  regs[a1] = (RegContents){false, nullptr, "$a1", false};
+  regs[a2] = (RegContents){false, nullptr, "$a2", false};
+  regs[a3] = (RegContents){false, nullptr, "$a3", false};
+  regs[k0] = (RegContents){false, nullptr, "$k0", false};
+  regs[k1] = (RegContents){false, nullptr, "$k1", false};
+  regs[gp] = (RegContents){false, nullptr, "$gp", false};
+  regs[sp] = (RegContents){false, nullptr, "$sp", false};
+  regs[fp] = (RegContents){false, nullptr, "$fp", false};
+  regs[ra] = (RegContents){false, nullptr, "$ra", false};
+  regs[t0] = (RegContents){false, nullptr, "$t0", true};
+  regs[t1] = (RegContents){false, nullptr, "$t1", true};
+  regs[t2] = (RegContents){false, nullptr, "$t2", true};
+  regs[t3] = (RegContents){false, nullptr, "$t3", true};
+  regs[t4] = (RegContents){false, nullptr, "$t4", true};
+  regs[t5] = (RegContents){false, nullptr, "$t5", true};
+  regs[t6] = (RegContents){false, nullptr, "$t6", true};
+  regs[t7] = (RegContents){false, nullptr, "$t7", true};
+  regs[t8] = (RegContents){false, nullptr, "$t8", true};
+  regs[t9] = (RegContents){false, nullptr, "$t9", true};
+  regs[s0] = (RegContents){false, nullptr, "$s0", true};
+  regs[s1] = (RegContents){false, nullptr, "$s1", true};
+  regs[s2] = (RegContents){false, nullptr, "$s2", true};
+  regs[s3] = (RegContents){false, nullptr, "$s3", true};
+  regs[s4] = (RegContents){false, nullptr, "$s4", true};
+  regs[s5] = (RegContents){false, nullptr, "$s5", true};
+  regs[s6] = (RegContents){false, nullptr, "$s6", true};
+  regs[s7] = (RegContents){false, nullptr, "$s7", true};
   rs = v0; rt = v1; rd = v0;
 }
 const char *Mips::mipsName[BinaryOp::NumOps];

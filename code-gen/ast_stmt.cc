@@ -20,17 +20,26 @@ void Program::Check() {
      */
 }
 void Program::Emit() {
-    /* pp4: here is where the code generation is kicked off.
-     *      The general idea is perform a tree traversal of the
-     *      entire program, generating instructions as you go.
-     *      Each node can have its own way of translating itself,
-     *      which makes for a great use of inheritance and
-     *      polymorphism in the node classes.
-     */
+    // enter global scope
+    auto g_scope = SymTbl::shared().enter_scope("global", ScopeType::Global);
+
+    // push all global declarations to global scope
+    for (int i = 0; i < decls->Size(); ++i) {
+        g_scope->insert_decl(decls->Get(i)->get_id()->get_name(), decls->Get(i));
+    }
+
+    SymTbl::shared().debug_print();
+
+    // call emit on all children
+    for (int i = 0; i < decls->Size(); ++i) {
+        decls->Get(i)->Emit();
+    }
+
+    SymTbl::shared().leave_scope();
 }
 
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
-    Assert(d != NULL && s != NULL);
+    Assert(d != nullptr && s != nullptr);
     (decls=d)->SetParentAll(this);
     (stmts=s)->SetParentAll(this);
 }

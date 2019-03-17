@@ -19,18 +19,19 @@
 class Identifier;
 class Stmt;
 
-class Decl : public Node 
-{
-  protected:
+class Decl : public Node {
+
+protected:
     Identifier *id;
   
-  public:
-    Decl(Identifier *name);
+public:
+    explicit Decl(Identifier *name);
     friend std::ostream& operator<<(std::ostream& out, Decl *d) { return out << d->id; }
+
+    virtual Identifier * get_id() const { return id; }
 };
 
-class VarDecl : public Decl 
-{
+class VarDecl : public Decl {
   protected:
     Type *type;
     
@@ -38,8 +39,7 @@ class VarDecl : public Decl
     VarDecl(Identifier *name, Type *type);
 };
 
-class ClassDecl : public Decl 
-{
+class ClassDecl : public Decl {
   protected:
     List<Decl*> *members;
     NamedType *extends;
@@ -50,8 +50,7 @@ class ClassDecl : public Decl
               List<NamedType*> *implements, List<Decl*> *members);
 };
 
-class InterfaceDecl : public Decl 
-{
+class InterfaceDecl : public Decl {
   protected:
     List<Decl*> *members;
     
@@ -59,8 +58,7 @@ class InterfaceDecl : public Decl
     InterfaceDecl(Identifier *name, List<Decl*> *members);
 };
 
-class FnDecl : public Decl 
-{
+class FnDecl : public Decl {
   protected:
     List<VarDecl*> *formals;
     Type *returnType;

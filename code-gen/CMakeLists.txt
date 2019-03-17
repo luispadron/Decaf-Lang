@@ -22,7 +22,7 @@ include_directories(/usr/local/opt/flex/include)
 bison_target(MyParser parser.y ${CMAKE_CURRENT_BINARY_DIR}/y.tab.cpp COMPILE_FLAGS "-vty")
 flex_target(MyScanner scanner.l ${CMAKE_CURRENT_BINARY_DIR}/scanner.yy.cpp)
 
-add_executable(semantic
+add_executable(gen
         ${BISON_MyParser_OUTPUTS}
         ${FLEX_MyScanner_OUTPUTS}
         ast.cc
@@ -39,7 +39,7 @@ add_executable(semantic
         Scope.cpp
         main.cc)
 
-target_link_libraries(semantic
+target_link_libraries(gen
         ${FLEX_LIBRARIES}
         ${BISON_LIBRARIES}
         )

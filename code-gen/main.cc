@@ -29,9 +29,9 @@ int main(int argc, char *argv[])
     InitParser();
     yyparse();
     if (ReportError::NumErrors() > 0)
-	ReportError::PrintErrors();
+	    ReportError::PrintErrors();
     if (ReportError::NumErrors() == 0)
-	SysCallCodeGen();
+	    SysCallCodeGen();
     return (ReportError::NumErrors() == 0? 0 : -1);
 }
 
