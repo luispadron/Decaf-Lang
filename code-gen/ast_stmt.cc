@@ -9,7 +9,7 @@
 
 
 Program::Program(List<Decl*> *d) {
-    Assert(d != NULL);
+    Assert(d != nullptr);
     (decls=d)->SetParentAll(this);
 }
 
@@ -28,12 +28,10 @@ void Program::Emit() {
         g_scope->insert_decl(decls->Get(i)->get_id()->get_name(), decls->Get(i));
     }
 
-    SymTbl::shared().debug_print();
-
     // call emit on all children
-    for (int i = 0; i < decls->Size(); ++i) {
-        decls->Get(i)->Emit();
-    }
+    decls->EmitAll();
+
+    SymTbl::shared().debug_print();
 
     SymTbl::shared().leave_scope();
 }
@@ -44,32 +42,44 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     (stmts=s)->SetParentAll(this);
 }
 
+void StmtBlock::Emit() {
+    auto scope = SymTbl::shared().enter_scope("block", ScopeType::Block);
+    for (int i = 0; i < decls->Size(); ++i) {
+        scope->insert_decl(decls->Get(i)->get_id()->get_name(), decls->Get(i));
+    }
+
+    decls->EmitAll();
+    stmts->EmitAll();
+
+    SymTbl::shared().leave_scope();
+}
+
 ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) { 
-    Assert(t != NULL && b != NULL);
+    Assert(t != nullptr && b != nullptr);
     (test=t)->SetParent(this); 
     (body=b)->SetParent(this);
 }
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) { 
-    Assert(i != NULL && t != NULL && s != NULL && b != NULL);
+    Assert(i != nullptr && t != nullptr && s != nullptr && b != nullptr);
     (init=i)->SetParent(this);
     (step=s)->SetParent(this);
 }
 
 IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) { 
-    Assert(t != NULL && tb != NULL); // else can be NULL
+    Assert(t != nullptr && tb != nullptr); // else can be nullptr
     elseBody = eb;
     if (elseBody) elseBody->SetParent(this);
 }
 
 
 ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) { 
-    Assert(e != NULL);
+    Assert(e != nullptr);
     (expr=e)->SetParent(this);
 }
   
 PrintStmt::PrintStmt(List<Expr*> *a) {    
-    Assert(a != NULL);
+    Assert(a != nullptr);
     (args=a)->SetParentAll(this);
 }
 

@@ -15,6 +15,7 @@ class Decl;
 
 enum class ScopeType {
     Global,
+    Interface,
     Function,
     Block,
     Class

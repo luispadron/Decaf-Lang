@@ -15,7 +15,7 @@ Scope* SymbolTable::enter_scope(const string &name, ScopeType type) {
     // create the scope names
     string scope_name;
     if (type == ScopeType::Block) {
-        scope_name = scope_ptr->parent_ptr->name_ + "_" + name + to_string(scope_ptr->parent_ptr->block_counter++);
+        scope_name = scope_ptr->name_ + "_" + name + to_string(scope_ptr->block_counter++);
     } else if (scope_ptr && scope_ptr->this_ptr) {
         scope_name = scope_ptr->this_ptr->name_ + "_" + name;
     }
@@ -27,7 +27,13 @@ Scope* SymbolTable::enter_scope(const string &name, ScopeType type) {
 
     auto new_scope = new Scope(scope_name.empty() ? name : scope_name, type);
     new_scope->parent_ptr = scope_ptr;
-    new_scope->this_ptr = scope_ptr ? scope_ptr->this_ptr : nullptr;
+
+    if (type == ScopeType::Class || type == ScopeType::Interface) {
+        new_scope->this_ptr = new_scope;
+    } else {
+        new_scope->this_ptr = scope_ptr ? scope_ptr->this_ptr : nullptr;
+    }
+
     new_scope->super_ptr = scope_ptr ? scope_ptr->super_ptr : nullptr;
     scope_ptr = new_scope;
 
@@ -58,7 +64,7 @@ void SymbolTable::debug_print() const {
     for (const auto &scope : scopes) {
         cout << "----- " << scope.first << " -----" << endl;
         for (const auto &sym : scope.second->symbols) {
-            cout << "\t" << sym.first << endl;
+            cout << sym.first << endl;
         }
     }
     cout << "------------------------------------" << endl;

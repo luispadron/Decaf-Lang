@@ -32,41 +32,53 @@ public:
 };
 
 class VarDecl : public Decl {
-  protected:
+protected:
     Type *type;
     
-  public:
+public:
     VarDecl(Identifier *name, Type *type);
+
+    void Emit() override;
 };
 
+
 class ClassDecl : public Decl {
-  protected:
+protected:
     List<Decl*> *members;
     NamedType *extends;
     List<NamedType*> *implements;
 
-  public:
+public:
     ClassDecl(Identifier *name, NamedType *extends, 
               List<NamedType*> *implements, List<Decl*> *members);
+
+    void Emit() override;
 };
+
 
 class InterfaceDecl : public Decl {
-  protected:
+protected:
     List<Decl*> *members;
     
-  public:
+public:
     InterfaceDecl(Identifier *name, List<Decl*> *members);
+
+    void Emit() override;
 };
 
+
 class FnDecl : public Decl {
-  protected:
+protected:
     List<VarDecl*> *formals;
     Type *returnType;
     Stmt *body;
     
-  public:
+public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
+
     void SetFunctionBody(Stmt *b);
+
+    void Emit() override;
 };
 
 #endif

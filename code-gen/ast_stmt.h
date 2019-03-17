@@ -46,6 +46,8 @@ protected:
 
 public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
+
+    void Emit() override;
 };
 
 
