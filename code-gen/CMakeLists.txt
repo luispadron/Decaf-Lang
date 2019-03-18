@@ -35,8 +35,8 @@ add_executable(gen
         mips.cc
         tac.cc
         codegen.cc
-        SymbolTable.cpp
-        Scope.cpp
+        SymbolTable.cc
+        Scope.cc
         main.cc)
 
 target_link_libraries(gen
