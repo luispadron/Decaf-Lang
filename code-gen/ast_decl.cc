@@ -93,7 +93,7 @@ void FnDecl::Emit() {
 
     // generate function code
     auto fnCode = g_codeGen->GenBeginFunc();
-    fnCode->SetFrameSize(abs(bodyOffset));
+    fnCode->SetFrameSize(abs(bodyOffset) == 0 ? 0 : abs(bodyOffset) - 4);
 
     returnType->Emit();
     formals->EmitAll();
