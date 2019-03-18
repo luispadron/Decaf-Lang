@@ -6,7 +6,11 @@
 #include "ast_type.h"
 #include "ast_stmt.h"
 
+#include <iostream>
 #include <cmath>
+
+using namespace std;
+
          
 Decl::Decl(Identifier *n) : Node(*n->GetLocation()) {
     Assert(n != nullptr);
@@ -25,6 +29,12 @@ void VarDecl::set_location(Segment segment, int offset) {
 }
 
 void VarDecl::Emit() {
+    // some debug printing
+#if DEBUG==1
+    const char *seg = location->GetSegment() == Segment::gpRelative ? "gp" : "fp";
+    cout << location->GetName() << ": (" << location->GetOffset() << ", " <<  seg << ")" << endl;
+#endif
+
 
 }
   
@@ -88,18 +98,27 @@ void FnDecl::Emit() {
     }
 
     // set locations for parameters
-    int paramOffset = SetLocations(formals, Segment::fpRelative, CodeGenerator::OffsetToFirstParam);
-    int bodyOffset = body->set_locations(Segment::fpRelative, CodeGenerator::OffsetToFirstLocal);
+    int paramOffset = SetLocations(
+            formals,
+            Segment::fpRelative,
+            CodeGenerator::OffsetToFirstParam + (scope->is_class_scope() ? 4 : 0) // needed if function is a method
+            );
+
+    // set locations for body variables
+    int bodyOffset = body->set_locations(
+            Segment::fpRelative,
+            CodeGenerator::OffsetToFirstLocal
+            );
 
     // generate function code
     auto fnCode = g_codeGen->GenBeginFunc();
     fnCode->SetFrameSize(abs(bodyOffset) == 0 ? 0 : abs(bodyOffset) - 4);
 
+    // call child emit functions
     returnType->Emit();
     formals->EmitAll();
     body->Emit();
 
     SymTbl::shared().leave_scope();
-
     g_codeGen->GenEndFunc();
 }
