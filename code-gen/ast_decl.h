@@ -33,10 +33,15 @@ public:
 
 class VarDecl : public Decl {
 protected:
+    Location *location = nullptr;
     Type *type;
     
 public:
     VarDecl(Identifier *name, Type *type);
+
+    void set_location(Segment segment, int offset);
+
+    Location * get_location() const { return location; }
 
     void Emit() override;
 };

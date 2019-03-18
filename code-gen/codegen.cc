@@ -110,15 +110,13 @@ void CodeGenerator::GenReturn(Location *val)
 }
 
 
-BeginFunc *CodeGenerator::GenBeginFunc()
-{
+BeginFunc *CodeGenerator::GenBeginFunc() {
   BeginFunc *result = new BeginFunc;
   code->Append(result);
   return result;
 }
 
-void CodeGenerator::GenEndFunc()
-{
+void CodeGenerator::GenEndFunc() {
   code->Append(new EndFunc());
 }
 

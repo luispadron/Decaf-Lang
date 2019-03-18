@@ -31,13 +31,17 @@
 
 #include "location.h"
 #include "SymbolTable.h"
+#include "tac.h"
+#include "codegen.h"
+#include "mips.h"
 
 #include <iostream>
 
-class CodeGenerator;
-
 // Global singleton for symbol table
 using SymTbl = SymbolTable;
+
+// Global code generator object
+extern CodeGenerator *g_codeGen;
 
 class Node {
 protected:

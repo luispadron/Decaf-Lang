@@ -5,7 +5,8 @@
 #include "ast_decl.h"
 #include "ast_type.h"
 #include "ast_stmt.h"
-        
+
+#include <cmath>
          
 Decl::Decl(Identifier *n) : Node(*n->GetLocation()) {
     Assert(n != nullptr);
@@ -16,6 +17,11 @@ Decl::Decl(Identifier *n) : Node(*n->GetLocation()) {
 VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
     Assert(n != nullptr && t != nullptr);
     (type=t)->SetParent(this);
+}
+
+void VarDecl::set_location(Segment segment, int offset) {
+    delete location;
+    location = new Location(segment, offset, id->get_name());
 }
 
 void VarDecl::Emit() {
@@ -81,12 +87,19 @@ void FnDecl::Emit() {
         scope->insert_decl(formals->Get(i)->get_id()->get_name(), formals->Get(i));
     }
 
+    // set locations for parameters
+    int paramOffset = SetLocations(formals, Segment::fpRelative, CodeGenerator::OffsetToFirstParam);
+    int bodyOffset = body->set_locations(Segment::fpRelative, CodeGenerator::OffsetToFirstLocal);
+
+    // generate function code
+    auto fnCode = g_codeGen->GenBeginFunc();
+    fnCode->SetFrameSize(abs(bodyOffset));
+
     returnType->Emit();
     formals->EmitAll();
     body->Emit();
 
     SymTbl::shared().leave_scope();
+
+    g_codeGen->GenEndFunc();
 }
-
-
-

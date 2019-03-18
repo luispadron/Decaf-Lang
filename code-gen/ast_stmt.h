@@ -37,6 +37,8 @@ class Stmt : public Node {
 public:
      Stmt() : Node() {}
      explicit Stmt(yyltype loc) : Node(loc) {}
+
+     virtual int set_locations(Segment segment, int startOffset) { return 0; }
 };
 
 class StmtBlock : public Stmt {
@@ -48,6 +50,8 @@ public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
 
     void Emit() override;
+
+    int set_locations(Segment segment, int startOffset) override;
 };
 
 

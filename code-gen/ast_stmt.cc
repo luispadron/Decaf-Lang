@@ -28,12 +28,16 @@ void Program::Emit() {
         g_scope->insert_decl(decls->Get(i)->get_id()->get_name(), decls->Get(i));
     }
 
-    // call emit on all children
+    // set location for global variables
+    int globalOffset = SetLocations(decls, Segment::gpRelative, CodeGenerator::OffsetToFirstGlobal);
+
     decls->EmitAll();
 
     SymTbl::shared().debug_print();
 
     SymTbl::shared().leave_scope();
+
+    g_codeGen->DoFinalCodeGen();
 }
 
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
@@ -53,6 +57,12 @@ void StmtBlock::Emit() {
 
     SymTbl::shared().leave_scope();
 }
+
+int StmtBlock::set_locations(Segment segment, int startOffset) {
+    // TODO: probably add nested block handling here?
+    return SetLocations(decls, segment, startOffset);
+}
+
 
 ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) { 
     Assert(t != nullptr && b != nullptr);

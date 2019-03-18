@@ -29,6 +29,7 @@
 #define _H_list
 
 #include "utility.h"  // for Assert()
+#include "tac.h"
 
 #include <deque>
 #include <algorithm>
@@ -118,8 +119,6 @@ public:
             Get(i)->Emit();
         }
     }
-
-
 };
 
 #endif

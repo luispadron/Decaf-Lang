@@ -6,7 +6,9 @@
 #include "ast_type.h"
 #include "ast_decl.h"
 
-#include <cstring> // strdup
+#include <cstring>
+
+CodeGenerator *g_codeGen = new CodeGenerator();
 
 Node::Node(yyltype loc) {
     location = new yyltype(loc);
