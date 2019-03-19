@@ -5,8 +5,8 @@
  * language (add, call, New, etc.) there is a corresponding
  * node class for that construct. 
  *
- * pp4: You will need to extend the Expr classes to implement 
- * code generation for expressions.
+ * pp3: You will need to extend the Expr classes to implement 
+ * semantic analysis for rules pertaining to expressions.
  */
 
 
@@ -14,11 +14,10 @@
 #define _H_ast_expr
 
 #include "ast.h"
+#include "ast_decl.h"
 #include "ast_stmt.h"
+#include "ast_type.h"
 #include "list.h"
-
-class NamedType; // for new
-class Type; // for NewArray
 
 
 class Expr : public Stmt {
@@ -26,136 +25,178 @@ public:
     explicit Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
 
-    virtual Location * emit_with_location() { return nullptr; }
+    virtual bool is_this_expr() const { return false; }
 };
+
 
 /* This node type is used for those places where an expression is optional.
  * We could use a NULL pointer, but then it adds a lot of checking for
  * NULL. By using a valid, but no-op, node, we save that trouble */
 class EmptyExpr : public Expr {
 public:
+    Type * type_check() override { return Type::voidType; }
 };
+
 
 class IntConstant : public Expr {
 protected:
     int value;
-
+  
 public:
     IntConstant(yyltype loc, int val);
 
-    Location * emit_with_location() override;
+    Type * type_check() override;
 };
+
 
 class DoubleConstant : public Expr {
 protected:
     double value;
-
+    
 public:
     DoubleConstant(yyltype loc, double val);
 
-    Location * emit_with_location() override;
+    Type * type_check() override;
 };
+
 
 class BoolConstant : public Expr {
 protected:
     bool value;
-
+    
 public:
     BoolConstant(yyltype loc, bool val);
 
-    Location * emit_with_location() override;
+    Type * type_check() override;
 };
+
 
 class StringConstant : public Expr {
 protected:
     char *value;
-
+    
 public:
     StringConstant(yyltype loc, const char *val);
 
-    Location * emit_with_location() override;
+    Type * type_check() override;
 };
+
 
 class NullConstant: public Expr {
 public:
-    explicit NullConstant(yyltype loc) : Expr(loc) {}
+    explicit NullConstant(yyltype loc) : Expr(loc) { }
 
-    Location * emit_with_location() override;
+    Type * type_check() override;
 };
+
 
 class Operator : public Node {
 protected:
     char tokenString[4];
-
+    
 public:
     Operator(yyltype loc, const char *tok);
 
     friend std::ostream& operator<<(std::ostream& out, Operator *o) { return out << o->tokenString; }
+ };
 
-    const char * get_op_token() const { return tokenString; }
-};
 
 class CompoundExpr : public Expr {
 protected:
     Operator *op;
     Expr *left, *right; // left will be NULL if unary
 
+    virtual bool validate() { return false; }
+
 public:
-    CompoundExpr(Expr *lhs, Operator *op, Expr *rhs); // for binary
+    CompoundExpr(Expr *lhs, Operator *op, Expr *rhs);  // for binary
     CompoundExpr(Operator *op, Expr *rhs);             // for unary
 };
 
+
 class ArithmeticExpr : public CompoundExpr {
+protected:
+    bool validate() override;
+
 public:
     ArithmeticExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     ArithmeticExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
 
-    Location * emit_with_location() override;
-
-    void Emit() override;
+    Type * type_check() override;
 };
+
 
 class RelationalExpr : public CompoundExpr {
+    bool validate();
+
 public:
     RelationalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
+
+    Type * type_check() override;
 };
+
 
 class EqualityExpr : public CompoundExpr {
+protected:
+    bool validate() override;
+
 public:
     EqualityExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
-    const char *GetPrintNameForNode() { return "EqualityExpr"; }
+
+    Type * type_check() override;
 };
+
 
 class LogicalExpr : public CompoundExpr {
+protected:
+    bool validate() override;
+
 public:
     LogicalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
+
     LogicalExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
-    const char *GetPrintNameForNode() { return "LogicalExpr"; }
+
+    Type * type_check() override;
 };
 
+
 class AssignExpr : public CompoundExpr {
+protected:
+    bool validate() override;
+
 public:
     AssignExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
-    const char *GetPrintNameForNode() { return "AssignExpr"; }
+
+    Type * type_check() override;
 };
+
 
 class LValue : public Expr {
 public:
     explicit LValue(yyltype loc) : Expr(loc) {}
 };
 
+
 class This : public Expr {
 public:
     explicit This(yyltype loc) : Expr(loc) {}
+
+    bool is_this_expr() const override { return true; }
+
+    Type * type_check() override;
 };
+
 
 class ArrayAccess : public LValue {
 protected:
     Expr *base, *subscript;
-
+    
 public:
     ArrayAccess(yyltype loc, Expr *base, Expr *subscript);
+
+    Type * type_check() override;
 };
+
 
 /* Note that field access is used both for qualified names
  * base.field and just field without qualification. We don't
@@ -169,7 +210,10 @@ protected:
 
 public:
     FieldAccess(Expr *base, Identifier *field); //ok to pass NULL base
+
+    Type * type_check() override;
 };
+
 
 /* Like field access, call is used both for qualified base.field()
  * and unqualified field().  We won't figure out until later
@@ -180,37 +224,55 @@ protected:
     Expr *base;	// will be NULL if no explicit base
     Identifier *field;
     List<Expr*> *actuals;
-
+    
 public:
     Call(yyltype loc, Expr *base, Identifier *field, List<Expr*> *args);
+
+    Type * type_check() override;
 };
 
-class NewExpr : public Expr{
+
+class NewExpr : public Expr {
+private:
+    bool validate();
+
 protected:
     NamedType *cType;
-
+    
 public:
     NewExpr(yyltype loc, NamedType *clsType);
+
+    Type * type_check() override;
 };
+
 
 class NewArrayExpr : public Expr {
 protected:
     Expr *size;
     Type *elemType;
-
+    ArrayType *arrayType;
+    
 public:
     NewArrayExpr(yyltype loc, Expr *sizeExpr, Type *elemType);
+
+    Type * type_check() override;
 };
+
 
 class ReadIntegerExpr : public Expr {
 public:
     explicit ReadIntegerExpr(yyltype loc) : Expr(loc) {}
+
+    Type * type_check() override;
 };
+
 
 class ReadLineExpr : public Expr {
 public:
     explicit ReadLineExpr(yyltype loc) : Expr (loc) {}
+
+    Type * type_check() override;
 };
 
-
+    
 #endif

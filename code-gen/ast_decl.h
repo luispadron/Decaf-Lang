@@ -5,8 +5,9 @@
  * specialized for declarations of variables, functions, classes,
  * and interfaces.
  *
- * pp4: You will need to extend the Decl classes to implement 
- * code generation for declarations.
+ * pp3: You will need to extend the Decl classes to implement 
+ * semantic processing including detection of declaration conflicts 
+ * and managing scoping issues.
  */
 
 #ifndef _H_ast_decl
@@ -16,73 +17,66 @@
 #include "ast_type.h"
 #include "list.h"
 
+#include <string>
+#include <vector>
+
 class Identifier;
 class Stmt;
+class Expr;
+class Call;
 
-enum class DeclType {
-    Variable,
-    Function,
-    Interface,
-    Class
-};
+/// Declares the different types of decls
+enum class DeclType { Variable, Class, Function, Interface };
 
 class Decl : public Node {
-
 protected:
+    Type *type;
     Identifier *id;
   
 public:
+
     explicit Decl(Identifier *name);
     friend std::ostream& operator<<(std::ostream& out, Decl *d) { return out << d->id; }
 
-    virtual Identifier * get_id() const { return id; }
+    Identifier * get_id() { return id; }
 
-    /// returns type of the decl, either class, function, interface or variable
     virtual DeclType get_decl_type() const = 0;
 
-    /// returns the prefix for the label, that is, the prefix used for MIPS label
-    virtual std::string get_label_prefix() const { return ""; }
+    Type* type_check() override;
 
-    virtual std::string get_mips_label() const { return "_" + id->get_name(); }
+    virtual void check(Scope *class_or_interface_scope) = 0;
 };
 
+
 class VarDecl : public Decl {
-protected:
-    Location *location = nullptr;
-    Type *type;
-    
 public:
     VarDecl(Identifier *name, Type *type);
 
-    void set_location(Segment segment, int offset);
-
-    Location * get_location() const { return location; }
-
     DeclType get_decl_type() const override { return DeclType::Variable; }
 
-    std::string get_mips_label() const override { return g_codeGen->NewLabel(); }
-
-    void Emit() override;
+    void check(Scope *class_or_interface_scope) override;
 };
 
 
-class ClassDecl : public Decl {
+class FnDecl : public Decl {
 protected:
-    List<Decl*> *members;
-    NamedType *extends;
-    List<NamedType*> *implements;
+    List<VarDecl*> *formals;
+    Type *returnType;
+    Stmt *body;
 
 public:
-    ClassDecl(Identifier *name, NamedType *extends, 
-              List<NamedType*> *implements, List<Decl*> *members);
+    FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
 
-    DeclType get_decl_type() const override { return DeclType::Class; }
+    void set_function_body(Stmt *b);
 
-    std::string get_label_prefix() const override { return "_" + id->get_name() + "."; }
+    DeclType get_decl_type() const override { return DeclType::Function; }
 
-    std::string get_mips_label() const override { return id->get_name(); }
+    /// returns the mangled function name
+    /// if in class/interface: _Class/Interface.FunctionName
+    /// if global: _FunctionName
+    std::string get_mangled_name(const std::string &class_or_interface_name) const;
 
-    void Emit() override;
+    void check(Scope *class_or_interface_scope) override;
 };
 
 
@@ -95,33 +89,23 @@ public:
 
     DeclType get_decl_type() const override { return DeclType::Interface; }
 
-    std::string get_label_prefix() const override { return "_" + id->get_name() + "."; }
-
-    void Emit() override;
+    void check(Scope *class_or_interface_scope) override;
 };
 
 
-class FnDecl : public Decl {
+class ClassDecl : public Decl {
 protected:
-    List<VarDecl*> *formals;
-    Type *returnType;
-    Stmt *body;
-    
+    List<Decl*> *members;
+    NamedType *extends;
+    List<NamedType*> *implements;
+
 public:
-    FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
+    ClassDecl(Identifier *name, NamedType *extends,
+              List<NamedType*> *implements, List<Decl*> *members);
 
-    void SetFunctionBody(Stmt *b);
+    DeclType get_decl_type() const override { return DeclType::Class; }
 
-    DeclType get_decl_type() const override { return DeclType::Function; }
-
-    std::string get_label_prefix() const override {
-        if (id->get_name() == "main") return "";
-        else return "_";
-    }
-
-    std::string get_mips_label() const override;
-
-    void Emit() override;
+    void check(Scope *class_or_interface_scope) override;
 };
 
 #endif

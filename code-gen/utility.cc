@@ -31,8 +31,8 @@ void Failure(const char *format, ...) {
 
 
 int IndexOf(const char *key) {
-    for (int i = 0; i < debugKeys.Size(); i++)
-        if (!strcmp(debugKeys.Get(i), key)) return i;
+    for (int i = 0; i < debugKeys.size(); i++)
+        if (!strcmp(debugKeys.get(i), key)) return i;
     return -1;
 }
 
@@ -44,9 +44,9 @@ bool IsDebugOn(const char *key) {
 void SetDebugForKey(const char *key, bool value) {
     int k = IndexOf(key);
     if (!value && k != -1)
-        debugKeys.Remove(k);
+        debugKeys.erase(k);
     else if (value && k == -1)
-        debugKeys.Append(key);
+        debugKeys.append(key);
 }
 
 
@@ -76,36 +76,4 @@ void ParseCommandLine(int argc, char *argv[]) {
 
     for (int i = 2; i < argc; i++)
         SetDebugForKey(argv[i], true);
-}
-
-
-int SetLocations(List<Decl*> *list, Segment segment, int startOffset) {
-    for (int i = 0; i < list->Size(); ++i) {
-        auto var = dynamic_cast<VarDecl*>(list->Get(i));
-        if (!var) continue;
-
-        var->set_location(segment, startOffset);
-
-        if (startOffset < 0) {
-            startOffset -= 4;
-        } else {
-            startOffset += 4;
-        }
-    }
-
-    return startOffset;
-}
-
-int SetLocations(List<VarDecl*> *list, Segment segment, int startOffset) {
-    for (int i = 0; i < list->Size(); ++i) {
-        list->Get(i)->set_location(segment, startOffset);
-
-        if (startOffset < 0) {
-            startOffset -= 4;
-        } else {
-            startOffset += 4;
-        }
-    }
-
-    return startOffset;
 }

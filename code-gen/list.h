@@ -49,36 +49,36 @@ public:
     List(const List<Element> &lst) : elems(lst.elems) {}
 
     /// Clear the list
-    void Clear() {
+    void clear() {
         elems.clear();
     }
 
     /// Returns count of elements currently in list
-    int Size() const {
+    int size() const {
         return static_cast<int>(elems.size());
     }
 
     /// Returns element at index in list. Indexing is 0-based.
     /// Raises an assert if index is out of range.
-    Element Get(int index) const {
-        Assert(index >= 0 && index < Size());
+    Element get(int index) const {
+        Assert(index >= 0 && index < size());
         return elems[index];
     }
 
     /// Inserts element at index, shuffling over others
     /// Raises assert if index out of range
-    void Insert(const Element &elem, int index) {
-        Assert(index >= 0 && index <= Size());
+    void insert(const Element &elem, int index) {
+        Assert(index >= 0 && index <= size());
         elems.insert(elems.begin() + index, elem);
     }
 
     /// Adds element to list end
-    void Append(const Element &elem) {
+    void append(const Element &elem) {
         elems.push_back(elem);
     }
 
     /// Adds all elements to list end
-    void Append(const List<Element> &lst) {
+    void append(const List<Element> &lst) {
         for (int i = 0; i < lst.size(); i++) {
             append(lst.get(i));
         }
@@ -86,18 +86,18 @@ public:
 
     /// Removes element at index, shuffling down others
     /// Raises assert if index out of range
-    void Remove(int index) {
-        Assert(index >= 0 && index < Size());
+    void erase(int index) {
+        Assert(index >= 0 && index < size());
         elems.erase(elems.begin() + index);
     }
 
     /// Removes all elements of a specific value
-    void Remove(const Element &elem) {
+    void erase(const Element &elem) {
         elems.erase(std::remove(elems.begin(), elems.end(), elem), elems.end());
     }
 
     /// Sort and remove repeated elements
-    void Unique() {
+    void unique() {
         std::sort(elems.begin(), elems.end());
         elems.erase(std::unique(elems.begin(), elems.end()), elems.end());
     }
@@ -107,16 +107,9 @@ public:
     /// messages, but since C++ only instantiates the template if you use
     /// you can still have Lists of ints, chars*, as long as you
     /// don't try to SetParentAll on that list.
-    void SetParentAll(Node *p) {
-        for (int i = 0; i < Size(); i++) {
-            Get(i)->SetParent(p);
-        }
-    }
-
-    /// calls the `Check` function for all Nodes in the list
-    void EmitAll() {
-        for (int i = 0; i < Size(); ++i) {
-            Get(i)->Emit();
+    void set_parent_all(Node *p) {
+        for (int i = 0; i < size(); i++) {
+            get(i)->set_parent(p);
         }
     }
 };

@@ -26,6 +26,7 @@ add_executable(gen
         ${BISON_MyParser_OUTPUTS}
         ${FLEX_MyScanner_OUTPUTS}
         ast.cc
+        ast_program.cc
         ast_decl.cc
         ast_expr.cc
         ast_stmt.cc

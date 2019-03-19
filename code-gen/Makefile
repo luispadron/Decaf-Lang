@@ -12,7 +12,7 @@ PRODUCTS = $(COMPILER)
 default: $(PRODUCTS)
 
 # Set up the list of source and object files
-SRCS = ast.cc ast_decl.cc ast_expr.cc ast_stmt.cc ast_type.cc codegen.cc tac.cc mips.cc errors.cc utility.cc main.cc SymbolTable.cc Scope.cc
+SRCS = ast.cc ast_program.cc ast_decl.cc ast_expr.cc ast_stmt.cc ast_type.cc codegen.cc tac.cc mips.cc errors.cc utility.cc main.cc SymbolTable.cc Scope.cc
 
 # OBJS can deal with either .cc or .c files listed in SRCS
 OBJS = y.tab.o lex.yy.o $(patsubst %.cc, %.o, $(filter %.cc,$(SRCS))) $(patsubst %.c, %.o, $(filter %.c, $(SRCS)))
@@ -98,24 +98,29 @@ clean:
 
 # DO NOT DELETE
 ast.o: ast.cc ast.h location.h SymbolTable.h Scope.h tac.h list.h \
- utility.h codegen.h mips.h ast_type.h ast_decl.h
+ utility.h codegen.h mips.h errors.h ast_type.h ast_decl.h
+ast_program.o: ast_program.cc ast_program.h ast.h location.h \
+ SymbolTable.h Scope.h tac.h list.h utility.h codegen.h mips.h errors.h \
+ ast_decl.h ast_type.h
 ast_decl.o: ast_decl.cc ast_decl.h ast.h location.h SymbolTable.h Scope.h \
- tac.h list.h utility.h codegen.h mips.h ast_type.h ast_stmt.h
+ tac.h list.h utility.h codegen.h mips.h errors.h ast_type.h ast_expr.h \
+ ast_stmt.h
 ast_expr.o: ast_expr.cc ast_expr.h ast.h location.h SymbolTable.h Scope.h \
- tac.h list.h utility.h codegen.h mips.h ast_stmt.h ast_type.h ast_decl.h
+ tac.h list.h utility.h codegen.h mips.h errors.h ast_decl.h ast_type.h \
+ ast_stmt.h
 ast_stmt.o: ast_stmt.cc ast_stmt.h list.h utility.h tac.h ast.h \
- location.h SymbolTable.h Scope.h codegen.h mips.h ast_type.h ast_decl.h \
- ast_expr.h
+ location.h SymbolTable.h Scope.h codegen.h mips.h errors.h ast_type.h \
+ ast_decl.h ast_expr.h
 ast_type.o: ast_type.cc ast_type.h ast.h location.h SymbolTable.h Scope.h \
- tac.h list.h utility.h codegen.h mips.h ast_decl.h
+ tac.h list.h utility.h codegen.h mips.h errors.h ast_decl.h
 codegen.o: codegen.cc codegen.h list.h utility.h tac.h mips.h
 tac.o: tac.cc tac.h list.h utility.h mips.h
 mips.o: mips.cc mips.h tac.h list.h utility.h
 errors.o: errors.cc errors.h location.h scanner.h ast_type.h ast.h \
  SymbolTable.h Scope.h tac.h list.h utility.h codegen.h mips.h ast_expr.h \
- ast_stmt.h ast_decl.h
+ ast_decl.h ast_stmt.h
 utility.o: utility.cc utility.h list.h tac.h ast_decl.h ast.h location.h \
- SymbolTable.h Scope.h codegen.h mips.h ast_type.h
+ SymbolTable.h Scope.h codegen.h mips.h errors.h ast_type.h
 main.o: main.cc utility.h errors.h location.h parser.h scanner.h list.h \
  tac.h ast.h SymbolTable.h Scope.h codegen.h mips.h ast_type.h ast_decl.h \
  ast_expr.h ast_stmt.h y.tab.h

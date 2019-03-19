@@ -11,19 +11,12 @@
 using namespace std;
 
 Scope* SymbolTable::enter_scope(const string &name, ScopeType type) {
-
-    // create the scope names
-    string scope_name = name;
-    if (type == ScopeType::Block) {
-        scope_name = scope_ptr->name_ + "_" + name + to_string(scope_ptr->block_counter++);
-    }
-
-    if (scopes.find(scope_name) != scopes.end()) {
+    if (scopes.find(name) != scopes.end()) {
         assert(false);
         return nullptr;
     }
 
-    auto new_scope = new Scope(scope_name.empty() ? name : scope_name, type);
+    auto new_scope = new Scope(name, type);
     new_scope->parent_ptr = scope_ptr;
 
     if (type == ScopeType::Class || type == ScopeType::Interface) {
@@ -35,7 +28,7 @@ Scope* SymbolTable::enter_scope(const string &name, ScopeType type) {
     new_scope->super_ptr = scope_ptr ? scope_ptr->super_ptr : nullptr;
     scope_ptr = new_scope;
 
-    scopes.insert({scope_name.empty() ? name : scope_name, new_scope});
+    scopes.insert({name, new_scope});
 
     return new_scope;
 }

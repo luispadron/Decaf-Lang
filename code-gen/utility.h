@@ -84,17 +84,5 @@ bool IsDebugOn(const char *key);
  * as being flags to turn on.
  */
 void ParseCommandLine(int argc, char *argv[]);
-
-/*
- * Simply iterates through the list calling "set_location" on each Decl that is a VarDecl
- * Increasing offset at each iteration, when finished, returns the final offset amount.
- */
-int SetLocations(List<Decl*> *list, Segment segment, int startOffset);
-
-/*
- * Simply iterates through the list calling "set_location" on each Decl that is a VarDecl
- * Increasing offset at each iteration, when finished, returns the final offset amount.
- */
-int SetLocations(List<VarDecl*> *list, Segment segment, int startOffset);
      
 #endif

@@ -112,7 +112,7 @@ class SparseMatrix extends Matrix {
     }
   }
   
-  int Get(int x, int y) {
+  int get(int x, int y) {
     SparseItem elem;
     elem = Find(x,y);
     if (elem != null) {

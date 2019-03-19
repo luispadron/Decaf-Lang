@@ -72,12 +72,13 @@
 #include "scanner.h" // for yylex
 #include "parser.h"
 #include "errors.h"
+#include "ast_program.h"
 
 #include <string>
 
 void yyerror(const char *msg); // standard error-handling routine
 
-#line 81 "y.tab.c" /* yacc.c:337  */
+#line 82 "y.tab.c" /* yacc.c:337  */
 # ifndef YY_NULLPTR
 #  if defined __cplusplus
 #   if 201103L <= __cplusplus
@@ -196,7 +197,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 21 "parser.y" /* yacc.c:352  */
+#line 22 "parser.y" /* yacc.c:352  */
 
     int integerConstant;
     bool boolConstant;
@@ -217,7 +218,7 @@ union YYSTYPE
     List<Stmt*> *stmtList;
     LValue *lvalue;
 
-#line 221 "y.tab.c" /* yacc.c:352  */
+#line 222 "y.tab.c" /* yacc.c:352  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -540,16 +541,16 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    99,    99,   115,   116,   119,   120,   121,   122,   125,
-     128,   131,   132,   133,   134,   135,   136,   139,   143,   145,
-     148,   152,   154,   157,   159,   162,   164,   167,   168,   171,
-     172,   176,   178,   182,   183,   186,   188,   191,   194,   198,
-     199,   202,   203,   206,   207,   208,   210,   212,   214,   216,
-     218,   220,   223,   224,   225,   228,   230,   234,   235,   238,
-     239,   240,   241,   242,   243,   244,   245,   246,   247,   248,
-     249,   250,   251,   253,   255,   256,   257,   258,   260,   261,
-     263,   264,   266,   268,   271,   272,   273,   274,   275,   278,
-     279,   282,   283,   286,   287
+       0,   100,   100,   116,   117,   120,   121,   122,   123,   126,
+     129,   132,   133,   134,   135,   136,   137,   140,   144,   146,
+     149,   153,   155,   158,   160,   163,   165,   168,   169,   172,
+     173,   177,   179,   183,   184,   187,   189,   192,   195,   199,
+     200,   203,   204,   207,   208,   209,   211,   213,   215,   217,
+     219,   221,   224,   225,   226,   229,   231,   235,   236,   239,
+     240,   241,   242,   243,   244,   245,   246,   247,   248,   249,
+     250,   251,   252,   254,   256,   257,   258,   259,   261,   262,
+     264,   265,   267,   269,   272,   273,   274,   275,   276,   279,
+     280,   283,   284,   287,   288
 };
 #endif
 
@@ -1625,7 +1626,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 99 "parser.y" /* yacc.c:1667  */
+#line 100 "parser.y" /* yacc.c:1667  */
     {
                                       (yylsp[0]);
                                       Program *program = new Program((yyvsp[0].declList));
@@ -1635,531 +1636,531 @@ yyreduce:
                                       // and check for any semantic errors
 
                                       if (ReportError::NumErrors() == 0) {
-                                      	  program->Check();
-                                          program->Emit();
+                                      	  program->check();
+                                          program->emit();
                                       }
                                     }
-#line 1643 "y.tab.c" /* yacc.c:1667  */
+#line 1644 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 3:
-#line 115 "parser.y" /* yacc.c:1667  */
-    { ((yyval.declList)=(yyvsp[-1].declList))->Append((yyvsp[0].decl)); }
-#line 1649 "y.tab.c" /* yacc.c:1667  */
+#line 116 "parser.y" /* yacc.c:1667  */
+    { ((yyval.declList)=(yyvsp[-1].declList))->append((yyvsp[0].decl)); }
+#line 1650 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 4:
-#line 116 "parser.y" /* yacc.c:1667  */
-    { ((yyval.declList) = new List<Decl*>)->Append((yyvsp[0].decl)); }
-#line 1655 "y.tab.c" /* yacc.c:1667  */
+#line 117 "parser.y" /* yacc.c:1667  */
+    { ((yyval.declList) = new List<Decl*>)->append((yyvsp[0].decl)); }
+#line 1656 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 6:
-#line 120 "parser.y" /* yacc.c:1667  */
+#line 121 "parser.y" /* yacc.c:1667  */
     { (yyval.decl)=(yyvsp[0].fDecl); }
-#line 1661 "y.tab.c" /* yacc.c:1667  */
+#line 1662 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 7:
-#line 121 "parser.y" /* yacc.c:1667  */
+#line 122 "parser.y" /* yacc.c:1667  */
     { (yyval.decl)=(yyvsp[0].var); }
-#line 1667 "y.tab.c" /* yacc.c:1667  */
+#line 1668 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 10:
-#line 128 "parser.y" /* yacc.c:1667  */
+#line 129 "parser.y" /* yacc.c:1667  */
     { (yyval.var) = new VarDecl(new Identifier((yylsp[0]), (yyvsp[0].identifier)), (yyvsp[-1].type)); }
-#line 1673 "y.tab.c" /* yacc.c:1667  */
+#line 1674 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 11:
-#line 131 "parser.y" /* yacc.c:1667  */
+#line 132 "parser.y" /* yacc.c:1667  */
     { (yyval.type) = Type::intType; }
-#line 1679 "y.tab.c" /* yacc.c:1667  */
+#line 1680 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 12:
-#line 132 "parser.y" /* yacc.c:1667  */
+#line 133 "parser.y" /* yacc.c:1667  */
     { (yyval.type) = Type::boolType; }
-#line 1685 "y.tab.c" /* yacc.c:1667  */
+#line 1686 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 13:
-#line 133 "parser.y" /* yacc.c:1667  */
+#line 134 "parser.y" /* yacc.c:1667  */
     { (yyval.type) = Type::stringType; }
-#line 1691 "y.tab.c" /* yacc.c:1667  */
+#line 1692 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 14:
-#line 134 "parser.y" /* yacc.c:1667  */
+#line 135 "parser.y" /* yacc.c:1667  */
     { (yyval.type) = Type::doubleType; }
-#line 1697 "y.tab.c" /* yacc.c:1667  */
+#line 1698 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 15:
-#line 135 "parser.y" /* yacc.c:1667  */
+#line 136 "parser.y" /* yacc.c:1667  */
     { (yyval.type) = new NamedType(new Identifier((yylsp[0]),(yyvsp[0].identifier))); }
-#line 1703 "y.tab.c" /* yacc.c:1667  */
+#line 1704 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 16:
-#line 136 "parser.y" /* yacc.c:1667  */
+#line 137 "parser.y" /* yacc.c:1667  */
     { (yyval.type) = new ArrayType(Join((yylsp[-1]), (yylsp[0])), (yyvsp[-1].type)); }
-#line 1709 "y.tab.c" /* yacc.c:1667  */
+#line 1710 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 17:
-#line 140 "parser.y" /* yacc.c:1667  */
+#line 141 "parser.y" /* yacc.c:1667  */
     { (yyval.decl) = new InterfaceDecl(new Identifier((yylsp[-3]), (yyvsp[-3].identifier)), (yyvsp[-1].declList)); }
-#line 1715 "y.tab.c" /* yacc.c:1667  */
+#line 1716 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 18:
-#line 144 "parser.y" /* yacc.c:1667  */
-    { ((yyval.declList)=(yyvsp[-2].declList))->Append((yyvsp[-1].fDecl)); }
-#line 1721 "y.tab.c" /* yacc.c:1667  */
+#line 145 "parser.y" /* yacc.c:1667  */
+    { ((yyval.declList)=(yyvsp[-2].declList))->append((yyvsp[-1].fDecl)); }
+#line 1722 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 19:
-#line 145 "parser.y" /* yacc.c:1667  */
+#line 146 "parser.y" /* yacc.c:1667  */
     { (yyval.declList) = new List<Decl*>(); }
-#line 1727 "y.tab.c" /* yacc.c:1667  */
+#line 1728 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 20:
-#line 149 "parser.y" /* yacc.c:1667  */
+#line 150 "parser.y" /* yacc.c:1667  */
     { (yyval.decl) = new ClassDecl(new Identifier((yylsp[-5]), (yyvsp[-5].identifier)), (yyvsp[-4].cType), (yyvsp[-3].cTypeList), (yyvsp[-1].declList)); }
-#line 1733 "y.tab.c" /* yacc.c:1667  */
+#line 1734 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 21:
-#line 153 "parser.y" /* yacc.c:1667  */
+#line 154 "parser.y" /* yacc.c:1667  */
     { (yyval.cType) = new NamedType(new Identifier((yylsp[0]), (yyvsp[0].identifier))); }
-#line 1739 "y.tab.c" /* yacc.c:1667  */
+#line 1740 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 22:
-#line 154 "parser.y" /* yacc.c:1667  */
+#line 155 "parser.y" /* yacc.c:1667  */
     { (yyval.cType) = nullptr; }
-#line 1745 "y.tab.c" /* yacc.c:1667  */
+#line 1746 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 23:
-#line 158 "parser.y" /* yacc.c:1667  */
+#line 159 "parser.y" /* yacc.c:1667  */
     { (yyval.cTypeList) = (yyvsp[0].cTypeList); }
-#line 1751 "y.tab.c" /* yacc.c:1667  */
+#line 1752 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 24:
-#line 159 "parser.y" /* yacc.c:1667  */
+#line 160 "parser.y" /* yacc.c:1667  */
     { (yyval.cTypeList) = new List<NamedType*>; }
-#line 1757 "y.tab.c" /* yacc.c:1667  */
+#line 1758 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 25:
-#line 163 "parser.y" /* yacc.c:1667  */
-    { ((yyval.cTypeList)=(yyvsp[-2].cTypeList))->Append(new NamedType(new Identifier((yylsp[0]), (yyvsp[0].identifier)))); }
-#line 1763 "y.tab.c" /* yacc.c:1667  */
+#line 164 "parser.y" /* yacc.c:1667  */
+    { ((yyval.cTypeList)=(yyvsp[-2].cTypeList))->append(new NamedType(new Identifier((yylsp[0]), (yyvsp[0].identifier)))); }
+#line 1764 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 26:
-#line 164 "parser.y" /* yacc.c:1667  */
-    { ((yyval.cTypeList)=new List<NamedType*>)->Append(new NamedType(new Identifier((yylsp[0]), (yyvsp[0].identifier)))); }
-#line 1769 "y.tab.c" /* yacc.c:1667  */
+#line 165 "parser.y" /* yacc.c:1667  */
+    { ((yyval.cTypeList)=new List<NamedType*>)->append(new NamedType(new Identifier((yylsp[0]), (yyvsp[0].identifier)))); }
+#line 1770 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 27:
-#line 167 "parser.y" /* yacc.c:1667  */
-    { ((yyval.declList)=(yyvsp[-1].declList))->Append((yyvsp[0].decl)); }
-#line 1775 "y.tab.c" /* yacc.c:1667  */
+#line 168 "parser.y" /* yacc.c:1667  */
+    { ((yyval.declList)=(yyvsp[-1].declList))->append((yyvsp[0].decl)); }
+#line 1776 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 28:
-#line 168 "parser.y" /* yacc.c:1667  */
+#line 169 "parser.y" /* yacc.c:1667  */
     { (yyval.declList) = new List<Decl*>(); }
-#line 1781 "y.tab.c" /* yacc.c:1667  */
+#line 1782 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 29:
-#line 171 "parser.y" /* yacc.c:1667  */
+#line 172 "parser.y" /* yacc.c:1667  */
     { (yyval.decl) = (yyvsp[0].var); }
-#line 1787 "y.tab.c" /* yacc.c:1667  */
+#line 1788 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 30:
-#line 172 "parser.y" /* yacc.c:1667  */
+#line 173 "parser.y" /* yacc.c:1667  */
     { (yyval.decl) = (yyvsp[0].fDecl); }
-#line 1793 "y.tab.c" /* yacc.c:1667  */
+#line 1794 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 31:
-#line 177 "parser.y" /* yacc.c:1667  */
+#line 178 "parser.y" /* yacc.c:1667  */
     { (yyval.fDecl) = new FnDecl(new Identifier((yylsp[-3]), (yyvsp[-3].identifier)), (yyvsp[-4].type), (yyvsp[-1].varList)); }
-#line 1799 "y.tab.c" /* yacc.c:1667  */
+#line 1800 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 32:
-#line 179 "parser.y" /* yacc.c:1667  */
+#line 180 "parser.y" /* yacc.c:1667  */
     { (yyval.fDecl) = new FnDecl(new Identifier((yylsp[-3]), (yyvsp[-3].identifier)), Type::voidType, (yyvsp[-1].varList)); }
-#line 1805 "y.tab.c" /* yacc.c:1667  */
+#line 1806 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 33:
-#line 182 "parser.y" /* yacc.c:1667  */
+#line 183 "parser.y" /* yacc.c:1667  */
     { (yyval.varList) = (yyvsp[0].varList); }
-#line 1811 "y.tab.c" /* yacc.c:1667  */
+#line 1812 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 34:
-#line 183 "parser.y" /* yacc.c:1667  */
+#line 184 "parser.y" /* yacc.c:1667  */
     { (yyval.varList) = new List<VarDecl*>; }
-#line 1817 "y.tab.c" /* yacc.c:1667  */
+#line 1818 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 35:
-#line 187 "parser.y" /* yacc.c:1667  */
-    { ((yyval.varList)=(yyvsp[-2].varList))->Append((yyvsp[0].var)); }
-#line 1823 "y.tab.c" /* yacc.c:1667  */
+#line 188 "parser.y" /* yacc.c:1667  */
+    { ((yyval.varList)=(yyvsp[-2].varList))->append((yyvsp[0].var)); }
+#line 1824 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 36:
-#line 188 "parser.y" /* yacc.c:1667  */
-    { ((yyval.varList) = new List<VarDecl*>)->Append((yyvsp[0].var)); }
-#line 1829 "y.tab.c" /* yacc.c:1667  */
+#line 189 "parser.y" /* yacc.c:1667  */
+    { ((yyval.varList) = new List<VarDecl*>)->append((yyvsp[0].var)); }
+#line 1830 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 37:
-#line 191 "parser.y" /* yacc.c:1667  */
-    { ((yyval.fDecl)=(yyvsp[-1].fDecl))->SetFunctionBody((yyvsp[0].stmt)); }
-#line 1835 "y.tab.c" /* yacc.c:1667  */
+#line 192 "parser.y" /* yacc.c:1667  */
+    { ((yyval.fDecl)=(yyvsp[-1].fDecl))->set_function_body((yyvsp[0].stmt)); }
+#line 1836 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 38:
-#line 195 "parser.y" /* yacc.c:1667  */
+#line 196 "parser.y" /* yacc.c:1667  */
     { (yyval.stmt) = new StmtBlock((yyvsp[-2].varList), (yyvsp[-1].stmtList)); }
-#line 1841 "y.tab.c" /* yacc.c:1667  */
+#line 1842 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 39:
-#line 198 "parser.y" /* yacc.c:1667  */
-    { ((yyval.varList)=(yyvsp[-1].varList))->Append((yyvsp[0].var)); }
-#line 1847 "y.tab.c" /* yacc.c:1667  */
+#line 199 "parser.y" /* yacc.c:1667  */
+    { ((yyval.varList)=(yyvsp[-1].varList))->append((yyvsp[0].var)); }
+#line 1848 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 40:
-#line 199 "parser.y" /* yacc.c:1667  */
+#line 200 "parser.y" /* yacc.c:1667  */
     { (yyval.varList) = new List<VarDecl*>; }
-#line 1853 "y.tab.c" /* yacc.c:1667  */
+#line 1854 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 41:
-#line 202 "parser.y" /* yacc.c:1667  */
-    { (yyval.stmtList) = (yyvsp[0].stmtList); (yyval.stmtList)->Insert((yyvsp[-1].stmt), 0); }
-#line 1859 "y.tab.c" /* yacc.c:1667  */
+#line 203 "parser.y" /* yacc.c:1667  */
+    { (yyval.stmtList) = (yyvsp[0].stmtList); (yyval.stmtList)->insert((yyvsp[-1].stmt), 0); }
+#line 1860 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 42:
-#line 203 "parser.y" /* yacc.c:1667  */
+#line 204 "parser.y" /* yacc.c:1667  */
     { (yyval.stmtList) = new List<Stmt*>; }
-#line 1865 "y.tab.c" /* yacc.c:1667  */
+#line 1866 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 43:
-#line 206 "parser.y" /* yacc.c:1667  */
+#line 207 "parser.y" /* yacc.c:1667  */
     { (yyval.stmt) = (yyvsp[-1].expr); }
-#line 1871 "y.tab.c" /* yacc.c:1667  */
+#line 1872 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 45:
-#line 209 "parser.y" /* yacc.c:1667  */
+#line 210 "parser.y" /* yacc.c:1667  */
     { (yyval.stmt) = new IfStmt((yyvsp[-3].expr), (yyvsp[-1].stmt), (yyvsp[0].stmt)); }
-#line 1877 "y.tab.c" /* yacc.c:1667  */
+#line 1878 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 46:
-#line 211 "parser.y" /* yacc.c:1667  */
+#line 212 "parser.y" /* yacc.c:1667  */
     { (yyval.stmt) = new WhileStmt((yyvsp[-2].expr), (yyvsp[0].stmt)); }
-#line 1883 "y.tab.c" /* yacc.c:1667  */
+#line 1884 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 47:
-#line 213 "parser.y" /* yacc.c:1667  */
+#line 214 "parser.y" /* yacc.c:1667  */
     { (yyval.stmt) = new ForStmt((yyvsp[-6].expr), (yyvsp[-4].expr), (yyvsp[-2].expr), (yyvsp[0].stmt)); }
-#line 1889 "y.tab.c" /* yacc.c:1667  */
+#line 1890 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 48:
-#line 215 "parser.y" /* yacc.c:1667  */
+#line 216 "parser.y" /* yacc.c:1667  */
     { (yyval.stmt) = new ReturnStmt((yylsp[-1]), (yyvsp[-1].expr)); }
-#line 1895 "y.tab.c" /* yacc.c:1667  */
+#line 1896 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 49:
-#line 217 "parser.y" /* yacc.c:1667  */
+#line 218 "parser.y" /* yacc.c:1667  */
     { (yyval.stmt) = new ReturnStmt((yylsp[-1]), new EmptyExpr()); }
-#line 1901 "y.tab.c" /* yacc.c:1667  */
+#line 1902 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 50:
-#line 219 "parser.y" /* yacc.c:1667  */
+#line 220 "parser.y" /* yacc.c:1667  */
     { (yyval.stmt) = new PrintStmt((yyvsp[-2].exprList)); }
-#line 1907 "y.tab.c" /* yacc.c:1667  */
+#line 1908 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 51:
-#line 220 "parser.y" /* yacc.c:1667  */
+#line 221 "parser.y" /* yacc.c:1667  */
     { (yyval.stmt) = new BreakStmt((yylsp[-1])); }
-#line 1913 "y.tab.c" /* yacc.c:1667  */
+#line 1914 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 52:
-#line 223 "parser.y" /* yacc.c:1667  */
+#line 224 "parser.y" /* yacc.c:1667  */
     { (yyval.lvalue) = new FieldAccess(nullptr, new Identifier((yylsp[0]), (yyvsp[0].identifier))); }
-#line 1919 "y.tab.c" /* yacc.c:1667  */
+#line 1920 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 53:
-#line 224 "parser.y" /* yacc.c:1667  */
+#line 225 "parser.y" /* yacc.c:1667  */
     { (yyval.lvalue) = new FieldAccess((yyvsp[-2].expr), new Identifier((yylsp[0]), (yyvsp[0].identifier))); }
-#line 1925 "y.tab.c" /* yacc.c:1667  */
+#line 1926 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 54:
-#line 225 "parser.y" /* yacc.c:1667  */
+#line 226 "parser.y" /* yacc.c:1667  */
     { (yyval.lvalue) = new ArrayAccess(Join((yylsp[-3]), (yylsp[0])), (yyvsp[-3].expr), (yyvsp[-1].expr)); }
-#line 1931 "y.tab.c" /* yacc.c:1667  */
+#line 1932 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 55:
-#line 229 "parser.y" /* yacc.c:1667  */
+#line 230 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new Call(Join((yylsp[-3]),(yylsp[0])), nullptr, new Identifier((yylsp[-3]),(yyvsp[-3].identifier)), (yyvsp[-1].exprList)); }
-#line 1937 "y.tab.c" /* yacc.c:1667  */
+#line 1938 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 56:
-#line 231 "parser.y" /* yacc.c:1667  */
+#line 232 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new Call(Join((yylsp[-5]),(yylsp[0])), (yyvsp[-5].expr), new Identifier((yylsp[-3]),(yyvsp[-3].identifier)), (yyvsp[-1].exprList)); }
-#line 1943 "y.tab.c" /* yacc.c:1667  */
+#line 1944 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 57:
-#line 234 "parser.y" /* yacc.c:1667  */
+#line 235 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = (yyvsp[0].expr); }
-#line 1949 "y.tab.c" /* yacc.c:1667  */
+#line 1950 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 58:
-#line 235 "parser.y" /* yacc.c:1667  */
+#line 236 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new EmptyExpr(); }
-#line 1955 "y.tab.c" /* yacc.c:1667  */
+#line 1956 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 59:
-#line 238 "parser.y" /* yacc.c:1667  */
+#line 239 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = (yyvsp[0].lvalue); }
-#line 1961 "y.tab.c" /* yacc.c:1667  */
+#line 1962 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 62:
-#line 241 "parser.y" /* yacc.c:1667  */
+#line 242 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new AssignExpr((yyvsp[-2].lvalue), new Operator((yylsp[-1]),"="), (yyvsp[0].expr)); }
-#line 1967 "y.tab.c" /* yacc.c:1667  */
+#line 1968 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 63:
-#line 242 "parser.y" /* yacc.c:1667  */
+#line 243 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new ArithmeticExpr((yyvsp[-2].expr), new Operator((yylsp[-1]), "+"), (yyvsp[0].expr)); }
-#line 1973 "y.tab.c" /* yacc.c:1667  */
+#line 1974 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 64:
-#line 243 "parser.y" /* yacc.c:1667  */
+#line 244 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new ArithmeticExpr((yyvsp[-2].expr), new Operator((yylsp[-1]), "-"), (yyvsp[0].expr)); }
-#line 1979 "y.tab.c" /* yacc.c:1667  */
+#line 1980 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 65:
-#line 244 "parser.y" /* yacc.c:1667  */
+#line 245 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new ArithmeticExpr((yyvsp[-2].expr), new Operator((yylsp[-1]),"/"), (yyvsp[0].expr)); }
-#line 1985 "y.tab.c" /* yacc.c:1667  */
+#line 1986 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 66:
-#line 245 "parser.y" /* yacc.c:1667  */
+#line 246 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new ArithmeticExpr((yyvsp[-2].expr), new Operator((yylsp[-1]),"*"), (yyvsp[0].expr)); }
-#line 1991 "y.tab.c" /* yacc.c:1667  */
+#line 1992 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 67:
-#line 246 "parser.y" /* yacc.c:1667  */
+#line 247 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new ArithmeticExpr((yyvsp[-2].expr), new Operator((yylsp[-1]),"%"), (yyvsp[0].expr)); }
-#line 1997 "y.tab.c" /* yacc.c:1667  */
+#line 1998 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 68:
-#line 247 "parser.y" /* yacc.c:1667  */
+#line 248 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new EqualityExpr((yyvsp[-2].expr), new Operator((yylsp[-1]),"=="), (yyvsp[0].expr)); }
-#line 2003 "y.tab.c" /* yacc.c:1667  */
+#line 2004 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 69:
-#line 248 "parser.y" /* yacc.c:1667  */
+#line 249 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new EqualityExpr((yyvsp[-2].expr), new Operator((yylsp[-1]),"!="), (yyvsp[0].expr)); }
-#line 2009 "y.tab.c" /* yacc.c:1667  */
+#line 2010 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 70:
-#line 249 "parser.y" /* yacc.c:1667  */
+#line 250 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new RelationalExpr((yyvsp[-2].expr), new Operator((yylsp[-1]),"<"), (yyvsp[0].expr)); }
-#line 2015 "y.tab.c" /* yacc.c:1667  */
+#line 2016 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 71:
-#line 250 "parser.y" /* yacc.c:1667  */
+#line 251 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new RelationalExpr((yyvsp[-2].expr), new Operator((yylsp[-1]),">"), (yyvsp[0].expr)); }
-#line 2021 "y.tab.c" /* yacc.c:1667  */
+#line 2022 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 72:
-#line 252 "parser.y" /* yacc.c:1667  */
+#line 253 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new RelationalExpr((yyvsp[-2].expr), new Operator((yylsp[-1]),"<="), (yyvsp[0].expr)); }
-#line 2027 "y.tab.c" /* yacc.c:1667  */
+#line 2028 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 73:
-#line 254 "parser.y" /* yacc.c:1667  */
+#line 255 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new RelationalExpr((yyvsp[-2].expr), new Operator((yylsp[-1]),">="), (yyvsp[0].expr)); }
-#line 2033 "y.tab.c" /* yacc.c:1667  */
+#line 2034 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 74:
-#line 255 "parser.y" /* yacc.c:1667  */
+#line 256 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new LogicalExpr((yyvsp[-2].expr), new Operator((yylsp[-1]),"&&"), (yyvsp[0].expr)); }
-#line 2039 "y.tab.c" /* yacc.c:1667  */
+#line 2040 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 75:
-#line 256 "parser.y" /* yacc.c:1667  */
+#line 257 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new LogicalExpr((yyvsp[-2].expr), new Operator((yylsp[-1]),"||"), (yyvsp[0].expr)); }
-#line 2045 "y.tab.c" /* yacc.c:1667  */
+#line 2046 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 76:
-#line 257 "parser.y" /* yacc.c:1667  */
+#line 258 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = (yyvsp[-1].expr); }
-#line 2051 "y.tab.c" /* yacc.c:1667  */
+#line 2052 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 77:
-#line 259 "parser.y" /* yacc.c:1667  */
+#line 260 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new ArithmeticExpr(new Operator((yylsp[-1]),"-"), (yyvsp[0].expr)); }
-#line 2057 "y.tab.c" /* yacc.c:1667  */
+#line 2058 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 78:
-#line 260 "parser.y" /* yacc.c:1667  */
+#line 261 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new LogicalExpr(new Operator((yylsp[-1]),"!"), (yyvsp[0].expr)); }
-#line 2063 "y.tab.c" /* yacc.c:1667  */
+#line 2064 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 79:
-#line 262 "parser.y" /* yacc.c:1667  */
+#line 263 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new ReadIntegerExpr(Join((yylsp[-2]),(yylsp[0]))); }
-#line 2069 "y.tab.c" /* yacc.c:1667  */
+#line 2070 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 80:
-#line 263 "parser.y" /* yacc.c:1667  */
+#line 264 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new ReadLineExpr(Join((yylsp[-2]),(yylsp[0]))); }
-#line 2075 "y.tab.c" /* yacc.c:1667  */
+#line 2076 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 81:
-#line 265 "parser.y" /* yacc.c:1667  */
+#line 266 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new NewExpr(Join((yylsp[-3]),(yylsp[0])),new NamedType(new Identifier((yylsp[-1]),(yyvsp[-1].identifier)))); }
-#line 2081 "y.tab.c" /* yacc.c:1667  */
+#line 2082 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 82:
-#line 267 "parser.y" /* yacc.c:1667  */
+#line 268 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new NewArrayExpr(Join((yylsp[-5]),(yylsp[0])),(yyvsp[-3].expr), (yyvsp[-1].type)); }
-#line 2087 "y.tab.c" /* yacc.c:1667  */
+#line 2088 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 83:
-#line 268 "parser.y" /* yacc.c:1667  */
+#line 269 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new This((yylsp[0])); }
-#line 2093 "y.tab.c" /* yacc.c:1667  */
+#line 2094 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 84:
-#line 271 "parser.y" /* yacc.c:1667  */
+#line 272 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new IntConstant((yylsp[0]),(yyvsp[0].integerConstant)); }
-#line 2099 "y.tab.c" /* yacc.c:1667  */
+#line 2100 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 85:
-#line 272 "parser.y" /* yacc.c:1667  */
+#line 273 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new BoolConstant((yylsp[0]),(yyvsp[0].boolConstant)); }
-#line 2105 "y.tab.c" /* yacc.c:1667  */
+#line 2106 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 86:
-#line 273 "parser.y" /* yacc.c:1667  */
+#line 274 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new DoubleConstant((yylsp[0]),(yyvsp[0].doubleConstant)); }
-#line 2111 "y.tab.c" /* yacc.c:1667  */
+#line 2112 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 87:
-#line 274 "parser.y" /* yacc.c:1667  */
+#line 275 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new StringConstant((yylsp[0]),(yyvsp[0].stringConstant)); }
-#line 2117 "y.tab.c" /* yacc.c:1667  */
+#line 2118 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 88:
-#line 275 "parser.y" /* yacc.c:1667  */
+#line 276 "parser.y" /* yacc.c:1667  */
     { (yyval.expr) = new NullConstant((yylsp[0])); }
-#line 2123 "y.tab.c" /* yacc.c:1667  */
+#line 2124 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 89:
-#line 278 "parser.y" /* yacc.c:1667  */
+#line 279 "parser.y" /* yacc.c:1667  */
     { (yyval.exprList) = (yyvsp[0].exprList); }
-#line 2129 "y.tab.c" /* yacc.c:1667  */
+#line 2130 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 90:
-#line 279 "parser.y" /* yacc.c:1667  */
+#line 280 "parser.y" /* yacc.c:1667  */
     { (yyval.exprList) = new List<Expr*>; }
-#line 2135 "y.tab.c" /* yacc.c:1667  */
+#line 2136 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 91:
-#line 282 "parser.y" /* yacc.c:1667  */
-    { ((yyval.exprList)=(yyvsp[-2].exprList))->Append((yyvsp[0].expr)); }
-#line 2141 "y.tab.c" /* yacc.c:1667  */
+#line 283 "parser.y" /* yacc.c:1667  */
+    { ((yyval.exprList)=(yyvsp[-2].exprList))->append((yyvsp[0].expr)); }
+#line 2142 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 92:
-#line 283 "parser.y" /* yacc.c:1667  */
-    { ((yyval.exprList) = new List<Expr*>)->Append((yyvsp[0].expr)); }
-#line 2147 "y.tab.c" /* yacc.c:1667  */
+#line 284 "parser.y" /* yacc.c:1667  */
+    { ((yyval.exprList) = new List<Expr*>)->append((yyvsp[0].expr)); }
+#line 2148 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 93:
-#line 286 "parser.y" /* yacc.c:1667  */
+#line 287 "parser.y" /* yacc.c:1667  */
     { (yyval.stmt) = (yyvsp[0].stmt); }
-#line 2153 "y.tab.c" /* yacc.c:1667  */
+#line 2154 "y.tab.c" /* yacc.c:1667  */
     break;
 
   case 94:
-#line 288 "parser.y" /* yacc.c:1667  */
+#line 289 "parser.y" /* yacc.c:1667  */
     { (yyval.stmt) = nullptr; }
-#line 2159 "y.tab.c" /* yacc.c:1667  */
+#line 2160 "y.tab.c" /* yacc.c:1667  */
     break;
 
 
-#line 2163 "y.tab.c" /* yacc.c:1667  */
+#line 2164 "y.tab.c" /* yacc.c:1667  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2396,7 +2397,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 291 "parser.y" /* yacc.c:1918  */
+#line 292 "parser.y" /* yacc.c:1918  */
 
 
 

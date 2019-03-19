@@ -26,7 +26,7 @@
 	  lw $ra, -4($fp)	# restore saved ra
 	  lw $fp, 0($fp)	# restore saved fp
 	  jr $ra		# return from function
-  _Matrix.Get:
+  _Matrix.get:
 	# BeginFunc 0
 	  subu $sp, $sp, 8	# decrement sp to make space to save ra, fp
 	  sw $fp, 8($sp)	# save fp
@@ -523,7 +523,7 @@
 	  Matrix:		# label for class Matrix vtable
 	  .word _Matrix.Init
 	  .word _Matrix.Set
-	  .word _Matrix.Get
+	  .word _Matrix.get
 	  .word _Matrix.PrintMatrix
 	  .word _Matrix.SeedMatrix
 	  .text
@@ -1120,7 +1120,7 @@
 	  lw $ra, -4($fp)	# restore saved ra
 	  lw $fp, 0($fp)	# restore saved fp
 	  jr $ra		# return from function
-  _DenseMatrix.Get:
+  _DenseMatrix.get:
 	# BeginFunc 92
 	  subu $sp, $sp, 8	# decrement sp to make space to save ra, fp
 	  sw $fp, 8($sp)	# save fp
@@ -1278,7 +1278,7 @@
 	  DenseMatrix:		# label for class DenseMatrix vtable
 	  .word _DenseMatrix.Init
 	  .word _DenseMatrix.Set
-	  .word _DenseMatrix.Get
+	  .word _DenseMatrix.get
 	  .word _Matrix.PrintMatrix
 	  .word _Matrix.SeedMatrix
 	  .text
@@ -2039,7 +2039,7 @@
 	  lw $ra, -4($fp)	# restore saved ra
 	  lw $fp, 0($fp)	# restore saved fp
 	  jr $ra		# return from function
-  _SparseMatrix.Get:
+  _SparseMatrix.get:
 	# BeginFunc 48
 	  subu $sp, $sp, 8	# decrement sp to make space to save ra, fp
 	  sw $fp, 8($sp)	# save fp
@@ -2147,7 +2147,7 @@
 	  SparseMatrix:		# label for class SparseMatrix vtable
 	  .word _SparseMatrix.Init
 	  .word _SparseMatrix.Set
-	  .word _SparseMatrix.Get
+	  .word _SparseMatrix.get
 	  .word _Matrix.PrintMatrix
 	  .word _Matrix.SeedMatrix
 	  .word _SparseMatrix.Find

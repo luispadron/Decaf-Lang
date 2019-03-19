@@ -130,7 +130,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 21 "parser.y" /* yacc.c:1927  */
+#line 22 "parser.y" /* yacc.c:1927  */
 
     int integerConstant;
     bool boolConstant;

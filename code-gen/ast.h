@@ -39,8 +39,10 @@
 #include <iostream>
 #include <string>
 
+class Type;
+
 // Global singleton for symbol table
-using SymTbl = SymbolTable;
+using Sym_tbl_t = SymbolTable;
 
 // Global code generator object
 extern CodeGenerator *g_codeGen;
@@ -54,11 +56,11 @@ public:
     explicit Node(yyltype loc);
     Node();
     
-    yyltype *GetLocation()   { return location; }
-    void SetParent(Node *p)  { parent = p; }
-    Node *GetParent()        { return parent; }
+    yyltype *get_location()   { return location; }
+    void set_parent(Node *p)  { parent = p; }
+    Node *get_parent()        { return parent; }
 
-    virtual void Emit() { }
+    virtual Type* type_check();
 };
    
 
@@ -71,6 +73,9 @@ public:
     friend std::ostream& operator<<(std::ostream& out, Identifier *id) { return out << id->name; }
 
     const std::string & get_name() const { return name; }
+
+    /// returns whether this identifier is defined in the current scope of the symbol table
+    bool is_defined() const;
 };
 
 

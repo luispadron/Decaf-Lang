@@ -60,10 +60,10 @@ SINGLE_COMMENT    ("//"[^\n]*)
 
 <COPY>.*               { char curLine[512];
                          //strncpy(curLine, yytext, sizeof(curLine));
-                         savedLines.Append(strdup(yytext));
+                         savedLines.append(strdup(yytext));
                          curColNum = 1; yy_pop_state(); yyless(0); }
 <COPY><<EOF>>          { yy_pop_state(); }
-<*>\n                  { curLineNum++; curColNum = 1;                          if (YYSTATE == COPY) savedLines.Append("");
+<*>\n                  { curLineNum++; curColNum = 1;                          if (YYSTATE == COPY) savedLines.append("");
                          else yy_push_state(COPY); }
 
 [ ]+                { /* ignore all spaces */  }
@@ -189,8 +189,8 @@ static void DoBeforeEachAction()
  * retrieve them to report the context for errors.
  */
 const char *GetLineNumbered(int num) {
-   if (num <= 0 || num > savedLines.Size()) return NULL;
-   return savedLines.Get(num-1);
+   if (num <= 0 || num > savedLines.size()) return NULL;
+   return savedLines.get(num-1);
 }
 
 

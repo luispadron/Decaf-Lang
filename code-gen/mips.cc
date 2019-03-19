@@ -395,8 +395,8 @@ void Mips::EmitVTable(const char *label, List<const char*> *methodLabels)
   Emit(".data");
   Emit(".align 2");
   Emit("%s:\t\t# label for class %s vtable", label, label);
-  for (int i = 0; i < methodLabels->Size(); i++)
-    Emit(".word %s\n", methodLabels->Get(i));
+  for (int i = 0; i < methodLabels->size(); i++)
+    Emit(".word %s\n", methodLabels->get(i));
   Emit(".text");
 }
 

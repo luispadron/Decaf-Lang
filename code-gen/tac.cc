@@ -232,8 +232,8 @@ VTable::VTable(const char *l, List<const char *> *m)
 
 void VTable::Print() {
   printf("VTable %s =\n", label);
-  for (int i = 0; i < methodLabels->Size(); i++)
-    printf("\t%s,\n", methodLabels->Get(i));
+  for (int i = 0; i < methodLabels->size(); i++)
+    printf("\t%s,\n", methodLabels->get(i));
   printf("; \n"); 
 }
 void VTable::EmitSpecific(Mips *mips) {
