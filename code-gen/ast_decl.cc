@@ -112,7 +112,7 @@ void FnDecl::Emit() {
 
     // generate function code
     auto fnCode = g_codeGen->GenBeginFunc();
-    fnCode->SetFrameSize(abs(bodyOffset) == 0 ? 0 : abs(bodyOffset) - 4);
+    fnCode->SetFrameSize(abs(bodyOffset) - 8);
 
     // call child emit functions
     returnType->Emit();
