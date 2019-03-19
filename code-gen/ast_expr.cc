@@ -78,7 +78,6 @@ Location* ArithmeticExpr::emit_with_location() {
     auto r = right->emit_with_location();
     Assert(l && r);
 
-    g_codeGen->GenTempVar();
     return g_codeGen->GenBinaryOp(op->get_op_token(), l, r);
 }
 

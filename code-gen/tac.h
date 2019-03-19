@@ -195,6 +195,8 @@ public:
     // used to backpatch the instruction with frame size once known
     void SetFrameSize(int numBytesForAllLocalsAndTemps);
     void EmitSpecific(Mips *mips);
+
+    int get_size() const { return frameSize; }
 };
 
 class EndFunc: public Instruction {
