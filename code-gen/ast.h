@@ -34,6 +34,7 @@
 #include "tac.h"
 #include "codegen.h"
 #include "mips.h"
+#include "errors.h"
 
 #include <iostream>
 

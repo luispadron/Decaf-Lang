@@ -19,6 +19,13 @@
 class Identifier;
 class Stmt;
 
+enum class DeclType {
+    Variable,
+    Function,
+    Interface,
+    Class
+};
+
 class Decl : public Node {
 
 protected:
@@ -29,6 +36,8 @@ public:
     friend std::ostream& operator<<(std::ostream& out, Decl *d) { return out << d->id; }
 
     virtual Identifier * get_id() const { return id; }
+
+    virtual DeclType get_decl_type() const = 0;
 };
 
 class VarDecl : public Decl {
@@ -42,6 +51,8 @@ public:
     void set_location(Segment segment, int offset);
 
     Location * get_location() const { return location; }
+
+    DeclType get_decl_type() const override { return DeclType::Variable; }
 
     void Emit() override;
 };
@@ -57,6 +68,8 @@ public:
     ClassDecl(Identifier *name, NamedType *extends, 
               List<NamedType*> *implements, List<Decl*> *members);
 
+    DeclType get_decl_type() const override { return DeclType::Class; }
+
     void Emit() override;
 };
 
@@ -67,6 +80,8 @@ protected:
     
 public:
     InterfaceDecl(Identifier *name, List<Decl*> *members);
+
+    DeclType get_decl_type() const override { return DeclType::Interface; }
 
     void Emit() override;
 };
@@ -82,6 +97,8 @@ public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
 
     void SetFunctionBody(Stmt *b);
+
+    DeclType get_decl_type() const override { return DeclType::Function; }
 
     void Emit() override;
 };

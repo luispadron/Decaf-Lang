@@ -10,13 +10,11 @@
 #include "tac.h"
 #include "mips.h"
   
-CodeGenerator::CodeGenerator()
-{
+CodeGenerator::CodeGenerator() {
   code = new List<Instruction*>();
 }
 
-char *CodeGenerator::NewLabel()
-{
+char *CodeGenerator::NewLabel() {
   static int nextLabelNum = 0;
   char temp[10];
   sprintf(temp, "_L%d", nextLabelNum++);
@@ -24,8 +22,7 @@ char *CodeGenerator::NewLabel()
 }
 
 
-Location *CodeGenerator::GenTempVar()
-{
+Location *CodeGenerator::GenTempVar() {
   static int nextTempNum;
   char temp[10];
   Location *result = NULL;
@@ -89,8 +86,7 @@ Location *CodeGenerator::GenBinaryOp(const char *opName, Location *op1,
 }
 
 
-void CodeGenerator::GenLabel(const char *label)
-{
+void CodeGenerator::GenLabel(const char *label) {
   code->Append(new Label(label));
 }
 

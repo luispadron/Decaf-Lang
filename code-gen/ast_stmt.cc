@@ -7,6 +7,10 @@
 #include "ast_decl.h"
 #include "ast_expr.h"
 
+#include <cstring>
+
+using namespace std;
+
 
 Program::Program(List<Decl*> *d) {
     Assert(d != nullptr);
@@ -29,7 +33,22 @@ void Program::Emit() {
     }
 
     // set location for global variables
-    int globalOffset = SetLocations(decls, Segment::gpRelative, CodeGenerator::OffsetToFirstGlobal);
+    int global_offset = SetLocations(decls, Segment::gpRelative, CodeGenerator::OffsetToFirstGlobal);
+
+    // first find the main function, and verify it exists
+    bool found_main = false;
+    for (int i = 0; i < decls->Size(); ++i) {
+        auto decl = decls->Get(i);
+        if (decl->get_decl_type() == DeclType::Function &&
+            strcmp(decl->get_id()->get_name(), "main") == 0) {
+            found_main = true;
+        }
+    }
+
+    if (!found_main) {
+        ReportError::NoMainFound();
+        return;
+    }
 
     decls->EmitAll();
 
