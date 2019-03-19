@@ -37,6 +37,7 @@
 #include "errors.h"
 
 #include <iostream>
+#include <string>
 
 // Global singleton for symbol table
 using SymTbl = SymbolTable;
@@ -63,13 +64,13 @@ public:
 
 class Identifier : public Node {
 protected:
-    char *name;
+    std::string name;
     
 public:
     Identifier(yyltype loc, const char *name);
     friend std::ostream& operator<<(std::ostream& out, Identifier *id) { return out << id->name; }
 
-    const char * get_name() const { return name; }
+    const std::string & get_name() const { return name; }
 };
 
 

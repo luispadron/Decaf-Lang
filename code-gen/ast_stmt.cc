@@ -40,7 +40,7 @@ void Program::Emit() {
     for (int i = 0; i < decls->Size(); ++i) {
         auto decl = decls->Get(i);
         if (decl->get_decl_type() == DeclType::Function &&
-            strcmp(decl->get_id()->get_name(), "main") == 0) {
+            decl->get_id()->get_name() == "main") {
             found_main = true;
         }
     }

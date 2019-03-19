@@ -37,7 +37,13 @@ public:
 
     virtual Identifier * get_id() const { return id; }
 
+    /// returns type of the decl, either class, function, interface or variable
     virtual DeclType get_decl_type() const = 0;
+
+    /// returns the prefix for the label, that is, the prefix used for MIPS label
+    virtual std::string get_label_prefix() const { return ""; }
+
+    virtual std::string get_mips_label() const { return "_" + id->get_name(); }
 };
 
 class VarDecl : public Decl {
@@ -53,6 +59,8 @@ public:
     Location * get_location() const { return location; }
 
     DeclType get_decl_type() const override { return DeclType::Variable; }
+
+    std::string get_mips_label() const override { return g_codeGen->NewLabel(); }
 
     void Emit() override;
 };
@@ -70,6 +78,10 @@ public:
 
     DeclType get_decl_type() const override { return DeclType::Class; }
 
+    std::string get_label_prefix() const override { return "_" + id->get_name() + "."; }
+
+    std::string get_mips_label() const override { return id->get_name(); }
+
     void Emit() override;
 };
 
@@ -82,6 +94,8 @@ public:
     InterfaceDecl(Identifier *name, List<Decl*> *members);
 
     DeclType get_decl_type() const override { return DeclType::Interface; }
+
+    std::string get_label_prefix() const override { return "_" + id->get_name() + "."; }
 
     void Emit() override;
 };
@@ -99,6 +113,13 @@ public:
     void SetFunctionBody(Stmt *b);
 
     DeclType get_decl_type() const override { return DeclType::Function; }
+
+    std::string get_label_prefix() const override {
+        if (id->get_name() == "main") return "";
+        else return "_";
+    }
+
+    std::string get_mips_label() const override;
 
     void Emit() override;
 };

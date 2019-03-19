@@ -25,7 +25,7 @@ VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
 
 void VarDecl::set_location(Segment segment, int offset) {
     delete location;
-    location = new Location(segment, offset, id->get_name());
+    location = new Location(segment, offset, id->get_name().c_str());
 }
 
 void VarDecl::Emit() {
@@ -50,7 +50,7 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
 
 void ClassDecl::Emit() {
     // add new scope, push all declarations into scope
-    auto scope = SymTbl::shared().enter_scope(id->get_name(), ScopeType::Class);
+    auto scope = SymTbl::shared().enter_scope(get_mips_label(), ScopeType::Class);
     for (int i = 0; i < members->Size(); ++i) {
         scope->insert_decl(members->Get(i)->get_id()->get_name(), members->Get(i));
     }
@@ -70,7 +70,7 @@ InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
 
 void InterfaceDecl::Emit() {
     // add new scope, push all declarations into scope
-    auto scope = SymTbl::shared().enter_scope(id->get_name(), ScopeType::Interface);
+    auto scope = SymTbl::shared().enter_scope(get_mips_label(), ScopeType::Interface);
     for (int i = 0; i < members->Size(); ++i) {
         scope->insert_decl(members->Get(i)->get_id()->get_name(), members->Get(i));
     }
@@ -90,9 +90,24 @@ void FnDecl::SetFunctionBody(Stmt *b) {
     (body=b)->SetParent(this);
 }
 
+string FnDecl::get_mips_label() const {
+    string label;
+    // traverse up the AST getting the correct label
+    for (auto p = parent; p; p = p->GetParent()) {
+        auto decl = dynamic_cast<Decl*>(p);
+        if (decl) {
+            label = decl->get_label_prefix() + label;
+        }
+    }
+
+    label.append(id->get_name());
+
+    return label;
+}
+
 void FnDecl::Emit() {
     // add new scope, push all parameters declarations into scope
-    auto scope = SymTbl::shared().enter_scope(id->get_name(), ScopeType::Function);
+    auto scope = SymTbl::shared().enter_scope(get_mips_label(), ScopeType::Function);
     for (int i = 0; i < formals->Size(); ++i) {
         scope->insert_decl(formals->Get(i)->get_id()->get_name(), formals->Get(i));
     }
@@ -111,6 +126,7 @@ void FnDecl::Emit() {
             );
 
     // generate function code
+    g_codeGen->GenLabel(get_mips_label().c_str());
     auto fnCode = g_codeGen->GenBeginFunc();
     fnCode->SetFrameSize(abs(bodyOffset) - 8);
 

@@ -13,11 +13,9 @@ using namespace std;
 Scope* SymbolTable::enter_scope(const string &name, ScopeType type) {
 
     // create the scope names
-    string scope_name;
+    string scope_name = name;
     if (type == ScopeType::Block) {
         scope_name = scope_ptr->name_ + "_" + name + to_string(scope_ptr->block_counter++);
-    } else if (scope_ptr && scope_ptr->this_ptr) {
-        scope_name = scope_ptr->this_ptr->name_ + "_" + name;
     }
 
     if (scopes.find(scope_name) != scopes.end()) {
