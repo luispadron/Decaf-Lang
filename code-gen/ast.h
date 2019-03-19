@@ -43,9 +43,7 @@ class Type;
 
 // Global singleton for symbol table
 using Sym_tbl_t = SymbolTable;
-
-// Global code generator object
-extern CodeGenerator *g_codeGen;
+using Cgen_t = CodeGenerator;
 
 class Node {
 protected:

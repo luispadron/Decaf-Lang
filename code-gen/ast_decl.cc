@@ -72,6 +72,25 @@ void FnDecl::check(Scope *class_or_interface_scope) {
     Sym_tbl_t::shared().leave_scope();
 }
 
+void FnDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
+    // prepare offsets
+    Cgen_t::shared().curr_segment = Segment::fpRelative;
+    Cgen_t::shared().next_local_offset = Cgen_t::offset_first_local;
+    Cgen_t::shared().next_param_offset = Cgen_t::offset_first_param;
+
+    // generate function label and begin function code
+    const auto &label = get_mangled_name(class_or_interface_scope ? class_or_interface_scope->name() : "");
+    Cgen_t::shared().gen_label(label.c_str());
+    auto func_code = Cgen_t::shared().gen_begin_func();
+
+    // reset config for generator
+    Cgen_t::shared().curr_segment = Segment::gpRelative;
+    Cgen_t::shared().curr_func_frame_size = 0;
+    // end function code and pop scope
+    Sym_tbl_t::shared().leave_scope();
+    Cgen_t::shared().gen_end_func();
+}
+
 
 InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
     Assert(n != nullptr && m != nullptr);

@@ -8,8 +8,6 @@
 
 #include <cstring>
 
-CodeGenerator *g_codeGen = new CodeGenerator();
-
 Node::Node(yyltype loc) {
     location = new yyltype(loc);
     parent = nullptr;

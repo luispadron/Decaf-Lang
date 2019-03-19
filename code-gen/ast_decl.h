@@ -24,6 +24,7 @@ class Identifier;
 class Stmt;
 class Expr;
 class Call;
+class FnDecl;
 
 /// Declares the different types of decls
 enum class DeclType { Variable, Class, Function, Interface };
@@ -45,6 +46,8 @@ public:
     Type* type_check() override;
 
     virtual void check(Scope *class_or_interface_scope) = 0;
+
+    virtual void emit(Scope *class_or_interface_scope, FnDecl *curr_func) { }
 };
 
 
@@ -77,6 +80,8 @@ public:
     std::string get_mangled_name(const std::string &class_or_interface_name) const;
 
     void check(Scope *class_or_interface_scope) override;
+
+    void emit(Scope *class_or_interface_scope, FnDecl *curr_func) override;
 };
 
 
