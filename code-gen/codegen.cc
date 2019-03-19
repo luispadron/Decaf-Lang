@@ -25,33 +25,30 @@ char *CodeGenerator::NewLabel() {
 Location *CodeGenerator::GenTempVar() {
   static int nextTempNum;
   char temp[10];
-  Location *result = NULL;
+  Location *result = nullptr;
   sprintf(temp, "_tmp%d", nextTempNum++);
   /* pp4: need to create variable in proper location
      in stack frame for use as temporary. Until you
      do that, the assert below will always fail to remind
      you this needs to be implemented  */
-  Assert(result != NULL);
+  Assert(result);
   return result;
 }
 
  
-Location *CodeGenerator::GenLoadConstant(int value)
-{
+Location *CodeGenerator::GenLoadConstant(int value) {
   Location *result = GenTempVar();
   code->Append(new LoadConstant(result, value));
   return result;
 }
 
-Location *CodeGenerator::GenLoadConstant(const char *s)
-{
+Location *CodeGenerator::GenLoadConstant(const char *s) {
   Location *result = GenTempVar();
   code->Append(new LoadStringConstant(result, s));
   return result;
 } 
 
-Location *CodeGenerator::GenLoadLabel(const char *label)
-{
+Location *CodeGenerator::GenLoadLabel(const char *label) {
   Location *result = GenTempVar();
   code->Append(new LoadLabel(result, label));
   return result;
@@ -78,8 +75,7 @@ void CodeGenerator::GenStore(Location *dst,Location *src, int offset)
 
 
 Location *CodeGenerator::GenBinaryOp(const char *opName, Location *op1,
-						     Location *op2)
-{
+						     Location *op2) {
   Location *result = GenTempVar();
   code->Append(new BinaryOp(BinaryOp::OpCodeForName(opName), result, op1, op2));
   return result;

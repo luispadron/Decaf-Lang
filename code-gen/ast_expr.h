@@ -21,137 +21,139 @@ class NamedType; // for new
 class Type; // for NewArray
 
 
-class Expr : public Stmt 
-{
-  public:
-    Expr(yyltype loc) : Stmt(loc) {}
+class Expr : public Stmt {
+public:
+    explicit Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
+
+    virtual Location * emit_with_location() { return nullptr; }
 };
 
 /* This node type is used for those places where an expression is optional.
  * We could use a NULL pointer, but then it adds a lot of checking for
  * NULL. By using a valid, but no-op, node, we save that trouble */
-class EmptyExpr : public Expr
-{
-  public:
+class EmptyExpr : public Expr {
+public:
 };
 
-class IntConstant : public Expr 
-{
-  protected:
+class IntConstant : public Expr {
+protected:
     int value;
-  
-  public:
+
+public:
     IntConstant(yyltype loc, int val);
+
+    Location * emit_with_location() override;
 };
 
-class DoubleConstant : public Expr 
-{
-  protected:
+class DoubleConstant : public Expr {
+protected:
     double value;
-    
-  public:
+
+public:
     DoubleConstant(yyltype loc, double val);
+
+    Location * emit_with_location() override;
 };
 
-class BoolConstant : public Expr 
-{
-  protected:
+class BoolConstant : public Expr {
+protected:
     bool value;
-    
-  public:
+
+public:
     BoolConstant(yyltype loc, bool val);
+
+    Location * emit_with_location() override;
 };
 
-class StringConstant : public Expr 
-{ 
-  protected:
+class StringConstant : public Expr {
+protected:
     char *value;
-    
-  public:
+
+public:
     StringConstant(yyltype loc, const char *val);
+
+    Location * emit_with_location() override;
 };
 
-class NullConstant: public Expr 
-{
-  public: 
-    NullConstant(yyltype loc) : Expr(loc) {}
+class NullConstant: public Expr {
+public:
+    explicit NullConstant(yyltype loc) : Expr(loc) {}
+
+    Location * emit_with_location() override;
 };
 
-class Operator : public Node 
-{
-  protected:
+class Operator : public Node {
+protected:
     char tokenString[4];
-    
-  public:
+
+public:
     Operator(yyltype loc, const char *tok);
+
     friend std::ostream& operator<<(std::ostream& out, Operator *o) { return out << o->tokenString; }
- };
- 
-class CompoundExpr : public Expr
-{
-  protected:
+
+    const char * get_op_token() const { return tokenString; }
+};
+
+class CompoundExpr : public Expr {
+protected:
     Operator *op;
     Expr *left, *right; // left will be NULL if unary
-    
-  public:
+
+public:
     CompoundExpr(Expr *lhs, Operator *op, Expr *rhs); // for binary
     CompoundExpr(Operator *op, Expr *rhs);             // for unary
 };
 
-class ArithmeticExpr : public CompoundExpr 
-{
-  public:
+class ArithmeticExpr : public CompoundExpr {
+public:
     ArithmeticExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     ArithmeticExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
+
+    Location * emit_with_location() override;
+
+    void Emit() override;
 };
 
-class RelationalExpr : public CompoundExpr 
-{
-  public:
+class RelationalExpr : public CompoundExpr {
+public:
     RelationalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 };
 
-class EqualityExpr : public CompoundExpr 
-{
-  public:
+class EqualityExpr : public CompoundExpr {
+public:
     EqualityExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     const char *GetPrintNameForNode() { return "EqualityExpr"; }
 };
 
-class LogicalExpr : public CompoundExpr 
-{
-  public:
+class LogicalExpr : public CompoundExpr {
+public:
     LogicalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     LogicalExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
     const char *GetPrintNameForNode() { return "LogicalExpr"; }
 };
 
-class AssignExpr : public CompoundExpr 
-{
-  public:
+class AssignExpr : public CompoundExpr {
+public:
     AssignExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     const char *GetPrintNameForNode() { return "AssignExpr"; }
 };
 
-class LValue : public Expr 
-{
-  public:
-    LValue(yyltype loc) : Expr(loc) {}
+class LValue : public Expr {
+public:
+    explicit LValue(yyltype loc) : Expr(loc) {}
 };
 
-class This : public Expr 
-{
-  public:
-    This(yyltype loc) : Expr(loc) {}
+class This : public Expr {
+public:
+    explicit This(yyltype loc) : Expr(loc) {}
 };
 
-class ArrayAccess : public LValue 
-{
-  protected:
+class ArrayAccess : public LValue {
+protected:
     Expr *base, *subscript;
-    
-  public:
+
+public:
     ArrayAccess(yyltype loc, Expr *base, Expr *subscript);
 };
 
@@ -160,13 +162,12 @@ class ArrayAccess : public LValue
  * know for sure whether there is an implicit "this." in
  * front until later on, so we use one node type for either
  * and sort it out later. */
-class FieldAccess : public LValue 
-{
-  protected:
+class FieldAccess : public LValue {
+protected:
     Expr *base;	// will be NULL if no explicit base
     Identifier *field;
-    
-  public:
+
+public:
     FieldAccess(Expr *base, Identifier *field); //ok to pass NULL base
 };
 
@@ -174,47 +175,42 @@ class FieldAccess : public LValue
  * and unqualified field().  We won't figure out until later
  * whether we need implicit "this." so we use one node type for either
  * and sort it out later. */
-class Call : public Expr 
-{
-  protected:
+class Call : public Expr {
+protected:
     Expr *base;	// will be NULL if no explicit base
     Identifier *field;
     List<Expr*> *actuals;
-    
-  public:
+
+public:
     Call(yyltype loc, Expr *base, Identifier *field, List<Expr*> *args);
 };
 
-class NewExpr : public Expr
-{
-  protected:
+class NewExpr : public Expr{
+protected:
     NamedType *cType;
-    
-  public:
+
+public:
     NewExpr(yyltype loc, NamedType *clsType);
 };
 
-class NewArrayExpr : public Expr
-{
-  protected:
+class NewArrayExpr : public Expr {
+protected:
     Expr *size;
     Type *elemType;
-    
-  public:
+
+public:
     NewArrayExpr(yyltype loc, Expr *sizeExpr, Type *elemType);
 };
 
-class ReadIntegerExpr : public Expr
-{
-  public:
-    ReadIntegerExpr(yyltype loc) : Expr(loc) {}
+class ReadIntegerExpr : public Expr {
+public:
+    explicit ReadIntegerExpr(yyltype loc) : Expr(loc) {}
 };
 
-class ReadLineExpr : public Expr
-{
-  public:
-    ReadLineExpr(yyltype loc) : Expr (loc) {}
+class ReadLineExpr : public Expr {
+public:
+    explicit ReadLineExpr(yyltype loc) : Expr (loc) {}
 };
 
-    
+
 #endif
