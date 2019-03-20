@@ -110,6 +110,10 @@ Type* ArithmeticExpr::type_check() {
     }
 }
 
+int ArithmeticExpr::get_bytes() const {
+    return 0; // TODO
+}
+
 Location * ArithmeticExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
     return nullptr;
 }
@@ -127,6 +131,10 @@ Type* RelationalExpr::type_check() {
     }
 }
 
+int RelationalExpr::get_bytes() const {
+    return 0; // TODO
+}
+
 Location * RelationalExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
     return nullptr;
 }
@@ -142,6 +150,10 @@ Type* EqualityExpr::type_check() {
     } else {
         return Type::boolType;
     }
+}
+
+int EqualityExpr::get_bytes() const {
+    return 0; // TODO
 }
 
 Location * EqualityExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
@@ -162,6 +174,10 @@ Type* LogicalExpr::type_check() {
     }
 }
 
+int LogicalExpr::get_bytes() const {
+    return 0; // TODO
+}
+
 Location * LogicalExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
     return nullptr;
 }
@@ -177,6 +193,10 @@ Type * AssignExpr::type_check() {
     } else {
         return right->type_check();
     }
+}
+
+int AssignExpr::get_bytes() const {
+    return 0; // TODO
 }
 
 Location * AssignExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
@@ -226,6 +246,10 @@ Type * ArrayAccess::type_check() {
     }
 }
 
+int ArrayAccess::get_bytes() const {
+    return 0; // TODO
+}
+
 
 FieldAccess::FieldAccess(Expr *b, Identifier *f) 
   : LValue(b? Join(b->get_location(), f->get_location()) : *f->get_location()) {
@@ -253,6 +277,10 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
 Type* Call::type_check() {
     // not implemented for this project
     return Type::errorType;
+}
+
+int Call::get_bytes() const {
+    return 0; // TODO
 }
 
 
@@ -294,6 +322,10 @@ Type* NewArrayExpr::type_check() {
     } else {
         return arrayType;
     }
+}
+
+int NewArrayExpr::get_bytes() const {
+    return 0; // TODO
 }
 
 

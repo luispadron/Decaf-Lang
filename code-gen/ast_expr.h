@@ -25,6 +25,8 @@ public:
     explicit Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
 
+    virtual int get_bytes() const { return 0; }
+
     virtual Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const { return nullptr; }
 };
 
@@ -47,6 +49,8 @@ public:
 
     Type * type_check() override;
 
+    int get_bytes() const override { return CodeGenerator::word_size; }
+
     Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
@@ -59,6 +63,8 @@ public:
     DoubleConstant(yyltype loc, double val);
 
     Type * type_check() override;
+
+    int get_bytes() const override { return CodeGenerator::word_size; }
 
     Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
@@ -73,6 +79,8 @@ public:
 
     Type * type_check() override;
 
+    int get_bytes() const override { return CodeGenerator::word_size; }
+
     Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
@@ -86,6 +94,8 @@ public:
 
     Type * type_check() override;
 
+    int get_bytes() const override { return CodeGenerator::word_size; }
+
     Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
@@ -95,6 +105,8 @@ public:
     explicit NullConstant(yyltype loc) : Expr(loc) { }
 
     Type * type_check() override;
+
+    int get_bytes() const override { return CodeGenerator::word_size; }
 
     Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
@@ -134,6 +146,8 @@ public:
 
     Type * type_check() override;
 
+    int get_bytes() const override;
+
     Location *emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
@@ -147,6 +161,8 @@ public:
 
     Type * type_check() override;
 
+    int get_bytes() const override;
+
     Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
@@ -159,6 +175,8 @@ public:
     EqualityExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 
     Type * type_check() override;
+
+    int get_bytes() const override;
 
     Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
@@ -175,6 +193,8 @@ public:
 
     Type * type_check() override;
 
+    int get_bytes() const override;
+
     Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
@@ -187,6 +207,8 @@ public:
     AssignExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 
     Type * type_check() override;
+
+    int get_bytes() const override;
 
     Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
@@ -214,6 +236,8 @@ public:
     ArrayAccess(yyltype loc, Expr *base, Expr *subscript);
 
     Type * type_check() override;
+
+    int get_bytes() const override;
 };
 
 
@@ -248,6 +272,8 @@ public:
     Call(yyltype loc, Expr *base, Identifier *field, List<Expr*> *args);
 
     Type * type_check() override;
+
+    int get_bytes() const override;
 };
 
 
@@ -275,6 +301,8 @@ public:
     NewArrayExpr(yyltype loc, Expr *sizeExpr, Type *elemType);
 
     Type * type_check() override;
+
+    int get_bytes() const override;
 };
 
 
