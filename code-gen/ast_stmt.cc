@@ -25,7 +25,7 @@ string StmtBlock::get_mangled_name(const std::string &func_name) const {
 
 void StmtBlock::check(Scope *function_scope) {
     Assert(function_scope);
-    auto scope = Sym_tbl_t::shared().enter_scope(get_mangled_name(function_scope->name()), ScopeType::Block);
+    auto scope = Sym_tbl_t::shared().create_scope(get_mangled_name(function_scope->name()), ScopeType::Block);
 
     for (int i = 0; i < decls->size(); ++i) {
 

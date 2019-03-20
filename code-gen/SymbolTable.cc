@@ -10,7 +10,7 @@
 
 using namespace std;
 
-Scope* SymbolTable::enter_scope(const string &name, ScopeType type) {
+Scope * SymbolTable::create_scope(const string &name, ScopeType type) {
     if (scopes.find(name) != scopes.end()) {
         assert(false);
         return nullptr;
@@ -31,6 +31,16 @@ Scope* SymbolTable::enter_scope(const string &name, ScopeType type) {
     scopes.insert({name, new_scope});
 
     return new_scope;
+}
+
+Scope * SymbolTable::enter_scope(const std::string &name) {
+    auto scope_it = scopes.find(name);
+    if (scope_it != scopes.end()) {
+        return scope_it->second;
+    } else {
+        assert(false);
+        return nullptr;
+    }
 }
 
 bool SymbolTable::leave_scope() {

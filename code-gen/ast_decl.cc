@@ -55,10 +55,10 @@ string FnDecl::get_mangled_name(const std::string &class_or_interface_name) cons
 
 void FnDecl::check(Scope *class_or_interface_scope) {
     Scope *scope = Sym_tbl_t::shared()
-            .enter_scope(
+            .create_scope(
                     get_mangled_name(class_or_interface_scope ? class_or_interface_scope->name() : ""),
                     ScopeType::Function
-                    );
+            );
 
     // push all formals into scope
     for (int i = 0; i < formals->size(); ++i) {
@@ -99,7 +99,7 @@ InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
 }
 
 void InterfaceDecl::check(Scope *class_or_interface_scope) {
-    auto scope = Sym_tbl_t::shared().enter_scope(id->get_name(), ScopeType::Interface);
+    auto scope = Sym_tbl_t::shared().create_scope(id->get_name(), ScopeType::Interface);
 
     // insert all decls into class scope
     for (int i = 0; i < members->size(); ++i) {
@@ -126,7 +126,7 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
 }
 
 void ClassDecl::check(Scope *class_or_interface_scope) {
-    auto scope = Sym_tbl_t::shared().enter_scope(id->get_name(), ScopeType::Class);
+    auto scope = Sym_tbl_t::shared().create_scope(id->get_name(), ScopeType::Class);
 
     // insert all decls into class scope
     for (int i = 0; i < members->size(); ++i) {

@@ -13,15 +13,38 @@
 class SymbolTable {
 public:
 
+    /**
+     * @return SymbolTable &, returns a singleton instance to a SymbolTable object.
+     */
     static SymbolTable & shared() {
         static SymbolTable s;
         return s;
     }
 
-    /// adds a scope, returns the newly created scope
-    Scope * enter_scope(const std::string &name, ScopeType type);
+    /**
+     * Adds a scope to the symbol table and enters it, that is, the new scope will be the current scope.
 
-    /// leaves the current scope
+     * @param name, the name of the scope (usually a mangled name in order to be unique).
+     * @param type, the type of the scope.
+     * @return Scope *, the new scope that was created
+     */
+    Scope * create_scope(const std::string &name, ScopeType type);
+
+    /**
+     * Enters a given scope, that is, sets the current scope to the given scope.
+     * The scope must have been previously created.
+     *
+     * @param name, the scope name to enter.
+     * @return Scope *, a pointer to the entered scope, nullptr if no scope with given name exists.
+     */
+    Scope * enter_scope(const std::string &name);
+
+    /**
+     * Leaves a currently entered scope.
+     * If no current scope is available, false is returned. Otherwise returns true.
+
+     * @return bool, whether the scope was left successfully
+     */
     bool leave_scope();
 
     /// returns the current scope
