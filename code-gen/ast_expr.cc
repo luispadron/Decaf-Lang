@@ -20,6 +20,10 @@ Type* IntConstant::type_check() {
     return Type::intType;
 }
 
+Location* IntConstant::gen_location(FnDecl *curr_func) const {
+    return nullptr;
+}
+
 
 DoubleConstant::DoubleConstant(yyltype loc, double val) : Expr(loc) {
     value = val;
@@ -29,6 +33,10 @@ Type* DoubleConstant::type_check() {
     return Type::doubleType;
 }
 
+Location* DoubleConstant::gen_location(FnDecl *curr_func) const {
+    return nullptr;
+}
+
 
 BoolConstant::BoolConstant(yyltype loc, bool val) : Expr(loc) {
     value = val;
@@ -36,6 +44,10 @@ BoolConstant::BoolConstant(yyltype loc, bool val) : Expr(loc) {
 
 Type* BoolConstant::type_check() {
     return Type::boolType;
+}
+
+Location* BoolConstant::gen_location(FnDecl *curr_func) const {
+    return nullptr;
 }
 
 
@@ -48,9 +60,17 @@ Type* StringConstant::type_check() {
     return Type::stringType;
 }
 
+Location* StringConstant::gen_location(FnDecl *curr_func) const {
+    return nullptr;
+}
+
 
 Type* NullConstant::type_check() {
     return Type::nullType;
+}
+
+Location* NullConstant::gen_location(FnDecl *curr_func) const {
+    return nullptr;
 }
 
 
@@ -90,11 +110,14 @@ Type* ArithmeticExpr::type_check() {
     }
 }
 
+Location* ArithmeticExpr::gen_location(FnDecl *curr_func) const {
+    return nullptr;
+}
+
 
 bool RelationalExpr::validate() {
     return left->type_check()->can_perform_relational_with(right->type_check());
 }
-
 
 Type* RelationalExpr::type_check() {
     if (!validate()) {
@@ -102,6 +125,10 @@ Type* RelationalExpr::type_check() {
     } else {
         return Type::boolType;
     }
+}
+
+Location* RelationalExpr::gen_location(FnDecl *curr_func) const {
+    return nullptr;
 }
 
 
@@ -115,6 +142,10 @@ Type* EqualityExpr::type_check() {
     } else {
         return Type::boolType;
     }
+}
+
+Location* EqualityExpr::gen_location(FnDecl *curr_func) const {
+    return nullptr;
 }
 
 
@@ -131,6 +162,10 @@ Type* LogicalExpr::type_check() {
     }
 }
 
+Location* LogicalExpr::gen_location(FnDecl *curr_func) const {
+    return nullptr;
+}
+
 
 bool AssignExpr::validate() {
     return left->type_check()->can_perform_assignment_with(right->type_check());
@@ -142,6 +177,10 @@ Type * AssignExpr::type_check() {
     } else {
         return right->type_check();
     }
+}
+
+Location* AssignExpr::gen_location(FnDecl *curr_func) const {
+    return nullptr;
 }
 
 
@@ -198,31 +237,7 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
 
 
 Type* FieldAccess::type_check() {
-//    if (base) {
-//        auto btype = base->type_check();
-//        // only named types can use . syntax
-//        if (!btype->is_named_type()) { return Type::errorType; }
-//        // perform another type check on the named type, since we need to make sure name is defined
-//        if (btype->type_check() == Type::errorType) { return Type::errorType; }
-//
-//        // not found, thus this field doesnt exist in class
-//        if (!Sym_tbl_t::shared().is_declared_in_scope(btype->get_type_name(), field->get_name())) { return Type::errorType; }
-//        // found in sym table, simply return the type of the decl, if its a var decl
-//        auto decl = Sym_tbl_t::shared().get_declaration_in_scope(btype->get_type_name(), field->get_name());
-//        // if not a var decl, this is an error
-//        if (decl->get_decl_type() != DeclType::Variable) { return Type::errorType; }
-//        // everything is good, return type of decl
-//        return decl->type_check();
-//    } else {
-//        // field not found in current scope, error
-//        if (!field->is_defined()) { return Type::errorType; }
-//        // found in sym table, simply return the type of the decl, if its a var decl
-//        auto decl = Sym_tbl_t::shared().get_declaration(field->get_name());
-//        // if not a var decl, this is an error
-//        if (decl->get_decl_type() != DeclType::Variable) { return Type::errorType; }
-//        // everything is good, return type of decl
-//        return decl->type_check();
-//    }
+    // not implemented for this project
     return Type::errorType;
 }
 
@@ -236,28 +251,7 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
 }
 
 Type* Call::type_check() {
-//    if (base) {
-//        auto btype = base->type_check();
-//        // only named types can use . syntax
-//        if (!btype->is_named_type()) { return Type::errorType; }
-//        // not found, thus this field doesnt exist in class
-//        if (!Sym_tbl_t::shared().is_declared_in_scope(btype->get_type_name(), field->get_name())) { return Type::errorType; }
-//        // found in sym table, simply return the type of the decl, if its a function decl
-//        auto decl = Sym_tbl_t::shared().get_declaration_in_scope(btype->get_type_name(), field->get_name());
-//        // if not a function decl, this is an error
-//        if (decl->get_decl_type() != DeclType::Function) { return Type::errorType; }
-//        // everything is good, return type of decl
-//        return decl->type_check();
-//    } else {
-//        // field not found in current scope, error
-//        if (!field->is_defined()) { return Type::errorType; }
-//        // found in sym table, simply return the type of the decl, if its a function decl
-//        auto decl = Sym_tbl_t::shared().get_declaration(field->get_name());
-//        // if not a function decl, this is an error
-//        if (decl->get_decl_type() != DeclType::Function) { return Type::errorType; }
-//        // everything is good, return type of decl
-//        return decl->type_check();
-//    }
+    // not implemented for this project
     return Type::errorType;
 }
 

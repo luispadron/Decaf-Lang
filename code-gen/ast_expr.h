@@ -25,7 +25,7 @@ public:
     explicit Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
 
-    virtual bool is_this_expr() const { return false; }
+    virtual Location * gen_location(FnDecl *curr_func) const { return nullptr; }
 };
 
 
@@ -46,6 +46,8 @@ public:
     IntConstant(yyltype loc, int val);
 
     Type * type_check() override;
+
+    Location * gen_location(FnDecl *curr_func) const override;
 };
 
 
@@ -57,6 +59,8 @@ public:
     DoubleConstant(yyltype loc, double val);
 
     Type * type_check() override;
+
+    Location * gen_location(FnDecl *curr_func) const override;
 };
 
 
@@ -68,6 +72,8 @@ public:
     BoolConstant(yyltype loc, bool val);
 
     Type * type_check() override;
+
+    Location * gen_location(FnDecl *curr_func) const override;
 };
 
 
@@ -79,6 +85,8 @@ public:
     StringConstant(yyltype loc, const char *val);
 
     Type * type_check() override;
+
+    Location * gen_location(FnDecl *curr_func) const override;
 };
 
 
@@ -87,6 +95,8 @@ public:
     explicit NullConstant(yyltype loc) : Expr(loc) { }
 
     Type * type_check() override;
+
+    Location * gen_location(FnDecl *curr_func) const override;
 };
 
 
@@ -123,16 +133,21 @@ public:
     ArithmeticExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
 
     Type * type_check() override;
+
+    Location * gen_location(FnDecl *curr_func) const override;
 };
 
 
 class RelationalExpr : public CompoundExpr {
-    bool validate();
+protected:
+    bool validate() override;
 
 public:
     RelationalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 
     Type * type_check() override;
+
+    Location * gen_location(FnDecl *curr_func) const override;
 };
 
 
@@ -144,6 +159,8 @@ public:
     EqualityExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 
     Type * type_check() override;
+
+    Location * gen_location(FnDecl *curr_func) const override;
 };
 
 
@@ -157,6 +174,8 @@ public:
     LogicalExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
 
     Type * type_check() override;
+
+    Location * gen_location(FnDecl *curr_func) const override;
 };
 
 
@@ -168,6 +187,8 @@ public:
     AssignExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 
     Type * type_check() override;
+
+    Location * gen_location(FnDecl *curr_func) const override;
 };
 
 
@@ -180,8 +201,6 @@ public:
 class This : public Expr {
 public:
     explicit This(yyltype loc) : Expr(loc) {}
-
-    bool is_this_expr() const override { return true; }
 
     Type * type_check() override;
 };
