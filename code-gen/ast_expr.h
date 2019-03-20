@@ -1,12 +1,9 @@
-/* File: ast_expr.h
+/** File: ast_expr.h
  * ----------------
  * The Expr class and its subclasses are used to represent
  * expressions in the parse tree.  For each expression in the
  * language (add, call, New, etc.) there is a corresponding
- * node class for that construct. 
- *
- * pp3: You will need to extend the Expr classes to implement 
- * semantic analysis for rules pertaining to expressions.
+ * node class for that construct.
  */
 
 
@@ -25,15 +22,23 @@ public:
     explicit Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
 
+    /// returns the bytes required for an expression
+    /// any subclass which requires more than 0 bytes has to implement this
     virtual int get_bytes() const { return 0; }
 
+    /// emits the code required to perform an expression
+    /// if the expression generates a new location,
+    /// be it temporary, local, etc. that location is returned,
+    /// otherwise nullptr is returned
     virtual Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const { return nullptr; }
 };
 
 
-/* This node type is used for those places where an expression is optional.
+/**
+ * This node type is used for those places where an expression is optional.
  * We could use a NULL pointer, but then it adds a lot of checking for
- * NULL. By using a valid, but no-op, node, we save that trouble */
+ * NULL. By using a valid, but no-op, node, we save that trouble
+ */
 class EmptyExpr : public Expr {
 public:
     Type * type_check() override { return Type::voidType; }
@@ -241,11 +246,13 @@ public:
 };
 
 
-/* Note that field access is used both for qualified names
+/**
+ * Note that field access is used both for qualified names
  * base.field and just field without qualification. We don't
  * know for sure whether there is an implicit "this." in
  * front until later on, so we use one node type for either
- * and sort it out later. */
+ * and sort it out later.
+ */
 class FieldAccess : public LValue {
 protected:
     Expr *base;	// will be NULL if no explicit base
@@ -258,10 +265,12 @@ public:
 };
 
 
-/* Like field access, call is used both for qualified base.field()
+/**
+ * Like field access, call is used both for qualified base.field()
  * and unqualified field().  We won't figure out until later
  * whether we need implicit "this." so we use one node type for either
- * and sort it out later. */
+ * and sort it out later.
+ */
 class Call : public Expr {
 protected:
     Expr *base;	// will be NULL if no explicit base
