@@ -40,6 +40,8 @@ void Program::check() {
     }
 
     Sym_tbl_t::shared().debug_print();
+
+    Sym_tbl_t::shared().leave_scope();
 }
 
 
@@ -53,5 +55,9 @@ void Program::check() {
  * 4. Call "emit" on any declarations within the program.
  */
 void Program::emit() {
+    Sym_tbl_t::shared().enter_scope("global");
 
+    // TODO: Add code
+
+    Sym_tbl_t::shared().leave_scope();
 }

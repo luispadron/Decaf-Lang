@@ -22,6 +22,11 @@ public:
     }
 
     /**
+     * Clean up the memory by deleting all scopes
+     */
+    ~SymbolTable();
+
+    /**
      * Adds a scope to the symbol table and enters it, that is, the new scope will be the current scope.
 
      * @param name, the name of the scope (usually a mangled name in order to be unique).

@@ -51,8 +51,6 @@ private:
 
     std::string name_;
 
-    int block_counter = 1;
-
     ScopeType type;
 
     Scope *parent_ptr = nullptr;

@@ -10,6 +10,12 @@
 
 using namespace std;
 
+SymbolTable::~SymbolTable() {
+    for (const auto &scope_it : scopes) {
+        delete scope_it.second;
+    }
+}
+
 Scope * SymbolTable::create_scope(const string &name, ScopeType type) {
     if (scopes.find(name) != scopes.end()) {
         assert(false);
