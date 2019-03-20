@@ -39,23 +39,42 @@ public:
     explicit Decl(Identifier *name);
     friend std::ostream& operator<<(std::ostream& out, Decl *d) { return out << d->id; }
 
+    /// returns the id of a decl
     Identifier * get_id() { return id; }
 
+    /// returns the type of a decl
     virtual DeclType get_decl_type() const = 0;
 
+    /// returns the byte size of a decl
+    virtual int get_bytes() const { return 0; }
+
+    /// returns the type of a decl
     Type* type_check() override;
 
+    /// runs semantic checking on a decl
     virtual void check(Scope *class_or_interface_scope) = 0;
 
+    /// generates code for a decl
     virtual void emit(Scope *class_or_interface_scope, FnDecl *curr_func) { }
 };
 
 
 class VarDecl : public Decl {
+private:
+    Location *location = nullptr;
+
 public:
     VarDecl(Identifier *name, Type *type);
 
     DeclType get_decl_type() const override { return DeclType::Variable; }
+
+    int get_bytes() const override { return CodeGenerator::word_size; }
+
+    /// returns the memory location of this variable
+    Location * get_location() const { return location; }
+
+    /// sets the memory location of this variable
+    void set_location(Location *new_loc) { location = new_loc; }
 
     void check(Scope *class_or_interface_scope) override;
 };

@@ -25,7 +25,7 @@ public:
     explicit Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
 
-    virtual Location * gen_location(FnDecl *curr_func) const { return nullptr; }
+    virtual Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const { return nullptr; }
 };
 
 
@@ -47,7 +47,7 @@ public:
 
     Type * type_check() override;
 
-    Location * gen_location(FnDecl *curr_func) const override;
+    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 
@@ -60,7 +60,7 @@ public:
 
     Type * type_check() override;
 
-    Location * gen_location(FnDecl *curr_func) const override;
+    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 
@@ -73,7 +73,7 @@ public:
 
     Type * type_check() override;
 
-    Location * gen_location(FnDecl *curr_func) const override;
+    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 
@@ -86,7 +86,7 @@ public:
 
     Type * type_check() override;
 
-    Location * gen_location(FnDecl *curr_func) const override;
+    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 
@@ -96,7 +96,7 @@ public:
 
     Type * type_check() override;
 
-    Location * gen_location(FnDecl *curr_func) const override;
+    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 
@@ -134,7 +134,7 @@ public:
 
     Type * type_check() override;
 
-    Location * gen_location(FnDecl *curr_func) const override;
+    Location *emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 
@@ -147,7 +147,7 @@ public:
 
     Type * type_check() override;
 
-    Location * gen_location(FnDecl *curr_func) const override;
+    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 
@@ -160,7 +160,7 @@ public:
 
     Type * type_check() override;
 
-    Location * gen_location(FnDecl *curr_func) const override;
+    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 
@@ -175,7 +175,7 @@ public:
 
     Type * type_check() override;
 
-    Location * gen_location(FnDecl *curr_func) const override;
+    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 
@@ -188,7 +188,7 @@ public:
 
     Type * type_check() override;
 
-    Location * gen_location(FnDecl *curr_func) const override;
+    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 

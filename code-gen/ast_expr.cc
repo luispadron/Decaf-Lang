@@ -20,7 +20,7 @@ Type* IntConstant::type_check() {
     return Type::intType;
 }
 
-Location* IntConstant::gen_location(FnDecl *curr_func) const {
+Location * IntConstant::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
     return nullptr;
 }
 
@@ -33,7 +33,7 @@ Type* DoubleConstant::type_check() {
     return Type::doubleType;
 }
 
-Location* DoubleConstant::gen_location(FnDecl *curr_func) const {
+Location * DoubleConstant::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
     return nullptr;
 }
 
@@ -46,7 +46,7 @@ Type* BoolConstant::type_check() {
     return Type::boolType;
 }
 
-Location* BoolConstant::gen_location(FnDecl *curr_func) const {
+Location * BoolConstant::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
     return nullptr;
 }
 
@@ -60,7 +60,7 @@ Type* StringConstant::type_check() {
     return Type::stringType;
 }
 
-Location* StringConstant::gen_location(FnDecl *curr_func) const {
+Location * StringConstant::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
     return nullptr;
 }
 
@@ -69,7 +69,7 @@ Type* NullConstant::type_check() {
     return Type::nullType;
 }
 
-Location* NullConstant::gen_location(FnDecl *curr_func) const {
+Location * NullConstant::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
     return nullptr;
 }
 
@@ -110,7 +110,7 @@ Type* ArithmeticExpr::type_check() {
     }
 }
 
-Location* ArithmeticExpr::gen_location(FnDecl *curr_func) const {
+Location * ArithmeticExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
     return nullptr;
 }
 
@@ -127,7 +127,7 @@ Type* RelationalExpr::type_check() {
     }
 }
 
-Location* RelationalExpr::gen_location(FnDecl *curr_func) const {
+Location * RelationalExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
     return nullptr;
 }
 
@@ -144,7 +144,7 @@ Type* EqualityExpr::type_check() {
     }
 }
 
-Location* EqualityExpr::gen_location(FnDecl *curr_func) const {
+Location * EqualityExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
     return nullptr;
 }
 
@@ -162,7 +162,7 @@ Type* LogicalExpr::type_check() {
     }
 }
 
-Location* LogicalExpr::gen_location(FnDecl *curr_func) const {
+Location * LogicalExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
     return nullptr;
 }
 
@@ -179,7 +179,7 @@ Type * AssignExpr::type_check() {
     }
 }
 
-Location* AssignExpr::gen_location(FnDecl *curr_func) const {
+Location * AssignExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
     return nullptr;
 }
 
