@@ -35,7 +35,10 @@ class Mips;
 // variable in a function would be assigned a Location object
 // with name "num", segment fpRelative, and offset -8.
  
-enum class Segment {fpRelative, gpRelative};
+enum class Segment {
+    fp_relative,
+    gp_relative
+};
 
 class Location {
 protected:
@@ -65,33 +68,6 @@ public:
 	virtual void EmitSpecific(Mips *mips) = 0;
 	virtual void Emit(Mips *mips);
 };
-
-  
-  
-  // for convenience, the instruction classes are listed here.
-  // the interfaces for the classes follows below
-  
-  class LoadConstant;
-  class LoadStringConstant;
-  class LoadLabel;
-  class Assign;
-  class Load;
-  class Store;
-  class BinaryOp;
-  class Label;
-  class Goto;
-  class IfZ;
-  class BeginFunc;
-  class EndFunc;
-  class Return;
-  class PushParam;
-  class RemoveParams;
-  class LCall;
-  class ACall;
-  class VTable;
-
-
-
 
 class LoadConstant: public Instruction {
     Location *dst;

@@ -24,9 +24,6 @@ typedef enum { Alloc, ReadLine, ReadInteger, StringEqual,
     PrintInt, PrintString, PrintBool, Halt, NumBuiltIns } BuiltIn;
 
 class CodeGenerator {
-private:
-    List<Instruction*> *code = new List<Instruction*>;
-
 public:
     // Here are some class constants to remind you of the offsets
     // used for globals, locals, and parameters. You will be
@@ -50,33 +47,36 @@ public:
         return gen;
     }
 
-    int next_local_offset;
+                    /******** API ********/
 
-    int next_param_offset;
+    /**
+     * Prepares the code generator for next code generation steps.
+     */
+    void prepare(Segment seg);
 
-    int next_global_offset;
-
-    Segment curr_segment;
-
-    int curr_func_frame_size;
-
-    // Assigns a new unique label name and returns it. Does not
-    // generate any Tac instructions (see GenLabel below if needed)
+    /**
+     * Assigns a new unique label name and returns it. Does not
+     * generate any Tac instructions (see GenLabel below if needed)
+     */
     char *new_label();
 
-    // Creates and returns a Location for a new uniquely named
-    // temp variable. Does not generate any Tac instructions
+    /**
+     * Creates and returns a Location for a new uniquely named
+     * temp variable. Does not generate any Tac instructions
+     */
     Location *gen_temp_var();
 
-    // Generates Tac instructions to load a constant value. Creates
-    // a new temp var to hold the result. The constant
-    // value is passed as an integer, it can be 0 for integer zero,
-    // false for bool, NULL for null object, etc. All are just 4-byte
-    // zero in the code generation world.
-    // The second overloaded version is used for string constants.
-    // The LoadLabel method loads a label into a temporary.
-    // Each of the methods returns a Location for the temp var
-    // where the constant was loaded.
+    /**
+    * Generates Tac instructions to load a constant value. Creates
+    * a new temp var to hold the result. The constant
+    * value is passed as an integer, it can be 0 for integer zero,
+    * false for bool, NULL for null object, etc. All are just 4-byte
+    * zero in the code generation world.
+    * The second overloaded version is used for string constants.
+    * The LoadLabel method loads a label into a temporary.
+    * Each of the methods returns a Location for the temp var
+    * where the constant was loaded.
+    */
     Location *gen_load_constant(int value);
     Location *gen_load_constant(const char *str);
     Location *gen_load_label(const char *label);
@@ -179,6 +179,18 @@ public:
     // but instead just print the untranslated Tac. It may be
     // useful in debugging to first make sure your Tac is correct.
     void do_final_code_gen();
+
+private:
+    List<Instruction*> *code;
+    Segment curr_segment;
+    bool is_main_defined;
+    int next_local_offset;
+    int next_param_offset;
+    int next_global_offset;
+    int curr_func_frame_size;
+
+    /// creates a new code generator, private to disallow creation unless using "shared"
+    CodeGenerator();
 };
 
 #endif

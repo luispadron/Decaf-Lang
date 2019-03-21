@@ -16,7 +16,7 @@ static const int BufferSize = 2048;
 
 using namespace std;
 
-void Failure(const char *format, ...) {
+void failure(const char *format, ...) {
     va_list args;
     char errbuf[BufferSize];
 
@@ -24,25 +24,25 @@ void Failure(const char *format, ...) {
     vsprintf(errbuf, format, args);
     va_end(args);
     fflush(stdout);
-    fprintf(stderr,"\n*** Failure: %s\n\n", errbuf);
+    fprintf(stderr,"\n*** failure: %s\n\n", errbuf);
     abort();
 }
 
 
 
-int IndexOf(const char *key) {
+int index_of(const char *key) {
     for (int i = 0; i < debugKeys.size(); i++)
         if (!strcmp(debugKeys.get(i), key)) return i;
     return -1;
 }
 
-bool IsDebugOn(const char *key) {
-    return (IndexOf(key) != -1);
+bool is_debug_on(const char *key) {
+    return (index_of(key) != -1);
 }
 
 
-void SetDebugForKey(const char *key, bool value) {
-    int k = IndexOf(key);
+void set_debug_for_key(const char *key, bool value) {
+    int k = index_of(key);
     if (!value && k != -1)
         debugKeys.erase(k);
     else if (value && k == -1)
@@ -51,11 +51,11 @@ void SetDebugForKey(const char *key, bool value) {
 
 
 
-void PrintDebug(const char *key, const char *format, ...) {
+void debug_print(const char *key, const char *format, ...) {
     va_list args;
     char buf[BufferSize];
 
-    if (!IsDebugOn(key))
+    if (!is_debug_on(key))
         return;
 
     va_start(args, format);
@@ -65,7 +65,7 @@ void PrintDebug(const char *key, const char *format, ...) {
 }
 
 
-void ParseCommandLine(int argc, char *argv[]) {
+void parse_command_line(int argc, char **argv) {
     if (argc == 1)
         return;
 
@@ -75,5 +75,5 @@ void ParseCommandLine(int argc, char *argv[]) {
     }
 
     for (int i = 2; i < argc; i++)
-        SetDebugForKey(argv[i], true);
+        set_debug_for_key(argv[i], true);
 }

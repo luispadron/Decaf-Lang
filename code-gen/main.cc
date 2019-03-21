@@ -23,7 +23,7 @@ void SysCallCodeGen();
  */
 int main(int argc, char *argv[])
 {
-    ParseCommandLine(argc, argv);
+    parse_command_line(argc, argv);
   
     InitScanner();
     InitParser();

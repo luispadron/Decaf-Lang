@@ -284,8 +284,8 @@ int Call::get_bytes() const {
 }
 
 
-NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) { 
-  Assert(c != nullptr);
+NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) {
+    Assert(c != nullptr);
     (cType = c)->set_parent(this);
 }
 

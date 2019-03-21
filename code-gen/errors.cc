@@ -112,7 +112,7 @@ void ReportError::InterfaceNotImplemented(Decl *cd, Type *interfaceType) {
 void ReportError::IdentifierNotDeclared(Identifier *ident, reasonT whyNeeded) {
     ostringstream s;
     static const char *names[] =  {"type", "class", "interface", "variable", "function"};
-    Assert(whyNeeded >= 0 && whyNeeded <= sizeof(names)/sizeof(names[0]));
+    Assert(whyNeeded >= 0 && whyNeeded <= sizeof(names) / sizeof(names[0]));
     s << "No declaration found for "<< names[whyNeeded] << " '" << ident << "'";
     EmitError(ident->get_location(), s.str());
 }

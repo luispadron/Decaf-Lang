@@ -12,6 +12,24 @@
 
 using namespace std;
 
+CodeGenerator::CodeGenerator() :
+    code(new List<Instruction*>),
+    curr_segment(Segment::gp_relative),
+    is_main_defined(false),
+    next_local_offset(CodeGenerator::offset_first_local),
+    next_param_offset(CodeGenerator::offset_first_param),
+    next_global_offset(CodeGenerator::offset_first_global),
+    curr_func_frame_size(0) { }
+
+void CodeGenerator::prepare(Segment seg) {
+    curr_segment = seg;
+    // reset offsets
+    next_local_offset = CodeGenerator::offset_first_local;
+    next_param_offset = CodeGenerator::offset_first_param;
+    next_global_offset = CodeGenerator::offset_first_global;
+    curr_func_frame_size = 0;
+}
+
 char *CodeGenerator::new_label() {
     static int nextLabelNum = 0;
     char temp[10];
@@ -27,7 +45,7 @@ Location *CodeGenerator::gen_temp_var() {
     Location *result = nullptr;
 
     // calculate the correct offset
-    if (curr_segment == Segment::fpRelative) {
+    if (curr_segment == Segment::fp_relative) {
         result = new Location(curr_segment, next_local_offset, temp);
         next_local_offset -= word_size;
         curr_func_frame_size += word_size;
@@ -184,7 +202,7 @@ void CodeGenerator::gen_vtable(const char *className, List<const char *> *method
 
 void CodeGenerator::do_final_code_gen()
 {
-    if (IsDebugOn("tac")) { // if debug don't translate to mips, just print Tac
+    if (is_debug_on("tac")) { // if debug don't translate to mips, just print Tac
         for (int i = 0; i < code->size(); i++)
             code->get(i)->Print();
     }  else {

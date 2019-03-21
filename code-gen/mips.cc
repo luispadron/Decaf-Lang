@@ -46,7 +46,7 @@ static bool LocationsAreSame(Location *var1, Location *var2)
 void Mips::SpillRegister(Location *dst, Register reg)
 {
   Assert(dst);
-  const char *offsetFromWhere = dst->GetSegment() == Segment::fpRelative? regs[fp].name : regs[gp].name;
+  const char *offsetFromWhere = dst->GetSegment() == Segment::fp_relative? regs[fp].name : regs[gp].name;
   Assert(dst->GetOffset() % 4 == 0); // all variables are 4 bytes in size
   Emit("sw %s, %d(%s)\t# spill %s from %s to %s%+d", regs[reg].name,
        dst->GetOffset(), offsetFromWhere, dst->GetName(), regs[reg].name,
@@ -61,7 +61,7 @@ void Mips::SpillRegister(Location *dst, Register reg)
 void Mips::FillRegister(Location *src, Register reg)
 {
   Assert(src);
-  const char *offsetFromWhere = src->GetSegment() == Segment::fpRelative? regs[fp].name : regs[gp].name;
+  const char *offsetFromWhere = src->GetSegment() == Segment::fp_relative? regs[fp].name : regs[gp].name;
   Assert(src->GetOffset() % 4 == 0); // all variables are 4 bytes in size
   Emit("lw %s, %d(%s)\t# fill %s to %s from %s%+d", regs[reg].name,
        src->GetOffset(), offsetFromWhere, src->GetName(), regs[reg].name,
@@ -424,7 +424,7 @@ void Mips::EmitPreamble()
  */
 const char *Mips::NameForTac(BinaryOp::OpCode code)
 {
-  Assert(code >=0 && code < BinaryOp::NumOps);
+  Assert(code >= 0 && code < BinaryOp::NumOps);
   const char *name = mipsName[code];
   Assert(name != nullptr);
   return name;

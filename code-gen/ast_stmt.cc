@@ -46,34 +46,34 @@ void StmtBlock::check(Scope *function_scope) {
 }
 
 
-ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) { 
+ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
     Assert(t != nullptr && b != nullptr);
     (test = t)->set_parent(this);
     (body = b)->set_parent(this);
 }
 
 
-ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) { 
+ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
     Assert(i != nullptr && t != nullptr && s != nullptr && b != nullptr);
     (init = i)->set_parent(this);
     (step = s)->set_parent(this);
 }
 
 
-IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) { 
+IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) {
     Assert(t != nullptr && tb != nullptr); // else can be nullptr
     elseBody = eb;
     if (elseBody) elseBody->set_parent(this);
 }
 
 
-ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) { 
+ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
     Assert(e != nullptr);
     (expr = e)->set_parent(this);
 }
 
 
-PrintStmt::PrintStmt(List<Expr*> *a) {    
+PrintStmt::PrintStmt(List<Expr*> *a) {
     Assert(a != nullptr);
     (args = a)->set_parent_all(this);
 }
