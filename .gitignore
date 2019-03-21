@@ -46,3 +46,6 @@ parser/our_tests/output/*
 *cmake-build-debug/
 *.idea/
 semantic-analyzer/sample_tests/*
+code-gen/tac_tests/*
+code-gen/sample_tests/*
+
