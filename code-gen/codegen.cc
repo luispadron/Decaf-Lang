@@ -16,19 +16,13 @@ using namespace std;
 
 CodeGenerator::CodeGenerator() :
     code(new List<Instruction*>),
-    curr_segment(Segment::gp_relative),
     is_main_defined(false),
     next_local_offset(CodeGenerator::offset_first_local),
-    next_param_offset(CodeGenerator::offset_first_param),
-    next_global_offset(CodeGenerator::offset_first_global),
     curr_func_frame_size(0) { }
 
-void CodeGenerator::prepare(Segment seg) {
-    curr_segment = seg;
+void CodeGenerator::reset_offsets() {
     // reset offsets
     next_local_offset = CodeGenerator::offset_first_local;
-    next_param_offset = CodeGenerator::offset_first_param;
-    next_global_offset = CodeGenerator::offset_first_global;
     curr_func_frame_size = 0;
 }
 
@@ -46,15 +40,9 @@ Location *CodeGenerator::gen_temp_var() {
     sprintf(temp, "_tmp%d", nextTempNum++);
     Location *result = nullptr;
 
-    // calculate the correct offset
-    if (curr_segment == Segment::fp_relative) {
-        result = new Location(curr_segment, next_local_offset, temp);
-        next_local_offset -= word_size;
-        curr_func_frame_size += word_size;
-    } else {
-        result = new Location(curr_segment, next_global_offset, temp);
-        next_global_offset += word_size;
-    }
+    result = new Location(Segment::fp_relative, next_local_offset, temp);
+    next_local_offset -= word_size;
+    curr_func_frame_size += word_size;
 
     Assert(result);
     return result;
@@ -130,12 +118,14 @@ void CodeGenerator::gen_return(Location *val)
 
 
 BeginFunc *CodeGenerator::gen_begin_func() {
-    BeginFunc *result = new BeginFunc;
+    auto result = new BeginFunc;
     code->append(result);
     return result;
 }
 
-void CodeGenerator::gen_end_func() {
+void CodeGenerator::gen_end_func(BeginFunc *func) {
+    Assert(curr_func_frame_size >= 0);
+    func->SetFrameSize(curr_func_frame_size);
     code->append(new EndFunc());
 }
 

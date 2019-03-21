@@ -23,6 +23,12 @@
 typedef enum { Alloc, ReadLine, ReadInteger, StringEqual,
     PrintInt, PrintString, PrintBool, Halt, NumBuiltIns } BuiltIn;
 
+enum class OffsetType {
+    Global,
+    Local,
+    Param
+};
+
 class CodeGenerator {
 public:
 
@@ -58,7 +64,7 @@ public:
     /**
      * Prepares the code generator for next code generation steps.
      */
-    void prepare(Segment seg);
+    void reset_offsets();
 
     /**
      * Assigns a new unique label name and returns it. Does not
@@ -167,7 +173,7 @@ public:
     // These methods generate the Tac instructions that mark the start
     // and end of a function/method definition.
     BeginFunc * gen_begin_func();
-    void gen_end_func();
+    void gen_end_func(BeginFunc *func);
 
 
     // Generates the Tac instructions for defining vtable for a
@@ -188,11 +194,8 @@ public:
 
 private:
     List<Instruction*> *code;
-    Segment curr_segment;
     bool is_main_defined;
     int next_local_offset;
-    int next_param_offset;
-    int next_global_offset;
     int curr_func_frame_size;
 
     /// creates a new code generator, private to disallow creation unless using "shared"

@@ -56,7 +56,24 @@ void Program::check() {
 void Program::emit() {
     Sym_tbl_t::shared().enter_scope("global");
 
-    // TODO: Add code
+    // set location for globals
+    int goffset = CodeGenerator::offset_first_global;
+    for (int i = 0; i < decls->size(); ++i) {
+        auto gvar = dynamic_cast<VarDecl*>(decls->get(i));
+        if (gvar) {
+            auto var_loc = new Location(Segment::gp_relative, goffset, gvar->get_id()->get_name().c_str());
+            gvar->set_location(var_loc);
+            goffset += gvar->get_bytes();
+        }
+    }
+
+    // emit code for other decls that are not variables
+    for (int i = 0; i < decls->size(); ++i) {
+        auto decl = decls->get(i);
+        if (!dynamic_cast<VarDecl*>(decl)) {
+            decl->emit(nullptr, nullptr);
+        }
+    }
 
     // perform final code generation
     CodeGenerator::shared().do_final_code_gen();

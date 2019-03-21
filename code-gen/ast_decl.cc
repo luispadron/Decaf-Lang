@@ -74,16 +74,18 @@ void FnDecl::check(Scope *class_or_interface_scope) {
 
 void FnDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
     // prepare generator
-    Cgen_t::shared().prepare(Segment::fp_relative);
+    Cgen_t::shared().reset_offsets();
 
     // generate function label and begin function code
     const auto &label = get_mangled_name(class_or_interface_scope ? class_or_interface_scope->name() : "");
     Cgen_t::shared().gen_label(label.c_str());
     auto func_code = Cgen_t::shared().gen_begin_func();
 
+    // TODO: add code here for formals and body
+
     // end function code and pop scope
     Sym_tbl_t::shared().leave_scope();
-    Cgen_t::shared().gen_end_func();
+    Cgen_t::shared().gen_end_func(func_code);
 }
 
 
