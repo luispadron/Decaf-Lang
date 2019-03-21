@@ -6,8 +6,10 @@
  */
 
 #include "codegen.h"
+#include "errors.h"
 #include "tac.h"
 #include "mips.h"
+
 #include <cstring>
 
 using namespace std;
@@ -107,6 +109,8 @@ Location *CodeGenerator::gen_binary_op(const char *opName, Location *op1,
 
 void CodeGenerator::gen_label(const char *label) {
     code->append(new Label(label));
+    // check to see if the label is the "main" label
+    is_main_defined = is_main_defined || strcmp(label, CodeGenerator::main_func_name) == 0;
 }
 
 void CodeGenerator::gen_ifz(Location *test, const char *label)
@@ -149,14 +153,14 @@ void CodeGenerator::gen_pop_params(int num_bytes)
 
 Location *CodeGenerator::gen_l_call(const char *label, bool fn_has_return_val)
 {
-    Location *result = fn_has_return_val ? gen_temp_var() : NULL;
+    Location *result = fn_has_return_val ? gen_temp_var() : nullptr;
     code->append(new LCall(label, result));
     return result;
 }
 
 Location *CodeGenerator::gen_a_call(Location *fn_addr, bool fn_has_return_val)
 {
-    Location *result = fn_has_return_val ? gen_temp_var() : NULL;
+    Location *result = fn_has_return_val ? gen_temp_var() : nullptr;
     code->append(new ACall(fn_addr, result));
     return result;
 }
@@ -182,7 +186,7 @@ Location *CodeGenerator::gen_built_in_call(BuiltIn bn, Location *arg1, Location 
     Location *result = nullptr;
 
     if (b->hasReturn) result = gen_temp_var();
-    // verify appropriate number of non-NULL arguments given
+    // verify appropriate number of non-nullptr arguments given
     Assert((b->numArgs == 0 && !arg1 && !arg2)
            || (b->numArgs == 1 && arg1 && !arg2)
            || (b->numArgs == 2 && arg1 && arg2));
@@ -200,8 +204,13 @@ void CodeGenerator::gen_vtable(const char *className, List<const char *> *method
 }
 
 
-void CodeGenerator::do_final_code_gen()
-{
+void CodeGenerator::do_final_code_gen() {
+    // if main was not defined we need to throw a linker error
+    if (!is_main_defined) {
+        ReportError::NoMainFound();
+        return;
+    }
+
     if (is_debug_on("tac")) { // if debug don't translate to mips, just print Tac
         for (int i = 0; i < code->size(); i++)
             code->get(i)->Print();

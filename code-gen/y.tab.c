@@ -2414,7 +2414,8 @@ yyreturn:
  * Please be sure the variable is set to false when submitting your final
  * version.
  */
-void InitParser() {
+void InitParser()
+{
    debug_print("parser", "Initializing parser");
    yydebug = false;
 }

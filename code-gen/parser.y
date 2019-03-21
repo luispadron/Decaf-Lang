@@ -307,6 +307,6 @@ OptElse   :    T_Else Stmt          { $$ = $2; }
  */
 void InitParser()
 {
-   PrintDebug("parser", "Initializing parser");
+   debug_print("parser", "Initializing parser");
    yydebug = false;
 }

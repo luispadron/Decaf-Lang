@@ -49,15 +49,17 @@ void Program::check() {
  * This is the entry point for the code generator.
  * In this function we need to do:
  *
- * 1. Verify that the "main" function is defined
- * 2. Emit code for loading globals and setting offsets
- * 3. Setup any other thing the child nodes of the AST will need
- * 4. Call "emit" on any declarations within the program.
+ * 1. Emit code for loading globals and setting offsets
+ * 2. Setup any other thing the child nodes of the AST will need
+ * 3. Call "emit" on any declarations within the program.
  */
 void Program::emit() {
     Sym_tbl_t::shared().enter_scope("global");
 
     // TODO: Add code
+
+    // perform final code generation
+    CodeGenerator::shared().do_final_code_gen();
 
     Sym_tbl_t::shared().leave_scope();
 }

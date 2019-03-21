@@ -25,29 +25,35 @@ typedef enum { Alloc, ReadLine, ReadInteger, StringEqual,
 
 class CodeGenerator {
 public:
-    // Here are some class constants to remind you of the offsets
-    // used for globals, locals, and parameters. You will be
-    // responsible for using these when assigning Locations.
-    // In a MIPS stack frame, first local is at fp-8, subsequent locals
-    // are at fp-12, fp-16, and so on. The first param is at fp+4,
-    // subsequent ones as fp+8, fp+12, etc. (Because methods have secret
-    // "this" passed in first param slot at fp+4, all normal params
-    // are shifted up by 4.)  First global is at offset 0 from global
-    // pointer, all subsequent at +4, +8, etc.
-    // Conveniently, all vars are 4 bytes in size for code generation
-    static const int offset_first_local = -8,
-                     offset_first_param = 4,
-                     offset_first_global = 0;
 
+    /// Here are some class constants to remind you of the offsets
+    /// used for globals, locals, and parameters. You will be
+    /// responsible for using these when assigning Locations.
+    /// In a MIPS stack frame, first local is at fp-8, subsequent locals
+    /// are at fp-12, fp-16, and so on. The first param is at fp+4,
+    /// subsequent ones as fp+8, fp+12, etc. (Because methods have secret
+    /// "this" passed in first param slot at fp+4, all normal params
+    /// are shifted up by 4.)  First global is at offset 0 from global
+    /// pointer, all subsequent at +4, +8, etc.
+    /// Conveniently, all vars are 4 bytes in size for code generation
+    static const int offset_first_local = -8;
+    static const int offset_first_param = 4;
+    static const int offset_first_global = 0;
     static const int word_size = 4;
 
-    /// returns a singleton instance of the CodeGenerator class
+    /// the name of the main function, which is required in all programs
+    static constexpr const char * const main_func_name = "main";
+
+
+                    /******** API ********/
+
+    /**
+     * @return a singleton instance of the CodeGenerator class
+     */
     static CodeGenerator & shared() {
         static CodeGenerator gen;
         return gen;
     }
-
-                    /******** API ********/
 
     /**
      * Prepares the code generator for next code generation steps.
@@ -99,14 +105,14 @@ public:
     // temporary variable where the result was stored. The optional
     // offset argument can be used to offset the addr by a positive or
     // negative number of bytes. If not given, 0 is assumed.
-    Location *gen_load(Location *addr, int offset = 0);
+    Location * gen_load(Location *addr, int offset = 0);
 
 
     // Generates Tac instructions to perform one of the binary ops
     // identified by string name, such as "+" or "==".  Returns a
     // Location object for the new temporary where the result
     // was stored.
-    Location *gen_binary_op(const char *opName, Location *op1, Location *op2);
+    Location * gen_binary_op(const char *opName, Location *op1, Location *op2);
 
 
     // Generates the Tac instruction for pushing a single
@@ -126,14 +132,14 @@ public:
     // true,  a new temp var is created, the fn result is stored
     // there and that Location is returned. If false, no temp is
     // created and NULL is returned
-    Location *gen_l_call(const char *label, bool fn_has_return_val);
+    Location * gen_l_call(const char *label, bool fn_has_return_val);
 
     // Generates the Tac instructions for ACall, a jump to an
     // address computed at runtime. Works similarly to LCall,
     // described above, in terms of return type.
     // The fnAddr Location is expected to hold the address of
     // the code to jump to (typically it was read from the vtable)
-    Location *gen_a_call(Location *fn_addr, bool fn_has_return_val);
+    Location * gen_a_call(Location *fn_addr, bool fn_has_return_val);
 
     // Generates the Tac instructions to call one of
     // the built-in functions (Read, Print, Alloc, etc.) Although
@@ -144,7 +150,7 @@ public:
     // for the new temp var holding the result.  For those
     // built-ins with no return value (Print/Halt), no temporary
     // is created and NULL is returned.
-    Location *gen_built_in_call(BuiltIn bn, Location *arg1 = nullptr, Location *arg2 = nullptr);
+    Location * gen_built_in_call(BuiltIn bn, Location *arg1 = nullptr, Location *arg2 = nullptr);
 
 
     // These methods generate the Tac instructions for various
@@ -160,7 +166,7 @@ public:
 
     // These methods generate the Tac instructions that mark the start
     // and end of a function/method definition.
-    BeginFunc *gen_begin_func();
+    BeginFunc * gen_begin_func();
     void gen_end_func();
 
 

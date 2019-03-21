@@ -157,7 +157,7 @@ SINGLE_COMMENT    ("//"[^\n]*)
  */
 void InitScanner()
 {
-    PrintDebug("lex", "Initializing scanner");
+    debug_print("lex", "Initializing scanner");
     yy_flex_debug = false;
     BEGIN(N);
     yy_push_state(COPY); // copy first line at start
