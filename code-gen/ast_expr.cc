@@ -48,6 +48,10 @@ Type* BoolConstant::type_check() {
     return Type::boolType;
 }
 
+Location* BoolConstant::emit(Scope *func_scope) const {
+    return Cgen_t::shared().gen_load_constant(value);
+}
+
 
 StringConstant::StringConstant(yyltype loc, const char *val) : Expr(loc) {
     Assert(val != nullptr);
@@ -58,9 +62,17 @@ Type* StringConstant::type_check() {
     return Type::stringType;
 }
 
+Location* StringConstant::emit(Scope *func_scope) const {
+    return Cgen_t::shared().gen_load_constant(value);
+}
+
 
 Type* NullConstant::type_check() {
     return Type::nullType;
+}
+
+Location* NullConstant::emit(Scope *func_scope) const {
+    return Cgen_t::shared().gen_load_constant(0);
 }
 
 
