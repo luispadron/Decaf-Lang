@@ -33,6 +33,12 @@ Type* DoubleConstant::type_check() {
     return Type::doubleType;
 }
 
+Location* DoubleConstant::emit(Scope *func_scope) const {
+    // doubles are not implemented in this project
+    Assert(false);
+    return nullptr;
+}
+
 
 BoolConstant::BoolConstant(yyltype loc, bool val) : Expr(loc) {
     value = val;
@@ -107,7 +113,14 @@ Type* ArithmeticExpr::type_check() {
 }
 
 Location * ArithmeticExpr::emit(Scope *func_scope) const {
-    return nullptr;
+    Location *lhs = [&]() {
+        if (left) return left->emit(func_scope);
+        return Cgen_t::shared().gen_load_constant(0);
+    }();
+
+    Location *rhs = right->emit(func_scope);
+
+    return Cgen_t::shared().gen_binary_op(op->get_op_token(), lhs, rhs);
 }
 
 

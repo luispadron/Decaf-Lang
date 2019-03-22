@@ -21,10 +21,6 @@ class Expr : public Stmt {
 public:
     explicit Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
-
-    /// returns the bytes required for an expression
-    /// any subclass which requires more than 0 bytes has to implement this
-    virtual int get_bytes() const { return 0; }
 };
 
 
@@ -64,6 +60,8 @@ public:
     Type * type_check() override;
 
     int get_bytes() const override { return CodeGenerator::word_size; }
+
+    Location * emit(Scope *func_scope) const override;
 };
 
 
@@ -111,6 +109,8 @@ public:
     Operator(yyltype loc, const char *tok);
 
     friend std::ostream& operator<<(std::ostream& out, Operator *o) { return out << o->tokenString; }
+
+    const char * get_op_token() const { return tokenString; }
  };
 
 

@@ -89,8 +89,7 @@ void CodeGenerator::gen_store(Location *addr, Location *val, int offset)
 }
 
 
-Location *CodeGenerator::gen_binary_op(const char *opName, Location *op1,
-                                       Location *op2) {
+Location *CodeGenerator::gen_binary_op(const char *opName, Location *op1, Location *op2) {
     Location *result = gen_temp_var();
     code->append(new BinaryOp(BinaryOp::OpCodeForName(opName), result, op1, op2));
     return result;

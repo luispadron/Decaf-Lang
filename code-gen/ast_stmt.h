@@ -31,7 +31,7 @@ public:
 
     virtual Location * emit(Scope *func_scope) const { return nullptr; }
 
-    virtual int get_bytes() const { return 0; } // TODO: Make this pure virtual
+    virtual int get_bytes() const { return 0; }
 };
 
 
