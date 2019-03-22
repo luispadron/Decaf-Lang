@@ -93,6 +93,8 @@ public:
 
     DeclType get_decl_type() const override { return DeclType::Function; }
 
+    bool has_return() const { return !returnType->is_equal_to(Type::voidType); }
+
     /// returns the mangled function name
     /// if in class/interface: _Class/Interface.FunctionName
     /// if global: _FunctionName

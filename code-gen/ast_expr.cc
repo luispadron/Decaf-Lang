@@ -91,7 +91,7 @@ int CompoundExpr::get_bytes() const {
         if (left) {
             return left->get_bytes() + right->get_bytes() + CodeGenerator::word_size;
         } else {
-            return right->get_bytes() + CodeGenerator::word_size;
+            return right->get_bytes() + 2 * CodeGenerator::word_size; // 2 * word_size here because we turn unary to binary
         }
     }();
 
@@ -293,7 +293,53 @@ Type* Call::type_check() {
 }
 
 int Call::get_bytes() const {
-    return base->get_bytes();
+    auto scope = Sym_tbl_t::shared().get_scope();
+
+    // byte size for the parameters
+    int actual_bytes = 0;
+    for (int i = 0; i < actuals->size(); ++i) {
+        actual_bytes += actuals->get(i)->get_bytes();
+    }
+
+    if (base) {
+        // TODO: add this when class and stuff is done
+        Assert(false);
+        return 0;
+    } else {
+        auto fn = dynamic_cast<FnDecl*>(scope->get_decl(field->get_name()).first);
+        Assert(fn);
+        if (fn->has_return()) {
+            return actual_bytes + Cgen_t::word_size;
+        } else {
+            return actual_bytes;
+        }
+    }
+}
+
+Location* Call::emit(Scope *func_scope) const {
+    auto scope = Sym_tbl_t::shared().get_scope();
+
+    if (base) {
+        // TODO: add this when class stuff is done
+        Assert(false);
+        return nullptr;
+    } else {
+        auto fn = dynamic_cast<FnDecl*>(scope->get_decl(field->get_name()).first);
+        Assert(fn);
+
+        // generate parameter pushing
+        for (int i = 0; i < actuals->size(); ++i) {
+            Cgen_t::shared().gen_push_param(actuals->get(i)->emit(func_scope));
+        }
+
+        // generate call code
+        auto call_code = Cgen_t::shared().gen_l_call(fn->get_mangled_name("").c_str(), fn->has_return());
+
+        // generate pop params
+        Cgen_t::shared().gen_pop_params(actuals->size() * Cgen_t::word_size);
+
+        return call_code;
+    }
 }
 
 
