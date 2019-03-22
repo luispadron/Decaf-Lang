@@ -521,7 +521,6 @@ Location* NewArrayExpr::emit() const {
     auto size_tmp = size->emit();
     auto one_tmp = Cgen_t::shared().gen_load_constant(1);
     auto lt_1_tmp = Cgen_t::shared().gen_binary_op("<", size_tmp, one_tmp);
-    auto fail_msg = Cgen_t::shared().gen_load_constant("Decaf runtime error: Array size is <= 0\\n");
 
     auto size_pass_lbl = Cgen_t::shared().new_label();
 
@@ -529,15 +528,24 @@ Location* NewArrayExpr::emit() const {
     Cgen_t::shared().gen_ifz(lt_1_tmp, size_pass_lbl);
 
     // if the check fails (that is, given a size <= 0) the code below will be executed:
+    auto fail_msg = Cgen_t::shared().gen_load_constant("Decaf runtime error: Array size is <= 0\\n");
     Cgen_t::shared().gen_built_in_call(PrintString, fail_msg, nullptr);
     Cgen_t::shared().gen_built_in_call(Halt, nullptr, nullptr);
 
     // if the check doesnt fail, this code will be executed:
     Cgen_t::shared().gen_label(size_pass_lbl);
+    auto one_tmp2 = Cgen_t::shared().gen_load_constant(1);
+    auto final_size_tmp = Cgen_t::shared().gen_binary_op("+", one_tmp2, size_tmp); // this adds 1 to the size
+    auto word_size_tmp = Cgen_t::shared().gen_load_constant(4); // used to multiply by a word size for memory offsets
+    auto arr_word_size = Cgen_t::shared().gen_binary_op("*", final_size_tmp, word_size_tmp); // calculates the memory size
+    auto alloc_call_res = Cgen_t::shared().gen_built_in_call(Alloc, arr_word_size);
+    Cgen_t::shared().gen_store(alloc_call_res, size_tmp); // store size of array in first slot of array
 
-    // TODO: Finish this cus its confusing and hard and we need to figure out how to track the size, etc
-    Assert(false);
-    return nullptr;
+    // this sets the array offset to be the correct offset (that is the first true element)
+    // this is because, if we have an array [10, 20, 30], the real array looks like: [3, 10, 20, 30]
+    // where 3 is the size of the array, thus we need to return a pointer to the 1st index, thus offset the
+    // array by 4 bytes and return that new location
+    return Cgen_t::shared().gen_binary_op("+", alloc_call_res, word_size_tmp);
 }
 
 
