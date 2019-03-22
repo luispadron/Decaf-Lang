@@ -507,7 +507,37 @@ Type* NewArrayExpr::type_check() {
 }
 
 int NewArrayExpr::get_bytes() const {
-    return size->get_bytes();
+    // Example:
+    //  - NewArray(10, int);
+    // tmp0 = 10
+    // tmp1 = 1
+    // tmp2 = tmp0 < tmp1 (checks size is greater than 0)
+    // tmp3 = "Decaf runtime error: Array size is <= 0\n" (constant string for dynamic error)
+    return size->get_bytes() + 3 * Cgen_t::word_size;
+}
+
+Location* NewArrayExpr::emit() const {
+    // generates the variables to prepare for array making and checking
+    auto size_tmp = size->emit();
+    auto one_tmp = Cgen_t::shared().gen_load_constant(1);
+    auto lt_1_tmp = Cgen_t::shared().gen_binary_op("<", size_tmp, one_tmp);
+    auto fail_msg = Cgen_t::shared().gen_load_constant("Decaf runtime error: Array size is <= 0\\n");
+
+    auto size_pass_lbl = Cgen_t::shared().new_label();
+
+    // start if
+    Cgen_t::shared().gen_ifz(lt_1_tmp, size_pass_lbl);
+
+    // if the check fails (that is, given a size <= 0) the code below will be executed:
+    Cgen_t::shared().gen_built_in_call(PrintString, fail_msg, nullptr);
+    Cgen_t::shared().gen_built_in_call(Halt, nullptr, nullptr);
+
+    // if the check doesnt fail, this code will be executed:
+    Cgen_t::shared().gen_label(size_pass_lbl);
+
+    // TODO: Finish this cus its confusing and hard and we need to figure out how to track the size, etc
+    Assert(false);
+    return nullptr;
 }
 
 
