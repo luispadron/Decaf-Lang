@@ -178,7 +178,7 @@ public:
     // These methods generate the Tac instructions that mark the start
     // and end of a function/method definition.
     BeginFunc * gen_begin_func();
-    void gen_end_func(BeginFunc *func);
+    void gen_end_func();
 
 
     // Generates the Tac instructions for defining vtable for a
@@ -201,7 +201,6 @@ private:
     List<Instruction*> *code;
     bool is_main_defined;
     int next_local_offset;
-    int curr_func_frame_size;
 
     /// creates a new code generator, private to disallow creation unless using "shared"
     CodeGenerator();

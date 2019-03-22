@@ -72,7 +72,6 @@ void Program::emit() {
         decls->get(i)->emit(nullptr, nullptr);
     }
 
-
     // perform final code generation
     Cgen_t::shared().do_final_code_gen();
 
