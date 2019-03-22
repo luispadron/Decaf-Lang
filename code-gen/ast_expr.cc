@@ -80,6 +80,18 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r)
     (right = r)->set_parent(this);
 }
 
+int CompoundExpr::get_bytes() const {
+    const int bytes = [&]() {
+        if (left) {
+            return left->get_bytes() + right->get_bytes() + CodeGenerator::word_size;
+        } else {
+            return right->get_bytes() + CodeGenerator::word_size;
+        }
+    }();
+
+    return bytes;
+}
+
 
 bool ArithmeticExpr::validate() {
     if (left) return left->type_check()->can_perform_arithmetic_with(right->type_check());
@@ -92,10 +104,6 @@ Type* ArithmeticExpr::type_check() {
     } else {
         return right->type_check();
     }
-}
-
-int ArithmeticExpr::get_bytes() const {
-    return 0; // TODO
 }
 
 Location * ArithmeticExpr::emit(Scope *func_scope) const {
@@ -115,10 +123,6 @@ Type* RelationalExpr::type_check() {
     }
 }
 
-int RelationalExpr::get_bytes() const {
-    return 0; // TODO
-}
-
 Location * RelationalExpr::emit(Scope *func_scope) const {
     return nullptr;
 }
@@ -134,10 +138,6 @@ Type* EqualityExpr::type_check() {
     } else {
         return Type::boolType;
     }
-}
-
-int EqualityExpr::get_bytes() const {
-    return 0; // TODO
 }
 
 Location * EqualityExpr::emit(Scope *func_scope) const {
@@ -158,10 +158,6 @@ Type* LogicalExpr::type_check() {
     }
 }
 
-int LogicalExpr::get_bytes() const {
-    return 0; // TODO
-}
-
 Location * LogicalExpr::emit(Scope *func_scope) const {
     return nullptr;
 }
@@ -180,7 +176,7 @@ Type * AssignExpr::type_check() {
 }
 
 int AssignExpr::get_bytes() const {
-    return 0; // TODO
+    return right->get_bytes();
 }
 
 Location * AssignExpr::emit(Scope *func_scope) const {
@@ -237,7 +233,7 @@ Type * ArrayAccess::type_check() {
 }
 
 int ArrayAccess::get_bytes() const {
-    return 0; // TODO
+    return base->get_bytes() + subscript->get_bytes();
 }
 
 
@@ -284,7 +280,7 @@ Type* Call::type_check() {
 }
 
 int Call::get_bytes() const {
-    return 0; // TODO
+    return base->get_bytes();
 }
 
 
@@ -329,7 +325,7 @@ Type* NewArrayExpr::type_check() {
 }
 
 int NewArrayExpr::get_bytes() const {
-    return 0; // TODO
+    return size->get_bytes();
 }
 
 

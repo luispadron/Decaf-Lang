@@ -124,6 +124,8 @@ protected:
 public:
     CompoundExpr(Expr *lhs, Operator *op, Expr *rhs);  // for binary
     CompoundExpr(Operator *op, Expr *rhs);             // for unary
+
+    int get_bytes() const override;
 };
 
 
@@ -136,8 +138,6 @@ public:
     ArithmeticExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
 
     Type * type_check() override;
-
-    int get_bytes() const override;
 
     Location * emit(Scope *func_scope) const override;
 };
@@ -152,8 +152,6 @@ public:
 
     Type * type_check() override;
 
-    int get_bytes() const override;
-
     Location * emit(Scope *func_scope) const override;
 };
 
@@ -166,8 +164,6 @@ public:
     EqualityExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 
     Type * type_check() override;
-
-    int get_bytes() const override;
 
     Location * emit(Scope *func_scope) const override;
 };
@@ -183,8 +179,6 @@ public:
     LogicalExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
 
     Type * type_check() override;
-
-    int get_bytes() const override;
 
     Location * emit(Scope *func_scope) const override;
 };
