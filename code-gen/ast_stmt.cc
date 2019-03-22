@@ -10,17 +10,16 @@
 
 using namespace std;
 
+int StmtBlock::next_block_id = 0;
 
-int StmtBlock::current_block_id = 0;
-
-StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) : block_id(StmtBlock::current_block_id++) {
+StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s): block_id(next_block_id++) {
     Assert(d != nullptr && s != nullptr);
     (decls = d)->set_parent_all(this);
     (stmts = s)->set_parent_all(this);
 }
 
-string StmtBlock::get_mangled_name(const std::string &func_name) const {
-    return func_name + "_block" + to_string(block_id);
+string StmtBlock::get_mangled_name() const {
+    return "_block" + to_string(block_id);
 }
 
 int StmtBlock::get_bytes() const {
@@ -38,9 +37,8 @@ int StmtBlock::get_bytes() const {
     return bytes;
 }
 
-void StmtBlock::check(Scope *func_scope) {
-    Assert(func_scope);
-    auto scope = Sym_tbl_t::shared().create_scope(get_mangled_name(func_scope->name()), ScopeType::Block);
+void StmtBlock::check() {
+    auto scope = Sym_tbl_t::shared().create_scope(get_mangled_name(), ScopeType::Block);
 
     // add declarations to scope
     for (int i = 0; i < decls->size(); ++i) {
@@ -50,15 +48,14 @@ void StmtBlock::check(Scope *func_scope) {
 
     for (int i = 0; i < stmts->size(); ++i) {
         auto block = dynamic_cast<StmtBlock*>(stmts->get(i));
-        if (block) block->check(func_scope);
+        if (block) block->check();
     }
 
     Sym_tbl_t::shared().leave_scope();
 }
 
-Location * StmtBlock::emit(Scope *func_scope) const {
-    Assert(func_scope);
-    auto scope = Sym_tbl_t::shared().enter_scope(get_mangled_name(func_scope->name()));
+Location * StmtBlock::emit() const {
+    auto scope = Sym_tbl_t::shared().enter_scope(get_mangled_name());
 
     // set locations for local variables, the offset is tracked by code generator as there
     // can be multiple stmt blocks inside each other and thus must be done and tracked recursively
@@ -71,7 +68,7 @@ Location * StmtBlock::emit(Scope *func_scope) const {
     }
 
     for (int i = 0; i < stmts->size(); ++i) {
-        stmts->get(i)->emit(func_scope);
+        stmts->get(i)->emit();
     }
 
     Sym_tbl_t::shared().leave_scope();

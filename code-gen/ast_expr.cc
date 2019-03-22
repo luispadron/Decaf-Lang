@@ -20,7 +20,7 @@ Type* IntConstant::type_check() {
     return Type::intType;
 }
 
-Location* IntConstant::emit(Scope *func_scope) const {
+Location * IntConstant::emit() const {
     return Cgen_t::shared().gen_load_constant(value);
 }
 
@@ -33,7 +33,7 @@ Type* DoubleConstant::type_check() {
     return Type::doubleType;
 }
 
-Location* DoubleConstant::emit(Scope *func_scope) const {
+Location * DoubleConstant::emit() const {
     // doubles are not implemented in this project
     Assert(false);
     return nullptr;
@@ -48,7 +48,7 @@ Type* BoolConstant::type_check() {
     return Type::boolType;
 }
 
-Location* BoolConstant::emit(Scope *func_scope) const {
+Location * BoolConstant::emit() const {
     return Cgen_t::shared().gen_load_constant(value);
 }
 
@@ -62,7 +62,7 @@ Type* StringConstant::type_check() {
     return Type::stringType;
 }
 
-Location* StringConstant::emit(Scope *func_scope) const {
+Location * StringConstant::emit() const {
     return Cgen_t::shared().gen_load_constant(value);
 }
 
@@ -71,7 +71,7 @@ Type* NullConstant::type_check() {
     return Type::nullType;
 }
 
-Location* NullConstant::emit(Scope *func_scope) const {
+Location * NullConstant::emit() const {
     return Cgen_t::shared().gen_load_constant(0);
 }
 
@@ -143,13 +143,13 @@ int ArithmeticExpr::get_bytes() const {
     }
 }
 
-Location * ArithmeticExpr::emit(Scope *func_scope) const {
+Location * ArithmeticExpr::emit() const {
     Location *lhs = [&]() {
-        if (left) return left->emit(func_scope);
+        if (left) return left->emit();
         return Cgen_t::shared().gen_load_constant(0);
     }();
 
-    Location *rhs = right->emit(func_scope);
+    Location *rhs = right->emit();
 
     return Cgen_t::shared().gen_binary_op(op->get_op_token(), lhs, rhs);
 }
@@ -188,9 +188,9 @@ int RelationalExpr::get_bytes() const {
     }
 }
 
-Location * RelationalExpr::emit(Scope *func_scope) const {
-    auto lhs = left->emit(func_scope);
-    auto rhs = right->emit(func_scope);
+Location * RelationalExpr::emit() const {
+    auto lhs = left->emit();
+    auto rhs = right->emit();
 
     switch (op->get_op_type()) {
         case Operator::Type::less_than:
@@ -250,9 +250,9 @@ int EqualityExpr::get_bytes() const {
     }
 }
 
-Location * EqualityExpr::emit(Scope *func_scope) const {
-    auto lhs = left->emit(func_scope);
-    auto rhs = right->emit(func_scope);
+Location * EqualityExpr::emit() const {
+    auto lhs = left->emit();
+    auto rhs = right->emit();
 
     switch (op->get_op_type()) {
         case Operator::Type::equal:
@@ -294,7 +294,7 @@ Type* LogicalExpr::type_check() {
     }
 }
 
-Location * LogicalExpr::emit(Scope *func_scope) const {
+Location * LogicalExpr::emit() const {
     return nullptr;
 }
 
@@ -315,11 +315,11 @@ int AssignExpr::get_bytes() const {
     return right->get_bytes();
 }
 
-Location * AssignExpr::emit(Scope *func_scope) const {
+Location * AssignExpr::emit() const {
     Assert(left && right);
 
-    auto lhs = left->emit(func_scope);
-    auto rhs = right->emit(func_scope);
+    auto lhs = left->emit();
+    auto rhs = right->emit();
     Cgen_t::shared().gen_assign(lhs, rhs);
 
     return lhs;
@@ -387,7 +387,7 @@ Type* FieldAccess::type_check() {
     return Type::errorType;
 }
 
-Location* FieldAccess::emit(Scope *func_scope) const {
+Location * FieldAccess::emit() const {
     auto scope = Sym_tbl_t::shared().get_scope();
 
     if (base) {
@@ -439,7 +439,7 @@ int Call::get_bytes() const {
     }
 }
 
-Location* Call::emit(Scope *func_scope) const {
+Location * Call::emit() const {
     auto scope = Sym_tbl_t::shared().get_scope();
 
     if (base) {
@@ -452,7 +452,7 @@ Location* Call::emit(Scope *func_scope) const {
 
         // generate parameter pushing
         for (int i = 0; i < actuals->size(); ++i) {
-            Cgen_t::shared().gen_push_param(actuals->get(i)->emit(func_scope));
+            Cgen_t::shared().gen_push_param(actuals->get(i)->emit());
         }
 
         // generate call code

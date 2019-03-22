@@ -67,7 +67,7 @@ void FnDecl::check(Scope *class_or_interface_scope) {
     }
 
     auto block = dynamic_cast<StmtBlock*>(body);
-    if (block) { block->check(scope); }
+    if (block) { block->check(); }
 
     Sym_tbl_t::shared().leave_scope();
 }
@@ -96,7 +96,7 @@ void FnDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
 
     auto block = dynamic_cast<StmtBlock*>(body);
     if (block) {
-        block->emit(scope);
+        block->emit();
         func_code->SetFrameSize(block->get_bytes());
     }
 

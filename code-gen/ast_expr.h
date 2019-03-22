@@ -46,7 +46,7 @@ public:
 
     int get_bytes() const override { return CodeGenerator::word_size; }
 
-    Location * emit(Scope *func_scope) const override;
+    Location *emit() const override;
 };
 
 
@@ -61,7 +61,7 @@ public:
 
     int get_bytes() const override { return CodeGenerator::word_size; }
 
-    Location * emit(Scope *func_scope) const override;
+    Location *emit() const override;
 };
 
 
@@ -76,7 +76,7 @@ public:
 
     int get_bytes() const override { return CodeGenerator::word_size; }
 
-    Location * emit(Scope *func_scope) const override;
+    Location *emit() const override;
 };
 
 
@@ -91,7 +91,7 @@ public:
 
     int get_bytes() const override { return CodeGenerator::word_size; }
 
-    Location * emit(Scope *func_scope) const override;
+    Location *emit() const override;
 };
 
 
@@ -103,7 +103,7 @@ public:
 
     int get_bytes() const override { return CodeGenerator::word_size; }
 
-    Location * emit(Scope *func_scope) const override;
+    Location *emit() const override;
 };
 
 
@@ -166,7 +166,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit(Scope *func_scope) const override;
+    Location *emit() const override;
 };
 
 
@@ -181,7 +181,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit(Scope *func_scope) const override;
+    Location *emit() const override;
 };
 
 
@@ -196,7 +196,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit(Scope *func_scope) const override;
+    Location *emit() const override;
 };
 
 
@@ -211,7 +211,7 @@ public:
 
     Type * type_check() override;
 
-    Location * emit(Scope *func_scope) const override;
+    Location *emit() const override;
 };
 
 
@@ -226,7 +226,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit(Scope *func_scope) const override;
+    Location *emit() const override;
 };
 
 
@@ -274,7 +274,7 @@ public:
 
     Type * type_check() override;
 
-    Location * emit(Scope *func_scope) const override;
+    Location *emit() const override;
 };
 
 
@@ -297,7 +297,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit(Scope *func_scope) const override;
+    Location *emit() const override;
 };
 
 

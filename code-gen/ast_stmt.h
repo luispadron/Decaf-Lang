@@ -29,7 +29,7 @@ public:
     Stmt() : Node() {}
     explicit Stmt(yyltype loc) : Node(loc) {}
 
-    virtual Location * emit(Scope *func_scope) const { return nullptr; }
+    virtual Location *emit() const { return nullptr; }
 
     virtual int get_bytes() const { return 0; }
 };
@@ -37,7 +37,7 @@ public:
 
 class StmtBlock : public Stmt {
 private:
-    static int current_block_id;
+    static int next_block_id;
 
 protected:
     List<VarDecl*> *decls;
@@ -48,14 +48,14 @@ public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
 
     /// returns the mangled name of the block, for example:
-    /// if in function "test" --> "_test_block1", where 1 is a unique id
-    std::string get_mangled_name(const std::string &func_name) const;
+    /// if "_block1", where 1 is a unique id
+    std::string get_mangled_name() const;
 
     int get_bytes() const override;
 
-    void check(Scope *func_scope);
+    void check();
 
-    Location * emit(Scope *func_scope) const override;
+    Location *emit() const override;
 };
 
   
