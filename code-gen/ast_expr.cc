@@ -81,6 +81,27 @@ Operator::Operator(yyltype loc, const char *tok) : Node(loc) {
     strncpy(tokenString, tok, sizeof(tokenString));
 }
 
+Operator::Type Operator::get_op_type() const {
+    if (strcmp(tokenString, "<") == 0) return Type::less_than;
+    if (strcmp(tokenString, ">") == 0) return Type::greater_than;
+    if (strcmp(tokenString, "<=") == 0) return Type::less_than_eql;
+    if (strcmp(tokenString, ">=") == 0) return Type::greater_than_eql;
+    if (strcmp(tokenString, "=") == 0) return Type::assign;
+    if (strcmp(tokenString, "==") == 0) return Type::equal;
+    if (strcmp(tokenString, "!=") == 0) return Type::not_equal;
+    if (strcmp(tokenString, "!") == 0) return Type::notOp;
+    if (strcmp(tokenString, "||") == 0) return Type::orOp;
+    if (strcmp(tokenString, "&&") == 0) return Type::andOp;
+    if (strcmp(tokenString, "+") == 0) return Type::plus;
+    if (strcmp(tokenString, "-") == 0) return Type::minus;
+    if (strcmp(tokenString, "/") == 0) return Type::divide;
+    if (strcmp(tokenString, "*") == 0) return Type::multiply;
+    if (strcmp(tokenString, "%") == 0) return Type::mod;
+
+    Assert(false);
+    return Type::multiply; // shouldn't ever happen, but silences compiler warning
+}
+
 
 CompoundExpr::CompoundExpr(Expr *l, Operator *o, Expr *r) 
   : Expr(Join(l->get_location(), r->get_location())) {
@@ -98,19 +119,6 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r)
     (right = r)->set_parent(this);
 }
 
-int CompoundExpr::get_bytes() const {
-    const int bytes = [&]() {
-        if (left) {
-            return left->get_bytes() + right->get_bytes() + CodeGenerator::word_size;
-        } else {
-            return right->get_bytes() + 2 * CodeGenerator::word_size; // 2 * word_size here because we turn unary to binary
-        }
-    }();
-
-    return bytes;
-}
-
-
 bool ArithmeticExpr::validate() {
     if (left) return left->type_check()->can_perform_arithmetic_with(right->type_check());
     return right->type_check()->can_perform_arithmetic();
@@ -121,6 +129,17 @@ Type* ArithmeticExpr::type_check() {
         return Type::errorType;
     } else {
         return right->type_check();
+    }
+}
+
+int ArithmeticExpr::get_bytes() const {
+    if (left) {
+        return left->get_bytes() + right->get_bytes() + Cgen_t::word_size;
+    } else {
+        // for unary, (-) negative
+        // we will still generate a lhs, the value of the lhs temp will be zero
+        // ex: -3 -> 0 - 3
+        return right->get_bytes() + 2 * Cgen_t::word_size;
     }
 }
 
@@ -148,8 +167,54 @@ Type* RelationalExpr::type_check() {
     }
 }
 
+int RelationalExpr::get_bytes() const {
+    switch (op->get_op_type()) {
+        case Operator::Type::less_than:
+        case Operator::Type::greater_than:
+            return left->get_bytes() + right->get_bytes() + Cgen_t::word_size;
+
+        // for these operations we actually generate 3 temporaries
+        // example: x <= 3
+        // 1: x < 3
+        // 2: x == 3
+        // 3: 1 || 2
+        case Operator::Type::less_than_eql:
+        case Operator::Type::greater_than_eql:
+            return left->get_bytes() + right->get_bytes() + 3 * Cgen_t::word_size;
+
+        default:
+            Assert(false);
+            return -1;
+    }
+}
+
 Location * RelationalExpr::emit(Scope *func_scope) const {
-    return nullptr;
+    auto lhs = left->emit(func_scope);
+    auto rhs = right->emit(func_scope);
+
+    switch (op->get_op_type()) {
+        case Operator::Type::less_than:
+            return Cgen_t::shared().gen_binary_op("<", lhs, rhs);
+
+        case Operator::Type::greater_than:
+            return Cgen_t::shared().gen_binary_op(">", lhs, rhs);
+
+        case Operator::Type::less_than_eql: {
+            auto lt_temp = Cgen_t::shared().gen_binary_op("<", lhs, rhs);
+            auto eq_temp = Cgen_t::shared().gen_binary_op("==", lhs, rhs);
+            return Cgen_t::shared().gen_binary_op("||", lt_temp, eq_temp);
+        }
+
+        case Operator::Type::greater_than_eql: {
+            auto gt_temp = Cgen_t::shared().gen_binary_op(">", lhs, rhs);
+            auto eq_temp = Cgen_t::shared().gen_binary_op("==", lhs, rhs);
+            return Cgen_t::shared().gen_binary_op("||", gt_temp, eq_temp);
+        }
+
+        default:
+            Assert(false);
+            return nullptr;
+    }
 }
 
 

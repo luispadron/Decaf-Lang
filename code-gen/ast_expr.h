@@ -112,12 +112,33 @@ protected:
     char tokenString[4];
     
 public:
+
+    enum class Type {
+        less_than,
+        greater_than,
+        less_than_eql,
+        greater_than_eql,
+        assign,
+        equal,
+        not_equal,
+        notOp,
+        orOp,
+        andOp,
+        plus,
+        minus,
+        divide,
+        multiply,
+        mod
+    };
+
     Operator(yyltype loc, const char *tok);
 
     friend std::ostream& operator<<(std::ostream& out, Operator *o) { return out << o->tokenString; }
 
     const char * get_op_token() const { return tokenString; }
- };
+
+    Type get_op_type() const;
+};
 
 
 class CompoundExpr : public Expr {
@@ -130,8 +151,6 @@ protected:
 public:
     CompoundExpr(Expr *lhs, Operator *op, Expr *rhs);  // for binary
     CompoundExpr(Operator *op, Expr *rhs);             // for unary
-
-    int get_bytes() const override;
 };
 
 
@@ -145,6 +164,8 @@ public:
 
     Type * type_check() override;
 
+    int get_bytes() const override;
+
     Location * emit(Scope *func_scope) const override;
 };
 
@@ -157,6 +178,8 @@ public:
     RelationalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
 
     Type * type_check() override;
+
+    int get_bytes() const override;
 
     Location * emit(Scope *func_scope) const override;
 };
