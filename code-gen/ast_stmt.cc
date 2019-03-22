@@ -56,7 +56,7 @@ void StmtBlock::check(Scope *func_scope) {
     Sym_tbl_t::shared().leave_scope();
 }
 
-Location * StmtBlock::emit(Scope *func_scope) {
+Location * StmtBlock::emit(Scope *func_scope) const {
     Assert(func_scope);
     auto scope = Sym_tbl_t::shared().enter_scope(get_mangled_name(func_scope->name()));
 

@@ -29,7 +29,7 @@ public:
     Stmt() : Node() {}
     explicit Stmt(yyltype loc) : Node(loc) {}
 
-    virtual Location * emit(Scope *func_scope) { return nullptr; } // TODO: make this pure virtual
+    virtual Location * emit(Scope *func_scope) const { return nullptr; }
 
     virtual int get_bytes() const { return 0; } // TODO: Make this pure virtual
 };
@@ -55,7 +55,7 @@ public:
 
     void check(Scope *func_scope);
 
-    Location * emit(Scope *func_scope) override;
+    Location * emit(Scope *func_scope) const override;
 };
 
   

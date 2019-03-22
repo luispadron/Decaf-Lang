@@ -25,12 +25,6 @@ public:
     /// returns the bytes required for an expression
     /// any subclass which requires more than 0 bytes has to implement this
     virtual int get_bytes() const { return 0; }
-
-    /// emits the code required to perform an expression
-    /// if the expression generates a new location,
-    /// be it temporary, local, etc. that location is returned,
-    /// otherwise nullptr is returned
-    virtual Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const { return nullptr; }
 };
 
 
@@ -56,7 +50,7 @@ public:
 
     int get_bytes() const override { return CodeGenerator::word_size; }
 
-    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
+    Location * emit(Scope *func_scope) const override;
 };
 
 
@@ -70,8 +64,6 @@ public:
     Type * type_check() override;
 
     int get_bytes() const override { return CodeGenerator::word_size; }
-
-    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 
@@ -85,8 +77,6 @@ public:
     Type * type_check() override;
 
     int get_bytes() const override { return CodeGenerator::word_size; }
-
-    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 
@@ -100,8 +90,6 @@ public:
     Type * type_check() override;
 
     int get_bytes() const override { return CodeGenerator::word_size; }
-
-    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 
@@ -112,8 +100,6 @@ public:
     Type * type_check() override;
 
     int get_bytes() const override { return CodeGenerator::word_size; }
-
-    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
 };
 
 
@@ -153,7 +139,7 @@ public:
 
     int get_bytes() const override;
 
-    Location *emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
+    Location * emit(Scope *func_scope) const override;
 };
 
 
@@ -168,7 +154,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
+    Location * emit(Scope *func_scope) const override;
 };
 
 
@@ -183,7 +169,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
+    Location * emit(Scope *func_scope) const override;
 };
 
 
@@ -200,7 +186,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
+    Location * emit(Scope *func_scope) const override;
 };
 
 
@@ -215,7 +201,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit(Scope *class_or_interface_scope, FnDecl *curr_func) const override;
+    Location * emit(Scope *func_scope) const override;
 };
 
 
@@ -262,6 +248,8 @@ public:
     FieldAccess(Expr *base, Identifier *field); //ok to pass NULL base
 
     Type * type_check() override;
+
+    Location * emit(Scope *func_scope) const override;
 };
 
 

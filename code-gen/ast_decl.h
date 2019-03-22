@@ -68,7 +68,7 @@ public:
 
     DeclType get_decl_type() const override { return DeclType::Variable; }
 
-    int get_bytes() const override { return CodeGenerator::word_size; }
+    int get_bytes() const override { return Cgen_t::word_size; }
 
     /// returns the memory location of this variable
     Location * get_location() const { return location; }

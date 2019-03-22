@@ -42,6 +42,7 @@ Scope * SymbolTable::create_scope(const string &name, ScopeType type) {
 Scope * SymbolTable::enter_scope(const std::string &name) {
     auto scope_it = scopes.find(name);
     if (scope_it != scopes.end()) {
+        scope_ptr = scope_it->second;
         return scope_it->second;
     } else {
         assert(false);

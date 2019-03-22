@@ -20,8 +20,8 @@ Type* IntConstant::type_check() {
     return Type::intType;
 }
 
-Location * IntConstant::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
-    return nullptr;
+Location* IntConstant::emit(Scope *func_scope) const {
+    return Cgen_t::shared().gen_load_constant(value);
 }
 
 
@@ -33,10 +33,6 @@ Type* DoubleConstant::type_check() {
     return Type::doubleType;
 }
 
-Location * DoubleConstant::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
-    return nullptr;
-}
-
 
 BoolConstant::BoolConstant(yyltype loc, bool val) : Expr(loc) {
     value = val;
@@ -44,10 +40,6 @@ BoolConstant::BoolConstant(yyltype loc, bool val) : Expr(loc) {
 
 Type* BoolConstant::type_check() {
     return Type::boolType;
-}
-
-Location * BoolConstant::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
-    return nullptr;
 }
 
 
@@ -60,17 +52,9 @@ Type* StringConstant::type_check() {
     return Type::stringType;
 }
 
-Location * StringConstant::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
-    return nullptr;
-}
-
 
 Type* NullConstant::type_check() {
     return Type::nullType;
-}
-
-Location * NullConstant::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
-    return nullptr;
 }
 
 
@@ -114,7 +98,7 @@ int ArithmeticExpr::get_bytes() const {
     return 0; // TODO
 }
 
-Location * ArithmeticExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
+Location * ArithmeticExpr::emit(Scope *func_scope) const {
     return nullptr;
 }
 
@@ -135,7 +119,7 @@ int RelationalExpr::get_bytes() const {
     return 0; // TODO
 }
 
-Location * RelationalExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
+Location * RelationalExpr::emit(Scope *func_scope) const {
     return nullptr;
 }
 
@@ -156,7 +140,7 @@ int EqualityExpr::get_bytes() const {
     return 0; // TODO
 }
 
-Location * EqualityExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
+Location * EqualityExpr::emit(Scope *func_scope) const {
     return nullptr;
 }
 
@@ -178,7 +162,7 @@ int LogicalExpr::get_bytes() const {
     return 0; // TODO
 }
 
-Location * LogicalExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
+Location * LogicalExpr::emit(Scope *func_scope) const {
     return nullptr;
 }
 
@@ -199,8 +183,14 @@ int AssignExpr::get_bytes() const {
     return 0; // TODO
 }
 
-Location * AssignExpr::emit(Scope *class_or_interface_scope, FnDecl *curr_func) const {
-    return nullptr;
+Location * AssignExpr::emit(Scope *func_scope) const {
+    Assert(left && right);
+
+    auto lhs = left->emit(func_scope);
+    auto rhs = right->emit(func_scope);
+    Cgen_t::shared().gen_assign(lhs, rhs);
+
+    return lhs;
 }
 
 
@@ -263,6 +253,20 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
 Type* FieldAccess::type_check() {
     // not implemented for this project
     return Type::errorType;
+}
+
+Location* FieldAccess::emit(Scope *func_scope) const {
+    auto scope = Sym_tbl_t::shared().get_scope();
+
+    if (base) {
+        // TODO: add this when classes are finished
+        Assert(false);
+        return nullptr;
+    } else {
+        auto var = dynamic_cast<VarDecl*>(scope->get_decl(field->get_name()).first);
+        Assert(var);
+        return var->get_location();
+    }
 }
 
 

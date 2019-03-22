@@ -218,11 +218,11 @@ T_NewArray (283) 94
 T_Print (284) 63
 T_ReadInteger (285) 91
 T_ReadLine (286) 92
-T_Identifier (287) 107
-T_StringConstant (288) 105
-T_IntConstant (289) 54 102
-T_DoubleConstant (290) 103
-T_BoolConstant (291) 104
+T_Identifier <identifier> (287) 107
+T_StringConstant <stringConstant> (288) 105
+T_IntConstant <integerConstant> (289) 54 102
+T_DoubleConstant <doubleConstant> (290) 103
+T_BoolConstant <boolConstant> (291) 104
 T_Increm (292) 69
 T_Decrem (293) 70
 T_Switch (294) 58
@@ -237,79 +237,79 @@ $accept (62)
     on left: 0
 Program (63)
     on left: 1, on right: 0
-DeclList (64)
+DeclList <declList> (64)
     on left: 2 3, on right: 1 2
-Decl (65)
+Decl <decl> (65)
     on left: 4 5 6 7, on right: 2 3
-VariableDeclList (66)
+VariableDeclList <varDeclList> (66)
     on left: 8 9, on right: 8 39
-VariableDecl (67)
+VariableDecl <varDecl> (67)
     on left: 10, on right: 4 8 33
-Variable (68)
+Variable <varDecl> (68)
     on left: 11, on right: 10 21 22
-Type (69)
+Type <type> (69)
     on left: 12 13 14 15 16 17 18, on right: 11 18 19 37 94
-FunctionDecl (70)
+FunctionDecl <fnDecl> (70)
     on left: 19 20, on right: 5 32
-Formals (71)
+Formals <varDeclList> (71)
     on left: 21 22 23, on right: 19 20 21 37 38
-ClassDecl (72)
+ClassDecl <classDecl> (72)
     on left: 24 25 26 27, on right: 6
-NamedTypeList (73)
+NamedTypeList <namedTypeList> (73)
     on left: 28 29, on right: 26 27 28
-FieldList (74)
+FieldList <declList> (74)
     on left: 30 31, on right: 24 25 26 27 30
-Field (75)
+Field <decl> (75)
     on left: 32 33, on right: 30
-InterfaceDecl (76)
+InterfaceDecl <interfaceDecl> (76)
     on left: 34, on right: 7
-PrototypeList (77)
+PrototypeList <declList> (77)
     on left: 35 36, on right: 34 35
-Prototype (78)
+Prototype <decl> (78)
     on left: 37 38, on right: 35
-StmtBlock (79)
+StmtBlock <stmtBlock> (79)
     on left: 39, on right: 19 20 51
-StmtList (80)
+StmtList <stmtList> (80)
     on left: 40 41, on right: 39 40 54 55
-Stmt (81)
+Stmt <stmt> (81)
     on left: 42 43 44 45 46 47 48 49 50 51, on right: 40 56 57 59 60
-SwitchCaseList (82)
+SwitchCaseList <switchCaseList> (82)
     on left: 52 53, on right: 52 58
-SwitchCase (83)
+SwitchCase <switchCaseStmt> (83)
     on left: 54, on right: 52 53
-SwitchDefaultCase (84)
+SwitchDefaultCase <switchCaseStmt> (84)
     on left: 55, on right: 58
-IfStmt (85)
+IfStmt <stmt> (85)
     on left: 56 57, on right: 44
-SwitchStmt (86)
+SwitchStmt <stmt> (86)
     on left: 58, on right: 45
-WhileStmt (87)
+WhileStmt <stmt> (87)
     on left: 59, on right: 46
-ForStmt (88)
+ForStmt <stmt> (88)
     on left: 60, on right: 47
-ReturnStmt (89)
+ReturnStmt <stmt> (89)
     on left: 61, on right: 49
-BreakStmt (90)
+BreakStmt <stmt> (90)
     on left: 62, on right: 48
-PrintStmt (91)
+PrintStmt <stmt> (91)
     on left: 63, on right: 50
-ExprList (92)
+ExprList <exprList> (92)
     on left: 64 65, on right: 63 64 100
-OptExpr (93)
+OptExpr <expr> (93)
     on left: 66 67, on right: 60 61
-Expr (94)
+Expr <expr> (94)
     on left: 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85
     86 87 88 89 90 91 92 93 94, on right: 43 56 57 58 59 60 64 65 66
     68 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 94 96 97 99
-LValue (95)
+LValue <expr> (95)
     on left: 95 96 97, on right: 68 69 70 72
-Call (96)
+Call <expr> (96)
     on left: 98 99, on right: 74
-Actuals (97)
+Actuals <exprList> (97)
     on left: 100 101, on right: 98 99
-Constant (98)
+Constant <expr> (98)
     on left: 102 103 104 105 106, on right: 71
-Ident (99)
+Ident <ident> (99)
     on left: 107, on right: 11 17 19 20 24 25 26 27 28 29 34 37 38
     93 95 96 98 99
 
