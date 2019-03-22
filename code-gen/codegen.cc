@@ -17,13 +17,11 @@ using namespace std;
 CodeGenerator::CodeGenerator() :
     code(new List<Instruction*>),
     is_main_defined(false),
-    next_local_offset(CodeGenerator::offset_first_local),
-    curr_func_frame_size(0) { }
+    next_local_offset(CodeGenerator::offset_first_local) { }
 
 void CodeGenerator::reset_offsets() {
     // reset offsets
     next_local_offset = CodeGenerator::offset_first_local;
-    curr_func_frame_size = 0;
 }
 
 char *CodeGenerator::new_label() {
@@ -42,7 +40,6 @@ Location *CodeGenerator::gen_temp_var() {
 
     result = new Location(Segment::fp_relative, next_local_offset, temp);
     next_local_offset -= word_size;
-    curr_func_frame_size += word_size;
 
     Assert(result);
     return result;
@@ -128,9 +125,7 @@ BeginFunc *CodeGenerator::gen_begin_func() {
     return result;
 }
 
-void CodeGenerator::gen_end_func(BeginFunc *func) {
-    Assert(curr_func_frame_size >= 0);
-    func->SetFrameSize(curr_func_frame_size);
+void CodeGenerator::gen_end_func() {
     code->append(new EndFunc());
 }
 

@@ -23,9 +23,24 @@ string StmtBlock::get_mangled_name(const std::string &func_name) const {
     return func_name + "_block" + to_string(block_id);
 }
 
-void StmtBlock::check(Scope *function_scope) {
-    Assert(function_scope);
-    auto scope = Sym_tbl_t::shared().create_scope(get_mangled_name(function_scope->name()), ScopeType::Block);
+int StmtBlock::get_bytes() const {
+    // collect bytes from children
+    int bytes = 0;
+
+    for (int i = 0; i < decls->size(); ++i) {
+        bytes += decls->get(i)->get_bytes();
+    }
+
+    for (int i = 0; i < stmts->size(); ++i) {
+        bytes += stmts->get(i)->get_bytes();
+    }
+
+    return bytes;
+}
+
+void StmtBlock::check(Scope *func_scope) {
+    Assert(func_scope);
+    auto scope = Sym_tbl_t::shared().create_scope(get_mangled_name(func_scope->name()), ScopeType::Block);
 
     // add declarations to scope
     for (int i = 0; i < decls->size(); ++i) {
@@ -35,14 +50,14 @@ void StmtBlock::check(Scope *function_scope) {
 
     for (int i = 0; i < stmts->size(); ++i) {
         auto block = dynamic_cast<StmtBlock*>(stmts->get(i));
-        if (block) block->check(function_scope);
+        if (block) block->check(func_scope);
     }
 
     Sym_tbl_t::shared().leave_scope();
 }
 
-void StmtBlock::emit() {
-    Assert(func_scope && curr_func);
+Location * StmtBlock::emit(Scope *func_scope) {
+    Assert(func_scope);
     auto scope = Sym_tbl_t::shared().enter_scope(get_mangled_name(func_scope->name()));
 
     // set locations for local variables, the offset is tracked by code generator as there
@@ -56,10 +71,11 @@ void StmtBlock::emit() {
     }
 
     for (int i = 0; i < stmts->size(); ++i) {
-
+        stmts->get(i)->emit(func_scope);
     }
 
     Sym_tbl_t::shared().leave_scope();
+    return nullptr;
 }
 
 

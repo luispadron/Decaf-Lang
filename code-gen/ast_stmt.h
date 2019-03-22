@@ -29,7 +29,9 @@ public:
     Stmt() : Node() {}
     explicit Stmt(yyltype loc) : Node(loc) {}
 
-    virtual Location * emit() { return nullptr; } // TODO: make this pure virtual
+    virtual Location * emit(Scope *func_scope) { return nullptr; } // TODO: make this pure virtual
+
+    virtual int get_bytes() const { return 0; } // TODO: Make this pure virtual
 };
 
 
@@ -49,9 +51,11 @@ public:
     /// if in function "test" --> "_test_block1", where 1 is a unique id
     std::string get_mangled_name(const std::string &func_name) const;
 
-    void check(Scope *function_scope);
+    int get_bytes() const override;
 
-    Location * emit() override;
+    void check(Scope *func_scope);
+
+    Location * emit(Scope *func_scope) override;
 };
 
   

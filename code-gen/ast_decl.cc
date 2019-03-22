@@ -96,12 +96,13 @@ void FnDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
 
     auto block = dynamic_cast<StmtBlock*>(body);
     if (block) {
-        block->emit();
+        block->emit(scope);
+        func_code->SetFrameSize(block->get_bytes());
     }
 
     // end function code and pop scope
     Sym_tbl_t::shared().leave_scope();
-    Cgen_t::shared().gen_end_func(func_code);
+    Cgen_t::shared().gen_end_func();
 }
 
 
