@@ -27,10 +27,6 @@ void StmtBlock::check(Scope *function_scope) {
     Assert(function_scope);
     auto scope = Sym_tbl_t::shared().create_scope(get_mangled_name(function_scope->name()), ScopeType::Block);
 
-    for (int i = 0; i < decls->size(); ++i) {
-
-    }
-
     // add declarations to scope
     for (int i = 0; i < decls->size(); ++i) {
         auto decl = decls->get(i);
@@ -40,6 +36,27 @@ void StmtBlock::check(Scope *function_scope) {
     for (int i = 0; i < stmts->size(); ++i) {
         auto block = dynamic_cast<StmtBlock*>(stmts->get(i));
         if (block) block->check(function_scope);
+    }
+
+    Sym_tbl_t::shared().leave_scope();
+}
+
+void StmtBlock::emit() {
+    Assert(func_scope && curr_func);
+    auto scope = Sym_tbl_t::shared().enter_scope(get_mangled_name(func_scope->name()));
+
+    // set locations for local variables, the offset is tracked by code generator as there
+    // can be multiple stmt blocks inside each other and thus must be done and tracked recursively
+    for (int i = 0; i < decls->size(); ++i) {
+        auto var = dynamic_cast<VarDecl*>(decls->get(i));
+        if (var) {
+            auto loc = Cgen_t::shared().gen_local_var(var->get_id()->get_name().c_str(), var->get_bytes());
+            var->set_location(loc);
+        }
+    }
+
+    for (int i = 0; i < stmts->size(); ++i) {
+
     }
 
     Sym_tbl_t::shared().leave_scope();

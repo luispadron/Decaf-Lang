@@ -73,6 +73,10 @@ void FnDecl::check(Scope *class_or_interface_scope) {
 }
 
 void FnDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
+    // enter scope
+    auto scope = Sym_tbl_t::shared()
+            .enter_scope(get_mangled_name(class_or_interface_scope ? class_or_interface_scope->name() : ""));
+
     // prepare generator
     Cgen_t::shared().reset_offsets();
 
@@ -81,7 +85,19 @@ void FnDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
     Cgen_t::shared().gen_label(label.c_str());
     auto func_code = Cgen_t::shared().gen_begin_func();
 
-    // TODO: add code here for formals and body
+    // generate locations for parameters
+    int param_offset = Cgen_t::offset_first_param;
+    for (int i = 0; i < formals->size(); ++i) {
+        auto var = formals->get(i);
+        auto loc = new Location(Segment::fp_relative, param_offset, var->get_id()->get_name().c_str());
+        var->set_location(loc);
+        param_offset += var->get_bytes();
+    }
+
+    auto block = dynamic_cast<StmtBlock*>(body);
+    if (block) {
+        block->emit();
+    }
 
     // end function code and pop scope
     Sym_tbl_t::shared().leave_scope();

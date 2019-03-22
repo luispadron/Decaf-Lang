@@ -19,6 +19,7 @@
 #include <string>
 
 class Decl;
+class FnDecl;
 class VarDecl;
 class Expr;
 
@@ -27,6 +28,8 @@ class Stmt : public Node {
 public:
     Stmt() : Node() {}
     explicit Stmt(yyltype loc) : Node(loc) {}
+
+    virtual Location * emit() { return nullptr; } // TODO: make this pure virtual
 };
 
 
@@ -47,6 +50,8 @@ public:
     std::string get_mangled_name(const std::string &func_name) const;
 
     void check(Scope *function_scope);
+
+    Location * emit() override;
 };
 
   

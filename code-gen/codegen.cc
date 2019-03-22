@@ -48,6 +48,11 @@ Location *CodeGenerator::gen_temp_var() {
     return result;
 }
 
+Location* CodeGenerator::gen_local_var(const char *name, int bytes) {
+    auto loc = new Location(Segment::fp_relative, next_local_offset, name);
+    next_local_offset -= bytes;
+    return loc;
+}
 
 Location *CodeGenerator::gen_load_constant(int value) {
     Location *result = gen_temp_var();

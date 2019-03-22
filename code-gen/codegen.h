@@ -17,7 +17,6 @@
 #include <stdlib.h>
 #include "list.h"
 #include "tac.h"
- 
 
 // These codes are used to identify the built-in functions
 typedef enum { Alloc, ReadLine, ReadInteger, StringEqual,
@@ -70,13 +69,19 @@ public:
      * Assigns a new unique label name and returns it. Does not
      * generate any Tac instructions (see GenLabel below if needed)
      */
-    char *new_label();
+    char * new_label();
 
     /**
      * Creates and returns a Location for a new uniquely named
      * temp variable. Does not generate any Tac instructions
      */
-    Location *gen_temp_var();
+    Location * gen_temp_var();
+
+    /**
+     * Creates and returns a Location for a new local variable.
+     * Calling this function modifies the local offset of the current code generator.
+     */
+     Location * gen_local_var(const char *name, int bytes);
 
     /**
     * Generates Tac instructions to load a constant value. Creates
