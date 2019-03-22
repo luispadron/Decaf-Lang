@@ -194,6 +194,8 @@ public:
 
     Type * type_check() override;
 
+    int get_bytes() const override;
+
     Location * emit(Scope *func_scope) const override;
 };
 

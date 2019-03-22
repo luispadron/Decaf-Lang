@@ -230,8 +230,54 @@ Type* EqualityExpr::type_check() {
     }
 }
 
+int EqualityExpr::get_bytes() const {
+    switch (op->get_op_type()) {
+        case Operator::Type::equal:
+            return left->get_bytes() + right->get_bytes() + Cgen_t::word_size;
+
+        // != example:
+        // x != 3
+        // 1: tmp0 = 3
+        // 2: tmp1 = x == tmp0
+        // 3: tmp2 = 0
+        // 4: tmp3 = tmp1 == tmp2
+        case Operator::Type::not_equal:
+            return left->get_bytes() + right->get_bytes() + 3 * Cgen_t::word_size;
+
+        default:
+            Assert(false);
+            return -1;
+    }
+}
+
 Location * EqualityExpr::emit(Scope *func_scope) const {
-    return nullptr;
+    auto lhs = left->emit(func_scope);
+    auto rhs = right->emit(func_scope);
+
+    switch (op->get_op_type()) {
+        case Operator::Type::equal:
+            if (left->type_check()->is_equal_to(Type::stringType)) {
+                return Cgen_t::shared().gen_built_in_call(StringEqual, lhs, rhs);
+            } else {
+                return Cgen_t::shared().gen_binary_op("==", lhs, rhs);
+            }
+
+        case Operator::Type::not_equal: {
+            auto eql_tmp = [&]() {
+                if (left->type_check()->is_equal_to(Type::stringType)) {
+                    return Cgen_t::shared().gen_built_in_call(StringEqual, lhs, rhs);
+                } else {
+                    return Cgen_t::shared().gen_binary_op("==", lhs, rhs);
+                }
+            }();
+            auto zero_tmp = Cgen_t::shared().gen_load_constant(0);
+            return Cgen_t::shared().gen_binary_op("==", eql_tmp, zero_tmp);
+        }
+
+        default:
+            Assert(false);
+            return nullptr;
+    }
 }
 
 
