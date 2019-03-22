@@ -36,9 +36,7 @@ Location *CodeGenerator::gen_temp_var() {
     static int nextTempNum;
     char temp[10];
     sprintf(temp, "_tmp%d", nextTempNum++);
-    Location *result = nullptr;
-
-    result = new Location(Segment::fp_relative, next_local_offset, temp);
+    auto *result = new Location(Segment::fp_relative, next_local_offset, temp);
     next_local_offset -= word_size;
 
     Assert(result);
