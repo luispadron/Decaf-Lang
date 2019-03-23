@@ -298,8 +298,22 @@ Type* LogicalExpr::type_check() {
     }
 }
 
+int LogicalExpr::get_bytes() const {
+    if (left) return left->get_bytes() + right->get_bytes() + Cgen_t::word_size;
+    else return right->get_bytes() + 2 * Cgen_t::word_size;
+}
+
 Location * LogicalExpr::emit() const {
-    return nullptr;
+    if (!left) {
+        // do unary not (!) operation
+        auto rhs = right->emit();
+        auto zero_tmp = Cgen_t::shared().gen_load_constant(0);
+        return Cgen_t::shared().gen_binary_op("==", rhs, zero_tmp);
+    } else {
+        auto lhs = left->emit();
+        auto rhs = right->emit();
+        return Cgen_t::shared().gen_binary_op(op->get_op_token(), lhs, rhs);
+    }
 }
 
 
