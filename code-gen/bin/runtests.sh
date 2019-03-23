@@ -38,4 +38,6 @@ do
     TOTAL=$((TOTAL+1))
 done
 
+
+
 echo "passed $PASSED / $TOTAL tests"
