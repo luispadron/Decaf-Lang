@@ -369,7 +369,36 @@ Type * ArrayAccess::type_check() {
 }
 
 int ArrayAccess::get_bytes() const {
-    return base->get_bytes() + subscript->get_bytes();
+    return base->get_bytes() + subscript->get_bytes() + 11 * Cgen_t::word_size; // 11 temporaries are used
+}
+
+Location* ArrayAccess::emit() const {
+    auto base_tmp = base->emit();
+    auto subs_tmp = subscript->emit(); // subscript temp
+
+    auto zero_tmp = Cgen_t::shared().gen_load_constant(0); // 0, for out of bounds check
+    auto lt_zero = Cgen_t::shared().gen_binary_op("<", subs_tmp, zero_tmp); // check for less than 0
+
+    auto arr_size_tmp = Cgen_t::shared().gen_load(base_tmp, -4); // remember, array size is at first element (0th)
+    auto lt_size = Cgen_t::shared().gen_binary_op("<", subs_tmp, arr_size_tmp); // checks that subscript is less than size
+    auto eql_size = Cgen_t::shared().gen_binary_op("==", lt_size, zero_tmp); // bool check since if 0 == 0, then were ok (in bounds)
+    auto check = Cgen_t::shared().gen_binary_op("||", lt_zero, eql_size); // final or, to make sure > 0 and < size
+
+    auto size_pass_lbl = Cgen_t::shared().new_label();
+    Cgen_t::shared().gen_ifz(check, size_pass_lbl); // generate if check for "check"
+
+    // any code here will be executed if the size check fails
+    auto fail_msg = Cgen_t::shared().gen_load_constant("Decaf runtime error: Array subscript out of bound...");
+    Cgen_t::shared().gen_built_in_call(PrintString, fail_msg);
+    Cgen_t::shared().gen_built_in_call(Halt);
+
+    // any code here will be executed if the size check passed
+    Cgen_t::shared().gen_label(size_pass_lbl);
+    auto word_sz_tmp = Cgen_t::shared().gen_load_constant(Cgen_t::word_size);
+    auto index_addr = Cgen_t::shared().gen_binary_op("*", word_sz_tmp, subs_tmp); // get address of element at index
+    auto elem_tmp = Cgen_t::shared().gen_binary_op("+", base_tmp, index_addr); // get pointer to element
+
+    return Cgen_t::shared().gen_load(elem_tmp); // dereference pointer at element
 }
 
 
@@ -536,7 +565,7 @@ Location* NewArrayExpr::emit() const {
     Cgen_t::shared().gen_label(size_pass_lbl);
     auto one_tmp2 = Cgen_t::shared().gen_load_constant(1);
     auto final_size_tmp = Cgen_t::shared().gen_binary_op("+", one_tmp2, size_tmp); // this adds 1 to the size
-    auto word_size_tmp = Cgen_t::shared().gen_load_constant(4); // used to multiply by a word size for memory offsets
+    auto word_size_tmp = Cgen_t::shared().gen_load_constant(Cgen_t::word_size); // used to multiply by a word size for memory offsets
     auto arr_word_size = Cgen_t::shared().gen_binary_op("*", final_size_tmp, word_size_tmp); // calculates the memory size
     auto alloc_call_res = Cgen_t::shared().gen_built_in_call(Alloc, arr_word_size);
     Cgen_t::shared().gen_store(alloc_call_res, size_tmp); // store size of array in first slot of array
