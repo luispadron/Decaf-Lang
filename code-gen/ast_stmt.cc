@@ -47,8 +47,7 @@ void StmtBlock::check() {
     }
 
     for (int i = 0; i < stmts->size(); ++i) {
-        auto block = dynamic_cast<StmtBlock*>(stmts->get(i));
-        if (block) block->check();
+        stmts->get(i)->check();
     }
 
     Sym_tbl_t::shared().leave_scope();
@@ -82,6 +81,10 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
     (body = b)->set_parent(this);
 }
 
+void ConditionalStmt::check() {
+    body->check();
+}
+
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
     Assert(i != nullptr && t != nullptr && s != nullptr && b != nullptr);
@@ -95,6 +98,37 @@ IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) {
     elseBody = eb;
     if (elseBody) elseBody->set_parent(this);
 }
+
+void IfStmt::check() {
+    body->check();
+    if (elseBody) elseBody->check();
+}
+
+int IfStmt::get_bytes() const {
+    return body->get_bytes() + (elseBody ? elseBody->get_bytes() : 0) + Cgen_t::word_size;
+}
+
+Location* IfStmt::emit() const {
+    auto else_lbl = Cgen_t::shared().new_label();
+    auto end_lbl = Cgen_t::shared().new_label();
+    auto test_loc = test->emit();
+
+    Cgen_t::shared().gen_ifz(test_loc, else_lbl);
+
+    // anything under here will be executed if the if statement passes
+    body->emit();
+    Cgen_t::shared().gen_go_to(end_lbl); // skip over else body
+
+    Cgen_t::shared().gen_label(else_lbl);
+    // anything here will be executed if the if statement fails
+    if (elseBody) elseBody->emit();
+
+    // end of if statement
+    Cgen_t::shared().gen_label(end_lbl);
+
+    return nullptr;
+}
+
 
 
 ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {

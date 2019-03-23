@@ -29,6 +29,8 @@ public:
     Stmt() : Node() {}
     explicit Stmt(yyltype loc) : Node(loc) {}
 
+    virtual void check() { }
+
     virtual Location *emit() const { return nullptr; }
 
     virtual int get_bytes() const { return 0; }
@@ -66,6 +68,8 @@ protected:
   
 public:
     ConditionalStmt(Expr *testExpr, Stmt *body);
+
+    void check() override;
 };
 
 
@@ -97,6 +101,12 @@ protected:
   
 public:
     IfStmt(Expr *test, Stmt *thenBody, Stmt *elseBody);
+
+    void check() override;
+
+    int get_bytes() const override;
+
+    Location * emit() const override;
 };
 
 
