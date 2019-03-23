@@ -341,6 +341,10 @@ public:
     explicit ReadIntegerExpr(yyltype loc) : Expr(loc) {}
 
     Type * type_check() override;
+
+    int get_bytes() const override;
+
+    Location * emit() const override;
 };
 
 
@@ -349,6 +353,10 @@ public:
     explicit ReadLineExpr(yyltype loc) : Expr (loc) {}
 
     Type * type_check() override;
+
+    int get_bytes() const override;
+
+    Location * emit() const override;
 };
 
     

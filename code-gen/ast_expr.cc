@@ -600,7 +600,23 @@ Type* ReadIntegerExpr::type_check() {
     return Type::intType;
 }
 
+int ReadIntegerExpr::get_bytes() const {
+    return Cgen_t::word_size;
+}
+
+Location* ReadIntegerExpr::emit() const {
+    return Cgen_t::shared().gen_built_in_call(ReadInteger);
+}
+
 
 Type* ReadLineExpr::type_check() {
     return Type::stringType;
+}
+
+int ReadLineExpr::get_bytes() const {
+    return Cgen_t::word_size;
+}
+
+Location* ReadLineExpr::emit() const {
+    return Cgen_t::shared().gen_built_in_call(ReadLine);
 }
