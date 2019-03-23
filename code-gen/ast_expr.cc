@@ -144,12 +144,12 @@ int ArithmeticExpr::get_bytes() const {
 }
 
 Location * ArithmeticExpr::emit() const {
+    Location *rhs = right->emit();
+
     Location *lhs = [&]() {
         if (left) return left->emit();
         return Cgen_t::shared().gen_load_constant(0);
     }();
-
-    Location *rhs = right->emit();
 
     return Cgen_t::shared().gen_binary_op(op->get_op_token(), lhs, rhs);
 }
@@ -542,7 +542,7 @@ int NewArrayExpr::get_bytes() const {
     // tmp1 = 1
     // tmp2 = tmp0 < tmp1 (checks size is greater than 0)
     // tmp3 = "Decaf runtime error: Array size is <= 0\n" (constant string for dynamic error)
-    return size->get_bytes() + 3 * Cgen_t::word_size;
+    return size->get_bytes() + 9 * Cgen_t::word_size;
 }
 
 Location* NewArrayExpr::emit() const {

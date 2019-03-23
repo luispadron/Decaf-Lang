@@ -107,3 +107,28 @@ PrintStmt::PrintStmt(List<Expr*> *a) {
     Assert(a != nullptr);
     (args = a)->set_parent_all(this);
 }
+
+int PrintStmt::get_bytes() const {
+    return args->size() * Cgen_t::word_size;
+}
+
+Location* PrintStmt::emit() const {
+    for (int i = 0; i < args->size(); ++i) {
+        auto arg = args->get(i);
+        auto arg_type = arg->type_check();
+        auto arg_tmp = arg->emit();
+
+        if (arg_type->is_equal_to(Type::stringType)) {
+            Cgen_t::shared().gen_built_in_call(PrintString, arg_tmp);
+        } else if (arg_type->is_equal_to(Type::boolType)){
+            Cgen_t::shared().gen_built_in_call(PrintBool, arg_tmp);
+        } else if (arg_type->is_equal_to(Type::intType)) {
+            Cgen_t::shared().gen_built_in_call(PrintInt, arg_tmp);
+        } else {
+            Assert(false);
+            return nullptr;
+        }
+    }
+
+    return nullptr;
+}

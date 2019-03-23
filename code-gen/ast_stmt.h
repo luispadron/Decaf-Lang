@@ -121,6 +121,10 @@ protected:
     
 public:
     explicit PrintStmt(List<Expr*> *arguments);
+
+    int get_bytes() const override;
+
+    Location * emit() const override;
 };
 
 #endif
