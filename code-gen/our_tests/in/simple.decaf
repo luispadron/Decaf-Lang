@@ -1,0 +1,9 @@
+void main() {
+    Print("Hello world!\n");
+
+    if (true) {
+        Print("This works!");
+    } else {
+        Print("This shouldn't print!");
+    }
+}
