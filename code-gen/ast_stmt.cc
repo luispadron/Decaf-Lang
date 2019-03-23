@@ -136,6 +136,16 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
     (expr = e)->set_parent(this);
 }
 
+int ReturnStmt::get_bytes() const {
+    return Cgen_t::word_size;
+}
+
+Location* ReturnStmt::emit() const {
+    auto ret_val = expr->emit();
+    Cgen_t::shared().gen_return(ret_val);
+    return nullptr;
+}
+
 
 PrintStmt::PrintStmt(List<Expr*> *a) {
     Assert(a != nullptr);

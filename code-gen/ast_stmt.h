@@ -122,6 +122,10 @@ protected:
   
 public:
     ReturnStmt(yyltype loc, Expr *expr);
+
+    int get_bytes() const override;
+
+    Location * emit() const override;
 };
 
 

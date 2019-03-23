@@ -8,6 +8,7 @@
 #include "errors.h"
 
 #include <cstring>
+#include <vector>
 
 using namespace std;
 
@@ -497,9 +498,16 @@ Location * Call::emit() const {
         auto fn = dynamic_cast<FnDecl*>(scope->get_decl(field->get_name()).first);
         Assert(fn);
 
-        // generate parameter pushing
+        // generate locations for parameters
+        vector<Location *> params;
+        params.reserve(static_cast<size_t>(actuals->size()));
         for (int i = 0; i < actuals->size(); ++i) {
-            Cgen_t::shared().gen_push_param(actuals->get(i)->emit());
+            params.push_back(actuals->get(i)->emit());
+        }
+
+        // generate parameter pushing, this is done from last to first
+        for (auto param_it = params.rbegin(); param_it != params.rend(); ++param_it) {
+            Cgen_t::shared().gen_push_param(*param_it);
         }
 
         // generate call code
