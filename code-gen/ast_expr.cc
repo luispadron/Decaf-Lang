@@ -144,12 +144,16 @@ int ArithmeticExpr::get_bytes() const {
 }
 
 Location * ArithmeticExpr::emit() const {
-    Location *rhs = right->emit();
+    Location *lhs;
+    Location *rhs;
 
-    Location *lhs = [&]() {
-        if (left) return left->emit();
-        return Cgen_t::shared().gen_load_constant(0);
-    }();
+    if (!left) {
+        rhs = right->emit();
+        lhs = Cgen_t::shared().gen_load_constant(0);
+    } else {
+        lhs = left->emit();
+        rhs = right->emit();
+    }
 
     return Cgen_t::shared().gen_binary_op(op->get_op_token(), lhs, rhs);
 }
