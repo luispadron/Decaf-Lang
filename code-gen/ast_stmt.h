@@ -86,6 +86,10 @@ protected:
   
 public:
     ForStmt(Expr *init, Expr *test, Expr *step, Stmt *body);
+
+    int get_bytes() const override;
+
+    Location * emit() const override;
 };
 
 

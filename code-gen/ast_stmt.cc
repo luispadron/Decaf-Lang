@@ -92,6 +92,27 @@ ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
     (step = s)->set_parent(this);
 }
 
+int ForStmt::get_bytes() const {
+    return init->get_bytes() + test->get_bytes() + step->get_bytes() + body->get_bytes();
+}
+
+Location* ForStmt::emit() const {
+    init->emit();
+
+    auto start_lbl = Cgen_t::shared().new_label();
+    auto end_lbl = Cgen_t::shared().new_label();
+
+    // start of the for loop, anything under here will be executed during every iteration
+    Cgen_t::shared().gen_label(start_lbl);
+    auto test_tmp = test->emit();
+    Cgen_t::shared().gen_ifz(test_tmp, end_lbl); // does the for loop check, if it fails goto's the end of the loop
+    body->emit(); // perform body operation
+    step->emit(); // perform step if it has it
+    Cgen_t::shared().gen_go_to(start_lbl); // go back to start of loop
+
+    Cgen_t ::shared().gen_label(end_lbl); // the end of the loop, jumps here if ifz fails above
+}
+
 
 IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) {
     Assert(t != nullptr && tb != nullptr); // else can be nullptr
