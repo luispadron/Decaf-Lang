@@ -194,7 +194,7 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
 }
 
 int ReturnStmt::get_bytes() const {
-    return Cgen_t::word_size;
+    return expr->get_bytes();
 }
 
 Location* ReturnStmt::emit() const {
