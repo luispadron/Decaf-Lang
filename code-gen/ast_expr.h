@@ -247,6 +247,10 @@ public:
 
 
 class ArrayAccess : public LValue {
+private:
+
+    void emit_check(Location *base, Location *subscript) const;
+
 protected:
     Expr *base, *subscript;
     
@@ -257,7 +261,11 @@ public:
 
     int get_bytes() const override;
 
+    int get_bytes_store() const;
+
     Location * emit() const override;
+
+    Location * emit_store() const;
 };
 
 

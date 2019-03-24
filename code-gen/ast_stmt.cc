@@ -198,7 +198,11 @@ PrintStmt::PrintStmt(List<Expr*> *a) {
 }
 
 int PrintStmt::get_bytes() const {
-    return args->size() * Cgen_t::word_size;
+    int bytes = 0;
+    for (int i = 0; i < args->size(); ++i) {
+        bytes += args->get(i)->get_bytes();
+    }
+    return bytes;
 }
 
 Location* PrintStmt::emit() const {

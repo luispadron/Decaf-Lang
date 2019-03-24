@@ -331,17 +331,30 @@ Type * AssignExpr::type_check() {
 }
 
 int AssignExpr::get_bytes() const {
-    return right->get_bytes();
+    auto arr = dynamic_cast<ArrayAccess*>(left);
+    if (arr) {
+        return arr->get_bytes_store() + right->get_bytes();
+    } else {
+        return right->get_bytes();
+    }
 }
 
 Location * AssignExpr::emit() const {
     Assert(left && right);
 
-    auto lhs = left->emit();
-    auto rhs = right->emit();
-    Cgen_t::shared().gen_assign(lhs, rhs);
+    auto arr = dynamic_cast<ArrayAccess*>(left);
 
-    return lhs;
+    if (arr) { // array assign is really a store and not a load
+        auto lhs = arr->emit_store();
+        auto rhs = right->emit();
+        Cgen_t::shared().gen_store(lhs, rhs);
+        return lhs;
+    } else {
+        auto lhs = left->emit();
+        auto rhs = right->emit();
+        Cgen_t::shared().gen_assign(lhs, rhs);
+        return lhs;
+    }
 }
 
 
@@ -387,19 +400,20 @@ Type * ArrayAccess::type_check() {
     }
 }
 
+int ArrayAccess::get_bytes_store() const {
+    return base->get_bytes() + subscript->get_bytes() + 10 * Cgen_t::word_size; // 10 temporaries are used
+}
+
 int ArrayAccess::get_bytes() const {
     return base->get_bytes() + subscript->get_bytes() + 11 * Cgen_t::word_size; // 11 temporaries are used
 }
 
-Location* ArrayAccess::emit() const {
-    auto base_tmp = base->emit();
-    auto subs_tmp = subscript->emit(); // subscript temp
-
+void ArrayAccess::emit_check(Location *base, Location *subscript) const {
     auto zero_tmp = Cgen_t::shared().gen_load_constant(0); // 0, for out of bounds check
-    auto lt_zero = Cgen_t::shared().gen_binary_op("<", subs_tmp, zero_tmp); // check for less than 0
+    auto lt_zero = Cgen_t::shared().gen_binary_op("<", subscript, zero_tmp); // check for less than 0
 
-    auto arr_size_tmp = Cgen_t::shared().gen_load(base_tmp, -4); // remember, array size is at first element (0th)
-    auto lt_size = Cgen_t::shared().gen_binary_op("<", subs_tmp, arr_size_tmp); // checks that subscript is less than size
+    auto arr_size_tmp = Cgen_t::shared().gen_load(base, -4); // remember, array size is at first element (0th)
+    auto lt_size = Cgen_t::shared().gen_binary_op("<", subscript, arr_size_tmp); // checks that subscript is less than size
     auto eql_size = Cgen_t::shared().gen_binary_op("==", lt_size, zero_tmp); // bool check since if 0 == 0, then were ok (in bounds)
     auto check = Cgen_t::shared().gen_binary_op("||", lt_zero, eql_size); // final or, to make sure > 0 and < size
 
@@ -413,11 +427,31 @@ Location* ArrayAccess::emit() const {
 
     // any code here will be executed if the size check passed
     Cgen_t::shared().gen_label(size_pass_lbl);
+}
+
+Location* ArrayAccess::emit_store() const {
+    auto base_tmp = base->emit();
+    auto subs_tmp = subscript->emit(); // subscript temp
+
+    emit_check(base_tmp, subs_tmp);
+
     auto word_sz_tmp = Cgen_t::shared().gen_load_constant(Cgen_t::word_size);
     auto index_addr = Cgen_t::shared().gen_binary_op("*", word_sz_tmp, subs_tmp); // get address of element at index
-    auto elem_tmp = Cgen_t::shared().gen_binary_op("+", base_tmp, index_addr); // get pointer to element
 
-    return Cgen_t::shared().gen_load(elem_tmp); // dereference pointer at element
+    return Cgen_t::shared().gen_binary_op("+", base_tmp, index_addr); // get pointer to element
+}
+
+Location* ArrayAccess::emit() const {
+    auto base_tmp = base->emit();
+    auto subs_tmp = subscript->emit(); // subscript temp
+
+    emit_check(base_tmp, subs_tmp);
+
+    auto word_sz_tmp = Cgen_t::shared().gen_load_constant(Cgen_t::word_size);
+    auto index_addr = Cgen_t::shared().gen_binary_op("*", word_sz_tmp, subs_tmp); // get address of element at index
+    auto elem_pointer = Cgen_t::shared().gen_binary_op("+", base_tmp, index_addr); // get pointer to element
+
+    return Cgen_t::shared().gen_load(elem_pointer); // dereference pointer at element
 }
 
 
@@ -431,8 +465,37 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
 
 
 Type* FieldAccess::type_check() {
-    // not implemented for this project
-    return Type::errorType;
+    auto scope = Sym_tbl_t::shared().get_scope();
+
+    if (base) {
+        auto btype = base->type_check();
+        // only named types can use . syntax
+        if (!btype->is_named_type()) { return Type::errorType; }
+        // perform another type check on the named type, since we need to make sure name is defined
+        if (btype->type_check() == Type::errorType) { return Type::errorType; }
+
+        auto base_scope = Sym_tbl_t::shared().get_scope(btype->get_type_name());
+        auto decl_pair = base_scope.first->get_decl(field->get_name());
+
+        // not found, thus this field doesnt exist in class
+        if (!decl_pair.second) { Assert(false); return Type::errorType; }
+
+        // found in sym table, simply return the type of the decl, if its a var decl
+        auto decl = decl_pair.first;
+        // if not a var decl, this is an error
+        if (decl->get_decl_type() != DeclType::Variable) { return Type::errorType; }
+        // everything is good, return type of decl
+        return decl->type_check();
+    } else {
+        // field not found in current scope, error
+        if (!field->is_defined()) { return Type::errorType; }
+        // found in sym table, simply return the type of the decl, if its a var decl
+        auto decl = scope->get_decl(field->get_name()).first;
+        // if not a var decl, this is an error
+        if (decl->get_decl_type() != DeclType::Variable) { return Type::errorType; }
+        // everything is good, return type of decl
+        return decl->type_check();
+    }
 }
 
 Location * FieldAccess::emit() const {
