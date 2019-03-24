@@ -23,6 +23,8 @@ string StmtBlock::get_mangled_name() const {
 }
 
 int StmtBlock::get_bytes() const {
+    Sym_tbl_t::shared().enter_scope(get_mangled_name());
+
     // collect bytes from children
     int bytes = 0;
 
@@ -34,6 +36,7 @@ int StmtBlock::get_bytes() const {
         bytes += stmts->get(i)->get_bytes();
     }
 
+    Sym_tbl_t::shared().leave_scope();
     return bytes;
 }
 

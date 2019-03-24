@@ -55,7 +55,7 @@ public:
 
     int get_bytes() const override;
 
-    void check();
+    void check() override;
 
     Location *emit() override;
 };

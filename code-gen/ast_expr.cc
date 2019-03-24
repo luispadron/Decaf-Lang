@@ -565,7 +565,10 @@ int Call::get_bytes() const {
     }
 
     if (base) {
-        // TODO: add this when class and stuff is done
+        if (base->type_check()->is_array_type() && field->get_name() == "length") { // handle built in length call
+            return base->get_bytes() + Cgen_t::word_size;
+        }
+
         Assert(false);
         return 0;
     } else {
@@ -579,11 +582,20 @@ int Call::get_bytes() const {
     }
 }
 
+Location* Call::emit_length_call() {
+    auto base_tmp = base->emit();
+    return Cgen_t::shared().gen_load(base_tmp, -4);
+}
+
 Location * Call::emit() {
     auto scope = Sym_tbl_t::shared().get_scope();
 
     if (base) {
-        // TODO: add this when class stuff is done
+
+        if (base->type_check()->is_array_type() && field->get_name() == "length") { // handle built in length call
+            return emit_length_call();
+        }
+
         Assert(false);
         return nullptr;
     } else {

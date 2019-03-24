@@ -297,6 +297,10 @@ public:
  * and sort it out later.
  */
 class Call : public Expr {
+private:
+    /// emits length of an array (.length() call)
+    Location * emit_length_call();
+
 protected:
     Expr *base;	// will be NULL if no explicit base
     Identifier *field;
