@@ -150,26 +150,38 @@ void IfStmt::check() {
 }
 
 int IfStmt::get_bytes() const {
-    return body->get_bytes() + (elseBody ? elseBody->get_bytes() : 0) + Cgen_t::word_size;
+    return test->get_bytes() + body->get_bytes() + (elseBody ? elseBody->get_bytes() : 0);
 }
 
 Location* IfStmt::emit() const {
-    auto else_lbl = Cgen_t::shared().new_label();
-    auto end_lbl = Cgen_t::shared().new_label();
-    auto test_loc = test->emit();
+    if (elseBody) {
+        auto else_lbl = Cgen_t::shared().new_label();
+        auto end_lbl = Cgen_t::shared().new_label();
+        auto test_loc = test->emit();
 
-    Cgen_t::shared().gen_ifz(test_loc, else_lbl);
+        Cgen_t::shared().gen_ifz(test_loc, else_lbl);
 
-    // anything under here will be executed if the if statement passes
-    body->emit();
-    Cgen_t::shared().gen_go_to(end_lbl); // skip over else body
+        // anything under here will be executed if the if statement passes
+        body->emit();
 
-    Cgen_t::shared().gen_label(else_lbl);
-    // anything here will be executed if the if statement fails
-    if (elseBody) elseBody->emit();
+        Cgen_t::shared().gen_go_to(end_lbl); // skip over else body
+        Cgen_t::shared().gen_label(else_lbl);
+        elseBody->emit();
 
-    // end of if statement
-    Cgen_t::shared().gen_label(end_lbl);
+        // end of if statement
+        Cgen_t::shared().gen_label(end_lbl);
+    } else {
+        auto end_lbl = Cgen_t::shared().new_label();
+        auto test_loc = test->emit();
+
+        Cgen_t::shared().gen_ifz(test_loc, end_lbl);
+
+        // anything under here will be executed if the if statement passes
+        body->emit();
+
+        // end of if statement
+        Cgen_t::shared().gen_label(end_lbl);
+    }
 
     return nullptr;
 }
