@@ -110,7 +110,31 @@ Location* ForStmt::emit() const {
     step->emit(); // perform step if it has it
     Cgen_t::shared().gen_go_to(start_lbl); // go back to start of loop
 
-    Cgen_t ::shared().gen_label(end_lbl); // the end of the loop, jumps here if ifz fails above
+    Cgen_t::shared().gen_label(end_lbl); // the end of the loop, jumps here if ifz fails above
+
+    return nullptr;
+}
+
+
+int WhileStmt::get_bytes() const {
+    return test->get_bytes() + body->get_bytes();
+}
+
+Location* WhileStmt::emit() const {
+    auto start_lbl = Cgen_t::shared().new_label();
+    auto end_lbl = Cgen_t::shared().new_label();
+
+    // start of for loop
+    Cgen_t::shared().gen_label(start_lbl);
+    auto test_tmp = test->emit();
+    Cgen_t::shared().gen_ifz(test_tmp, end_lbl);
+    body->emit();
+    Cgen_t::shared().gen_go_to(start_lbl); // go back to start
+
+    // end of loop
+    Cgen_t::shared().gen_label(end_lbl);
+
+    return nullptr;
 }
 
 

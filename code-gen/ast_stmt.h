@@ -96,6 +96,10 @@ public:
 class WhileStmt : public LoopStmt {
 public:
     WhileStmt(Expr *test, Stmt *body) : LoopStmt(test, body) {}
+
+    int get_bytes() const override;
+
+    Location * emit() const override;
 };
 
 
