@@ -477,11 +477,10 @@ Type* FieldAccess::type_check() {
         auto base_scope = Sym_tbl_t::shared().get_scope(btype->get_type_name());
         auto decl_pair = base_scope.first->get_decl(field->get_name());
 
-        // not found, thus this field doesnt exist in class
-        if (!decl_pair.second) { Assert(false); return Type::errorType; }
-
         // found in sym table, simply return the type of the decl, if its a var decl
         auto decl = decl_pair.first;
+        Assert(decl);
+
         // if not a var decl, this is an error
         if (decl->get_decl_type() != DeclType::Variable) { return Type::errorType; }
         // everything is good, return type of decl
@@ -491,6 +490,8 @@ Type* FieldAccess::type_check() {
         if (!field->is_defined()) { return Type::errorType; }
         // found in sym table, simply return the type of the decl, if its a var decl
         auto decl = scope->get_decl(field->get_name()).first;
+        Assert(decl);
+
         // if not a var decl, this is an error
         if (decl->get_decl_type() != DeclType::Variable) { return Type::errorType; }
         // everything is good, return type of decl
@@ -522,8 +523,36 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
 }
 
 Type* Call::type_check() {
-    // not implemented for this project
-    return Type::errorType;
+    auto scope = Sym_tbl_t::shared().get_scope();
+
+    if (base) {
+        auto btype = base->type_check();
+        // only named types can use . syntax
+        if (!btype->is_named_type()) { return Type::errorType; }
+
+        auto base_scope = Sym_tbl_t::shared().get_scope(btype->get_type_name());
+        auto decl_pair = base_scope.first->get_decl(field->get_name());
+
+        // found in sym table, simply return the type of the decl, if its a function decl
+        auto decl = decl_pair.first;
+        Assert(decl);
+
+        // if not a function decl, this is an error
+        if (decl->get_decl_type() != DeclType::Function) { return Type::errorType; }
+        // everything is good, return type of decl
+        return decl->type_check();
+    } else {
+        // field not found in current scope, error
+        if (!field->is_defined()) { return Type::errorType; }
+        // found in sym table, simply return the type of the decl, if its a function decl
+        auto decl = scope->get_decl(field->get_name()).first;
+        Assert(decl);
+
+        // if not a function decl, this is an error
+        if (decl->get_decl_type() != DeclType::Function) { return Type::errorType; }
+        // everything is good, return type of decl
+        return decl->type_check();
+    }
 }
 
 int Call::get_bytes() const {
