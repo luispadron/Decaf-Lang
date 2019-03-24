@@ -158,9 +158,9 @@ int IfStmt::get_bytes() const {
 
 Location* IfStmt::emit() {
     if (elseBody) {
+        auto test_loc = test->emit();
         auto else_lbl = Cgen_t::shared().new_label();
         auto end_lbl = Cgen_t::shared().new_label();
-        auto test_loc = test->emit();
 
         Cgen_t::shared().gen_ifz(test_loc, else_lbl);
 
@@ -174,8 +174,8 @@ Location* IfStmt::emit() {
         // end of if statement
         Cgen_t::shared().gen_label(end_lbl);
     } else {
-        auto end_lbl = Cgen_t::shared().new_label();
         auto test_loc = test->emit();
+        auto end_lbl = Cgen_t::shared().new_label();
 
         Cgen_t::shared().gen_ifz(test_loc, end_lbl);
 
