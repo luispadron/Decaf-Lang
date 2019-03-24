@@ -527,6 +527,9 @@ Type* Call::type_check() {
 
     if (base) {
         auto btype = base->type_check();
+
+        if (btype->is_array_type() && field->get_name() == "length") { return Type::intType; }
+
         // only named types can use . syntax
         if (!btype->is_named_type()) { return Type::errorType; }
 
