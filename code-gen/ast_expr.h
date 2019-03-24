@@ -46,7 +46,7 @@ public:
 
     int get_bytes() const override { return CodeGenerator::word_size; }
 
-    Location *emit() const override;
+    Location *emit() override;
 };
 
 
@@ -61,7 +61,7 @@ public:
 
     int get_bytes() const override { return CodeGenerator::word_size; }
 
-    Location *emit() const override;
+    Location *emit() override;
 };
 
 
@@ -76,7 +76,7 @@ public:
 
     int get_bytes() const override { return CodeGenerator::word_size; }
 
-    Location *emit() const override;
+    Location *emit() override;
 };
 
 
@@ -91,7 +91,7 @@ public:
 
     int get_bytes() const override { return CodeGenerator::word_size; }
 
-    Location *emit() const override;
+    Location *emit() override;
 };
 
 
@@ -103,7 +103,7 @@ public:
 
     int get_bytes() const override { return CodeGenerator::word_size; }
 
-    Location *emit() const override;
+    Location *emit() override;
 };
 
 
@@ -166,7 +166,7 @@ public:
 
     int get_bytes() const override;
 
-    Location *emit() const override;
+    Location *emit() override;
 };
 
 
@@ -181,7 +181,7 @@ public:
 
     int get_bytes() const override;
 
-    Location *emit() const override;
+    Location *emit() override;
 };
 
 
@@ -196,7 +196,7 @@ public:
 
     int get_bytes() const override;
 
-    Location *emit() const override;
+    Location *emit() override;
 };
 
 
@@ -213,7 +213,7 @@ public:
 
     int get_bytes() const override;
 
-    Location *emit() const override;
+    Location *emit() override;
 };
 
 
@@ -228,7 +228,7 @@ public:
 
     int get_bytes() const override;
 
-    Location *emit() const override;
+    Location *emit() override;
 };
 
 
@@ -263,7 +263,7 @@ public:
 
     int get_bytes_store() const;
 
-    Location * emit() const override;
+    Location * emit()  override;
 
     Location * emit_store() const;
 };
@@ -286,7 +286,7 @@ public:
 
     Type * type_check() override;
 
-    Location *emit() const override;
+    Location *emit() override;
 };
 
 
@@ -309,7 +309,7 @@ public:
 
     int get_bytes() const override;
 
-    Location *emit() const override;
+    Location *emit() override;
 };
 
 
@@ -340,7 +340,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit() const override;
+    Location * emit()  override;
 };
 
 
@@ -352,7 +352,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit() const override;
+    Location * emit()  override;
 };
 
 
@@ -364,7 +364,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit() const override;
+    Location * emit()  override;
 };
 
     

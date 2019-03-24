@@ -53,7 +53,7 @@ void StmtBlock::check() {
     Sym_tbl_t::shared().leave_scope();
 }
 
-Location * StmtBlock::emit() const {
+Location * StmtBlock::emit() {
     auto scope = Sym_tbl_t::shared().enter_scope(get_mangled_name());
 
     // set locations for local variables, the offset is tracked by code generator as there
@@ -96,21 +96,21 @@ int ForStmt::get_bytes() const {
     return init->get_bytes() + test->get_bytes() + step->get_bytes() + body->get_bytes();
 }
 
-Location* ForStmt::emit() const {
+Location* ForStmt::emit() {
     init->emit();
 
     auto start_lbl = Cgen_t::shared().new_label();
-    auto end_lbl = Cgen_t::shared().new_label();
+    done_label = Cgen_t::shared().new_label();
 
     // start of the for loop, anything under here will be executed during every iteration
     Cgen_t::shared().gen_label(start_lbl);
     auto test_tmp = test->emit();
-    Cgen_t::shared().gen_ifz(test_tmp, end_lbl); // does the for loop check, if it fails goto's the end of the loop
+    Cgen_t::shared().gen_ifz(test_tmp, done_label); // does the for loop check, if it fails goto's the end of the loop
     body->emit(); // perform body operation
     step->emit(); // perform step if it has it
     Cgen_t::shared().gen_go_to(start_lbl); // go back to start of loop
 
-    Cgen_t::shared().gen_label(end_lbl); // the end of the loop, jumps here if ifz fails above
+    Cgen_t::shared().gen_label(done_label); // the end of the loop, jumps here if ifz fails above
 
     return nullptr;
 }
@@ -120,19 +120,19 @@ int WhileStmt::get_bytes() const {
     return test->get_bytes() + body->get_bytes();
 }
 
-Location* WhileStmt::emit() const {
+Location* WhileStmt::emit() {
     auto start_lbl = Cgen_t::shared().new_label();
-    auto end_lbl = Cgen_t::shared().new_label();
+    done_label = Cgen_t::shared().new_label();
 
     // start of for loop
     Cgen_t::shared().gen_label(start_lbl);
     auto test_tmp = test->emit();
-    Cgen_t::shared().gen_ifz(test_tmp, end_lbl);
+    Cgen_t::shared().gen_ifz(test_tmp, done_label);
     body->emit();
     Cgen_t::shared().gen_go_to(start_lbl); // go back to start
 
     // end of loop
-    Cgen_t::shared().gen_label(end_lbl);
+    Cgen_t::shared().gen_label(done_label);
 
     return nullptr;
 }
@@ -153,7 +153,7 @@ int IfStmt::get_bytes() const {
     return test->get_bytes() + body->get_bytes() + (elseBody ? elseBody->get_bytes() : 0);
 }
 
-Location* IfStmt::emit() const {
+Location* IfStmt::emit() {
     if (elseBody) {
         auto else_lbl = Cgen_t::shared().new_label();
         auto end_lbl = Cgen_t::shared().new_label();
@@ -187,6 +187,21 @@ Location* IfStmt::emit() const {
 }
 
 
+Location * BreakStmt::emit() {
+    // find the parent loop stmt, get the done label and generate goto
+    LoopStmt *loop = nullptr;
+    for (auto p = parent; p; p = p->get_parent()) {
+        loop = dynamic_cast<LoopStmt*>(p);
+        if (loop) break;
+    }
+
+    Assert(loop);
+
+    Cgen_t::shared().gen_go_to(loop->get_done_label());
+
+    return nullptr;
+}
+
 
 ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
     Assert(e != nullptr);
@@ -197,7 +212,7 @@ int ReturnStmt::get_bytes() const {
     return expr->get_bytes();
 }
 
-Location* ReturnStmt::emit() const {
+Location* ReturnStmt::emit() {
     auto ret_val = expr->emit();
     Cgen_t::shared().gen_return(ret_val);
     return nullptr;
@@ -217,7 +232,7 @@ int PrintStmt::get_bytes() const {
     return bytes;
 }
 
-Location* PrintStmt::emit() const {
+Location* PrintStmt::emit() {
     for (int i = 0; i < args->size(); ++i) {
         auto arg = args->get(i);
         auto arg_type = arg->type_check();

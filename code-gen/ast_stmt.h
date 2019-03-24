@@ -31,7 +31,7 @@ public:
 
     virtual void check() { }
 
-    virtual Location *emit() const { return nullptr; }
+    virtual Location *emit() { return nullptr; }
 
     virtual int get_bytes() const { return 0; }
 };
@@ -57,7 +57,7 @@ public:
 
     void check();
 
-    Location *emit() const override;
+    Location *emit() override;
 };
 
   
@@ -74,8 +74,14 @@ public:
 
 
 class LoopStmt : public ConditionalStmt {
+protected:
+    char * done_label = nullptr;
+
 public:
+
     LoopStmt(Expr *testExpr, Stmt *body) : ConditionalStmt(testExpr, body) {}
+
+    const char * get_done_label() const { return done_label; }
 };
 
 
@@ -89,7 +95,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit() const override;
+    Location * emit() override;
 };
 
 
@@ -99,7 +105,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit() const override;
+    Location * emit() override;
 };
 
 
@@ -114,13 +120,15 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit() const override;
+    Location * emit() override;
 };
 
 
 class BreakStmt : public Stmt {
 public:
     explicit BreakStmt(yyltype loc) : Stmt(loc) {}
+
+    Location * emit() override;
 };
 
 
@@ -133,7 +141,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit() const override;
+    Location * emit()  override;
 };
 
 
@@ -146,7 +154,7 @@ public:
 
     int get_bytes() const override;
 
-    Location * emit() const override;
+    Location * emit() override;
 };
 
 #endif

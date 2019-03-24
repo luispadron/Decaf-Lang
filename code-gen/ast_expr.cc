@@ -21,7 +21,7 @@ Type* IntConstant::type_check() {
     return Type::intType;
 }
 
-Location * IntConstant::emit() const {
+Location * IntConstant::emit() {
     return Cgen_t::shared().gen_load_constant(value);
 }
 
@@ -34,7 +34,7 @@ Type* DoubleConstant::type_check() {
     return Type::doubleType;
 }
 
-Location * DoubleConstant::emit() const {
+Location * DoubleConstant::emit() {
     // doubles are not implemented in this project
     Assert(false);
     return nullptr;
@@ -49,7 +49,7 @@ Type* BoolConstant::type_check() {
     return Type::boolType;
 }
 
-Location * BoolConstant::emit() const {
+Location * BoolConstant::emit() {
     return Cgen_t::shared().gen_load_constant(value);
 }
 
@@ -63,7 +63,7 @@ Type* StringConstant::type_check() {
     return Type::stringType;
 }
 
-Location * StringConstant::emit() const {
+Location * StringConstant::emit() {
     return Cgen_t::shared().gen_load_constant(value);
 }
 
@@ -72,7 +72,7 @@ Type* NullConstant::type_check() {
     return Type::nullType;
 }
 
-Location * NullConstant::emit() const {
+Location * NullConstant::emit() {
     return Cgen_t::shared().gen_load_constant(0);
 }
 
@@ -144,7 +144,7 @@ int ArithmeticExpr::get_bytes() const {
     }
 }
 
-Location * ArithmeticExpr::emit() const {
+Location * ArithmeticExpr::emit() {
     Location *lhs;
     Location *rhs;
 
@@ -193,7 +193,7 @@ int RelationalExpr::get_bytes() const {
     }
 }
 
-Location * RelationalExpr::emit() const {
+Location * RelationalExpr::emit() {
     auto lhs = left->emit();
     auto rhs = right->emit();
 
@@ -255,7 +255,7 @@ int EqualityExpr::get_bytes() const {
     }
 }
 
-Location * EqualityExpr::emit() const {
+Location * EqualityExpr::emit() {
     auto lhs = left->emit();
     auto rhs = right->emit();
 
@@ -304,7 +304,7 @@ int LogicalExpr::get_bytes() const {
     else return right->get_bytes() + 2 * Cgen_t::word_size;
 }
 
-Location * LogicalExpr::emit() const {
+Location * LogicalExpr::emit() {
     if (!left) {
         // do unary not (!) operation
         auto rhs = right->emit();
@@ -339,7 +339,7 @@ int AssignExpr::get_bytes() const {
     }
 }
 
-Location * AssignExpr::emit() const {
+Location * AssignExpr::emit() {
     Assert(left && right);
 
     auto arr = dynamic_cast<ArrayAccess*>(left);
@@ -441,7 +441,7 @@ Location* ArrayAccess::emit_store() const {
     return Cgen_t::shared().gen_binary_op("+", base_tmp, index_addr); // get pointer to element
 }
 
-Location* ArrayAccess::emit() const {
+Location* ArrayAccess::emit() {
     auto base_tmp = base->emit();
     auto subs_tmp = subscript->emit(); // subscript temp
 
@@ -499,7 +499,7 @@ Type* FieldAccess::type_check() {
     }
 }
 
-Location * FieldAccess::emit() const {
+Location * FieldAccess::emit() {
     auto scope = Sym_tbl_t::shared().get_scope();
 
     if (base) {
@@ -579,7 +579,7 @@ int Call::get_bytes() const {
     }
 }
 
-Location * Call::emit() const {
+Location * Call::emit() {
     auto scope = Sym_tbl_t::shared().get_scope();
 
     if (base) {
@@ -663,7 +663,7 @@ int NewArrayExpr::get_bytes() const {
     return size->get_bytes() + 9 * Cgen_t::word_size;
 }
 
-Location* NewArrayExpr::emit() const {
+Location* NewArrayExpr::emit() {
     // generates the variables to prepare for array making and checking
     auto size_tmp = size->emit();
     auto one_tmp = Cgen_t::shared().gen_load_constant(1);
@@ -704,7 +704,7 @@ int ReadIntegerExpr::get_bytes() const {
     return Cgen_t::word_size;
 }
 
-Location* ReadIntegerExpr::emit() const {
+Location* ReadIntegerExpr::emit() {
     return Cgen_t::shared().gen_built_in_call(ReadInteger);
 }
 
@@ -717,6 +717,6 @@ int ReadLineExpr::get_bytes() const {
     return Cgen_t::word_size;
 }
 
-Location* ReadLineExpr::emit() const {
+Location* ReadLineExpr::emit() {
     return Cgen_t::shared().gen_built_in_call(ReadLine);
 }
