@@ -186,7 +186,7 @@ public:
     // methods in the order they should be laid out.  The vtable
     // is tagged with a label of the class name, so when you later
     // need access to the vtable, you use LoadLabel of class name.
-    void gen_vtable(const char *className, List<const char *> *methodLabels);
+    void gen_vtable(const char *className, List<const char *> methodLabels);
 
 
     // Emits the final "object code" for the program by

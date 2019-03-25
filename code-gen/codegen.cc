@@ -185,7 +185,7 @@ Location *CodeGenerator::gen_built_in_call(BuiltIn bn, Location *arg1, Location 
 }
 
 
-void CodeGenerator::gen_vtable(const char *className, List<const char *> *methodLabels)
+void CodeGenerator::gen_vtable(const char *className, List<const char *> methodLabels)
 {
     code->append(new VTable(className, methodLabels));
 }

@@ -121,7 +121,9 @@ public:
 
 class ClassDecl : public Decl {
 protected:
+    int bytes = Cgen_t::word_size; // how big the class is
     List<Decl*> *members;
+    std::vector<std::string> mangled_method_names;
     NamedType *extends;
     List<NamedType*> *implements;
 
@@ -131,7 +133,11 @@ public:
 
     DeclType get_decl_type() const override { return DeclType::Class; }
 
+    int get_bytes() const { return bytes; }
+
     void check(Scope *class_or_interface_scope) override;
+
+    void emit(Scope *class_or_interface_scope, FnDecl *curr_func) override;
 };
 
 #endif

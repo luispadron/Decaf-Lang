@@ -328,6 +328,10 @@ public:
     NewExpr(yyltype loc, NamedType *clsType);
 
     Type * type_check() override;
+
+    int get_bytes() const override;
+
+    Location * emit() override;
 };
 
 

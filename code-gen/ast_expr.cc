@@ -652,6 +652,30 @@ Type* NewExpr::type_check() {
     }
 }
 
+int NewExpr::get_bytes() const {
+    // find class decl
+    auto gscope = Sym_tbl_t::shared().get_scope("global").first;
+    Assert(gscope);
+    auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(cType->get_id()->get_name()).first);
+    Assert(class_decl);
+
+    return class_decl->get_bytes();
+}
+
+Location* NewExpr::emit() {
+    // find class decl
+    auto gscope = Sym_tbl_t::shared().get_scope("global").first;
+    Assert(gscope);
+    auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(cType->get_id()->get_name()).first);
+    Assert(class_decl);
+
+    auto size_tmp = Cgen_t::shared().gen_load_constant(class_decl->get_bytes()); // size of class
+    auto result = Cgen_t::shared().gen_built_in_call(Alloc, size_tmp);
+    auto class_name_tmp = Cgen_t::shared().gen_load_label(class_decl->get_id()->get_name().c_str());
+    Cgen_t::shared().gen_store(result, class_name_tmp);
+    return result;
+}
+
 
 NewArrayExpr::NewArrayExpr(yyltype loc, Expr *sz, Type *et) : Expr(loc) {
     Assert(sz != nullptr && et != nullptr);

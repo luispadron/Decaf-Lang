@@ -154,3 +154,31 @@ void ClassDecl::check(Scope *class_or_interface_scope) {
 
     Sym_tbl_t::shared().leave_scope();
 }
+
+void ClassDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
+    auto scope = Sym_tbl_t::shared().enter_scope(id->get_name());
+
+    // call emit on members
+    for (int i = 0; i < members->size(); ++i) {
+        auto member = members->get(i);
+        member->emit(scope, nullptr);
+
+        if (member->get_decl_type() == DeclType::Function) {
+            auto method = dynamic_cast<FnDecl*>(member);
+            Assert(method);
+
+            mangled_method_names.push_back(method->get_mangled_name(scope->name()));
+        } else if (member->get_decl_type() == DeclType::Variable) {
+            bytes += Cgen_t::word_size; // increase size of class
+        }
+    }
+
+    // generate v table
+    List<const char*> methods;
+    for (const auto &m : mangled_method_names) {
+        methods.append(m.c_str());
+    }
+    Cgen_t::shared().gen_vtable(id->get_name().c_str(), methods);
+
+    Sym_tbl_t::shared().leave_scope();
+}
