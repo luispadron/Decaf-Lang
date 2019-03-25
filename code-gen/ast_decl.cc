@@ -139,11 +139,25 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
     (members = m)->set_parent_all(this);
 }
 
-int ClassDecl::get_method_offset(const string &name) const {
+int ClassDecl::get_method_offset(const std::string &name) const {
     int offset = 0;
     for (int i = 0; i < members->size(); ++i) {
         auto member = members->get(i);
         if (member->get_decl_type() == DeclType::Function) {
+            if (member->get_id()->get_name() == name) { return offset; }
+            offset += 4;
+        }
+    }
+
+    Assert(false);
+    return -1;
+}
+
+int ClassDecl::get_member_offset(const string &name) const {
+    int offset = 4;
+    for (int i = 0; i < members->size(); ++i) {
+        auto member = members->get(i);
+        if (member->get_decl_type() == DeclType::Variable) {
             if (member->get_id()->get_name() == name) { return offset; }
             offset += 4;
         }
@@ -171,6 +185,16 @@ void ClassDecl::check(Scope *class_or_interface_scope) {
 
 void ClassDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
     auto scope = Sym_tbl_t::shared().enter_scope(id->get_name());
+
+    // generate variable locations
+    int offset = 4;
+    for (int i = 0; i < members->size(); ++i) {
+        auto var = dynamic_cast<VarDecl*>(members->get(i));
+        if (var) {
+            var->set_location(new Location(Segment::fp_relative, offset, "this"));
+            offset += var->get_bytes();
+        }
+    }
 
     // call emit on members
     for (int i = 0; i < members->size(); ++i) {

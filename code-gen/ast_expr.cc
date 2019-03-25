@@ -506,6 +506,16 @@ Location * FieldAccess::emit() {
         // TODO: add this when classes are finished
         Assert(false);
         return nullptr;
+    } else if (scope->is_class_scope()) {
+        auto var = dynamic_cast<VarDecl*>(scope->get_decl(field->get_name()).first);
+        Assert(var);
+        auto gscope = Sym_tbl_t::shared().get_scope("global").first;
+        Assert(gscope);
+        auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(scope->get_class_scope_name()).first);
+        Assert(class_decl);
+
+        int offset = class_decl->get_member_offset(var->get_id()->get_name());
+        return Cgen_t::shared().gen_load(var->get_location(), offset);
     } else {
         auto var = dynamic_cast<VarDecl*>(scope->get_decl(field->get_name()).first);
         Assert(var);
