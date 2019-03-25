@@ -135,6 +135,8 @@ public:
 
     int get_bytes() const { return bytes; }
 
+    int get_method_offset(const std::string &name) const;
+
     void check(Scope *class_or_interface_scope) override;
 
     void emit(Scope *class_or_interface_scope, FnDecl *curr_func) override;

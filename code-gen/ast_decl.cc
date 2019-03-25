@@ -139,6 +139,20 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
     (members = m)->set_parent_all(this);
 }
 
+int ClassDecl::get_method_offset(const string &name) const {
+    int offset = 0;
+    for (int i = 0; i < members->size(); ++i) {
+        auto member = members->get(i);
+        if (member->get_decl_type() == DeclType::Function) {
+            if (member->get_id()->get_name() == name) { return offset; }
+            offset += 4;
+        }
+    }
+
+    Assert(false);
+    return -1;
+}
+
 void ClassDecl::check(Scope *class_or_interface_scope) {
     auto scope = Sym_tbl_t::shared().create_scope(id->get_name(), ScopeType::Class);
 

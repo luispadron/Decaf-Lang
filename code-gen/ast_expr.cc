@@ -572,8 +572,22 @@ int Call::get_bytes() const {
             return base->get_bytes() + Cgen_t::word_size;
         }
 
-        Assert(false);
-        return 0;
+        auto class_name = base->type_check()->get_type_name();
+        auto gscope = Sym_tbl_t::shared().get_scope("global").first;
+        Assert(gscope);
+        auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(class_name).first);
+        Assert(class_decl);
+        auto class_scope = Sym_tbl_t::shared().get_scope(class_decl->get_id()->get_name()).first;
+        Assert(class_scope);
+        auto fn = dynamic_cast<FnDecl*>(class_scope->get_decl(field->get_name()).first);
+        Assert(fn);
+
+        if (fn->has_return()) {
+            return actual_bytes + (3 * Cgen_t::word_size);
+        } else {
+            return actual_bytes + (2 * Cgen_t::word_size);
+        }
+
     } else {
         auto fn = dynamic_cast<FnDecl*>(scope->get_decl(field->get_name()).first);
         Assert(fn);
@@ -590,6 +604,20 @@ Location* Call::emit_length_call() {
     return Cgen_t::shared().gen_load(base_tmp, -4);
 }
 
+void Call::push_params() const {
+    // generate locations for parameters
+    vector<Location *> params;
+    params.reserve(static_cast<size_t>(actuals->size()));
+    for (int i = 0; i < actuals->size(); ++i) {
+        params.push_back(actuals->get(i)->emit());
+    }
+
+    // generate parameter pushing, this is done from last to first
+    for (auto param_it = params.rbegin(); param_it != params.rend(); ++param_it) {
+        Cgen_t::shared().gen_push_param(*param_it);
+    }
+}
+
 Location * Call::emit() {
     auto scope = Sym_tbl_t::shared().get_scope();
 
@@ -599,23 +627,37 @@ Location * Call::emit() {
             return emit_length_call();
         }
 
-        Assert(false);
-        return nullptr;
+        // emit class method call
+        auto class_name = base->type_check()->get_type_name();
+        auto gscope = Sym_tbl_t::shared().get_scope("global").first;
+        Assert(gscope);
+        auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(class_name).first);
+        Assert(class_decl);
+        auto class_scope = Sym_tbl_t::shared().get_scope(class_decl->get_id()->get_name()).first;
+        Assert(class_scope);
+        auto fn = dynamic_cast<FnDecl*>(class_scope->get_decl(field->get_name()).first);
+        Assert(fn);
+
+        auto base_loc = base->emit();
+        auto base_tmp = Cgen_t::shared().gen_load(base_loc);
+        int method_offset = class_decl->get_method_offset(field->get_name());
+        auto method_tmp = Cgen_t::shared().gen_load(base_tmp, method_offset);
+
+        push_params();
+        // push "this" pointer
+        Cgen_t::shared().gen_push_param(base_loc);
+
+        auto ret = Cgen_t::shared().gen_a_call(method_tmp, fn->has_return());
+
+        // generate pop params
+        Cgen_t::shared().gen_pop_params(actuals->size() * Cgen_t::word_size + Cgen_t::word_size);
+
+        return ret;
     } else {
         auto fn = dynamic_cast<FnDecl*>(scope->get_decl(field->get_name()).first);
         Assert(fn);
 
-        // generate locations for parameters
-        vector<Location *> params;
-        params.reserve(static_cast<size_t>(actuals->size()));
-        for (int i = 0; i < actuals->size(); ++i) {
-            params.push_back(actuals->get(i)->emit());
-        }
-
-        // generate parameter pushing, this is done from last to first
-        for (auto param_it = params.rbegin(); param_it != params.rend(); ++param_it) {
-            Cgen_t::shared().gen_push_param(*param_it);
-        }
+        push_params();
 
         // generate call code
         auto call_code = Cgen_t::shared().gen_l_call(fn->get_mangled_name("").c_str(), fn->has_return());
