@@ -133,7 +133,7 @@ public:
 
     DeclType get_decl_type() const override { return DeclType::Class; }
 
-    int get_bytes() const { return bytes; }
+    int get_bytes() const override { return bytes; }
 
     int get_method_offset(const std::string &name) const;
 
