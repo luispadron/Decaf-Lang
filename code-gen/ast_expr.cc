@@ -641,40 +641,53 @@ Location * Call::emit() {
         auto class_name = base->type_check()->get_type_name();
         auto gscope = Sym_tbl_t::shared().get_scope("global").first;
         Assert(gscope);
-        auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(class_name).first);
+        auto class_decl = dynamic_cast<ClassDecl *>(gscope->get_decl(class_name).first);
         Assert(class_decl);
         auto class_scope = Sym_tbl_t::shared().get_scope(class_decl->get_id()->get_name()).first;
         Assert(class_scope);
-        auto fn = dynamic_cast<FnDecl*>(class_scope->get_decl(field->get_name()).first);
+        auto fn = dynamic_cast<FnDecl *>(class_scope->get_decl(field->get_name()).first);
         Assert(fn);
 
-        auto base_loc = base->emit();
-        auto base_tmp = Cgen_t::shared().gen_load(base_loc);
-        int method_offset = class_decl->get_method_offset(field->get_name());
-        auto method_tmp = Cgen_t::shared().gen_load(base_tmp, method_offset);
+        auto object_loc = base->emit();
+        auto vtable = Cgen_t::shared().gen_load(object_loc); // get vtable, remember vtable is at first 4 bytes of object
+        int method_offset = class_decl->get_method_offset(field->get_name()); // get offset of method in vtable
+        auto method_addr = Cgen_t::shared().gen_load(vtable, method_offset); // get actual method address
 
         push_params();
-        // push "this" pointer
-        Cgen_t::shared().gen_push_param(base_loc);
+        Cgen_t::shared().gen_push_param(object_loc); // push object for implicit "this" in class method
 
-        auto ret = Cgen_t::shared().gen_a_call(method_tmp, fn->has_return());
+        auto call_ret = Cgen_t::shared().gen_a_call(method_addr, fn->has_return());
+        Cgen_t::shared().gen_pop_params(fn->get_bytes() + Cgen_t::word_size);
+        return call_ret;
+    }
 
-        // generate pop params
-        Cgen_t::shared().gen_pop_params(actuals->size() * Cgen_t::word_size + Cgen_t::word_size);
+    // handle other two cases, either using implicit "this", or simple global function call
 
-        return ret;
+    auto fn = dynamic_cast<FnDecl*>(scope->get_decl(field->get_name()).first);
+    Assert(fn);
+
+    if (scope->is_class_scope()) {
+        auto gscope = Sym_tbl_t::shared().get_scope("global").first;
+        Assert(gscope);
+        auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(scope->get_class_scope_name()).first);
+        Assert(class_decl);
+
+        auto this_ptr = Cgen_t::shared().gen_load_label(class_decl->get_id()->get_name().c_str());
+        auto method_offset = class_decl->get_method_offset(field->get_name());
+        auto method_addr = Cgen_t::shared().gen_load(this_ptr, method_offset);
+
+        push_params();
+        Cgen_t::shared().gen_push_param(this_ptr);
+
+        auto call_ret = Cgen_t::shared().gen_a_call(method_addr, fn->has_return());
+        Cgen_t::shared().gen_pop_params(fn->get_bytes() + Cgen_t::word_size);
+        return call_ret;
     } else {
-        auto fn = dynamic_cast<FnDecl*>(scope->get_decl(field->get_name()).first);
-        Assert(fn);
-
         push_params();
-
         // generate call code
         auto call_code = Cgen_t::shared().gen_l_call(fn->get_mangled_name("").c_str(), fn->has_return());
-
         // generate pop params
         Cgen_t::shared().gen_pop_params(actuals->size() * Cgen_t::word_size);
-
         return call_code;
     }
 }
@@ -722,9 +735,9 @@ Location* NewExpr::emit() {
     Assert(class_decl);
 
     auto size_tmp = Cgen_t::shared().gen_load_constant(class_decl->get_bytes()); // size of class
-    auto result = Cgen_t::shared().gen_built_in_call(Alloc, size_tmp);
-    auto class_name_tmp = Cgen_t::shared().gen_load_label(class_decl->get_id()->get_name().c_str());
-    Cgen_t::shared().gen_store(result, class_name_tmp);
+    auto result = Cgen_t::shared().gen_built_in_call(Alloc, size_tmp); // allocate space for object
+    auto vtable_tmp = Cgen_t::shared().gen_load_label(class_decl->get_id()->get_name().c_str());
+    Cgen_t::shared().gen_store(result, vtable_tmp); // assign vtable address to start of object memory
     return result;
 }
 
