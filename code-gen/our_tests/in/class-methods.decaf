@@ -1,0 +1,12 @@
+class Dog {
+    int get_name_redundant() { get_name(); }
+    string get_name() { Print("Im a dog!"); }
+}
+
+void main() {
+    Dog d;
+    d = New(Dog);
+
+    d.get_name();
+    d.get_name_redundant();
+}

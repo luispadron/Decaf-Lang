@@ -24,6 +24,9 @@
 #define _H_tac
 
 #include "list.h" // for VTable
+
+#include <cstring>
+
 class Mips;
 
 
@@ -223,11 +226,11 @@ public:
 };
 
 class VTable: public Instruction {
-    List<const char *> *methodLabels;
     const char *label;
+	List<const char *> methodLabels;
 
 public:
-    VTable(const char *labelForTable, List<const char *> *methodLabels);
+    VTable(const char *labelForTable, List<const char *> methodLabels);
     void Print();
     void EmitSpecific(Mips *mips);
 };

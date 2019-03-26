@@ -10,6 +10,7 @@
 #include <utility>
 #include <map>
 #include <string>
+#include "utility.h"
 
 class Decl;
 
@@ -42,6 +43,8 @@ public:
 
     /// returns whether this scope is currently inside of a class scope
     bool is_class_scope() const { return this_ptr; }
+
+    std::string get_class_scope_name() { Assert(this_ptr); return this_ptr->name();}
 
 private:
 

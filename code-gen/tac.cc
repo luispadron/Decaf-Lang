@@ -226,20 +226,20 @@ void ACall::EmitSpecific(Mips *mips) {
 
 
 
-VTable::VTable(const char *l, List<const char *> *m)
-        : methodLabels(m), label(strdup(l)) {
-    Assert(methodLabels != NULL && label != NULL);
+VTable::VTable(const char *l, List<const char *> m)
+        : label(strdup(l)), methodLabels(m)  {
+    Assert(label != NULL);
     sprintf(printed, "VTable for class %s", l);
 }
 
 void VTable::Print() {
     printf("VTable %s =\n", label);
-    for (int i = 0; i < methodLabels->size(); i++)
-        printf("\t%s,\n", methodLabels->get(i));
+    for (int i = 0; i < methodLabels.size(); i++)
+        printf("\t%s,\n", methodLabels.get(i));
     printf("; \n");
 }
 void VTable::EmitSpecific(Mips *mips) {
-    mips->EmitVTable(label, methodLabels);
+    mips->EmitVTable(label, &methodLabels);
 }
 
 

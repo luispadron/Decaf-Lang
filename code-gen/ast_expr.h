@@ -301,6 +301,8 @@ private:
     /// emits length of an array (.length() call)
     Location * emit_length_call();
 
+    void push_params() const;
+
 protected:
     Expr *base;	// will be NULL if no explicit base
     Identifier *field;
@@ -328,6 +330,10 @@ public:
     NewExpr(yyltype loc, NamedType *clsType);
 
     Type * type_check() override;
+
+    int get_bytes() const override;
+
+    Location * emit() override;
 };
 
 
