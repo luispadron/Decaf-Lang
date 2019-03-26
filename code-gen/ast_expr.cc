@@ -585,11 +585,11 @@ int Call::get_bytes() const {
         auto class_name = base->type_check()->get_type_name();
         auto gscope = Sym_tbl_t::shared().get_scope("global").first;
         Assert(gscope);
-        auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(class_name).first);
+        auto class_decl = dynamic_cast<ClassDecl *>(gscope->get_decl(class_name).first);
         Assert(class_decl);
         auto class_scope = Sym_tbl_t::shared().get_scope(class_decl->get_id()->get_name()).first;
         Assert(class_scope);
-        auto fn = dynamic_cast<FnDecl*>(class_scope->get_decl(field->get_name()).first);
+        auto fn = dynamic_cast<FnDecl *>(class_scope->get_decl(field->get_name()).first);
         Assert(fn);
 
         if (fn->has_return()) {
@@ -598,9 +598,19 @@ int Call::get_bytes() const {
             return actual_bytes + (2 * Cgen_t::word_size);
         }
 
+    }
+
+    // handle the rest of two cases, either calling using implicit "this" or just a global function call
+    auto fn = dynamic_cast<FnDecl *>(scope->get_decl(field->get_name()).first);
+    Assert(fn);
+
+    if (scope->is_class_scope()) {
+        if (fn->has_return()) {
+            return actual_bytes + (3 * Cgen_t::word_size);
+        } else {
+            return actual_bytes + (2 * Cgen_t::word_size);
+        }
     } else {
-        auto fn = dynamic_cast<FnDecl*>(scope->get_decl(field->get_name()).first);
-        Assert(fn);
         if (fn->has_return()) {
             return actual_bytes + Cgen_t::word_size;
         } else {
@@ -724,7 +734,7 @@ int NewExpr::get_bytes() const {
     auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(cType->get_id()->get_name()).first);
     Assert(class_decl);
 
-    return class_decl->get_bytes();
+    return class_decl->get_bytes() + (2 * Cgen_t::word_size);
 }
 
 Location* NewExpr::emit() {

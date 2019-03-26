@@ -97,7 +97,7 @@ void FnDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
     auto block = dynamic_cast<StmtBlock*>(body);
     if (block) {
         block->emit();
-        func_code->SetFrameSize(block->get_bytes() + (class_or_interface_scope ? 4 : 0));
+        func_code->SetFrameSize(block->get_bytes());
     }
 
     // end function code and pop scope
