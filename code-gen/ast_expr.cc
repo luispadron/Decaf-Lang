@@ -421,7 +421,7 @@ void ArrayAccess::emit_check(Location *base, Location *subscript) const {
     Cgen_t::shared().gen_ifz(check, size_pass_lbl); // generate if check for "check"
 
     // any code here will be executed if the size check fails
-    auto fail_msg = Cgen_t::shared().gen_load_constant("Decaf runtime error: Array subscript out of bound...");
+    auto fail_msg = Cgen_t::shared().gen_load_constant("Decaf runtime error: Array subscript out of bounds\n");
     Cgen_t::shared().gen_built_in_call(PrintString, fail_msg);
     Cgen_t::shared().gen_built_in_call(Halt);
 
