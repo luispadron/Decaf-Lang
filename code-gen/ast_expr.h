@@ -301,7 +301,7 @@ private:
     /// emits length of an array (.length() call)
     Location * emit_length_call();
 
-    void push_params() const;
+    void push_params(Location *this_ptr = nullptr) const;
 
 protected:
     Expr *base;	// will be NULL if no explicit base

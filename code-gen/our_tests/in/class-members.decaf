@@ -1,0 +1,19 @@
+class Dog {
+    int age;
+
+    void set_age(int age) {
+        this.age = this.age + 1 + age;
+    }
+
+    int get_age() {
+        return age;
+    }
+}
+
+void main() {
+    Dog d;
+    d = New(Dog);
+
+    d.set_age(100);
+    Print(d.get_age());
+}

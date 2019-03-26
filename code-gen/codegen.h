@@ -97,6 +97,7 @@ public:
     Location *gen_load_constant(int value);
     Location *gen_load_constant(const char *str);
     Location *gen_load_label(const char *label);
+    Location *gen_load_this_ptr(int offset = 0);
 
 
     // Generates Tac instructions to copy value from one location to another
@@ -131,6 +132,7 @@ public:
     // The Decaf convention is that parameters are pushed right
     // to left (so the first argument is pushed last)
     void gen_push_param(Location *param);
+    void gen_push_this_param(Location *this_param);
 
     // Generates the Tac instruction for popping parameters to
     // clean up after an ACall or LCall instruction. All parameters

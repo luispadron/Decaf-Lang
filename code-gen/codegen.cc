@@ -67,6 +67,14 @@ Location *CodeGenerator::gen_load_label(const char *label) {
     return result;
 }
 
+Location *CodeGenerator::gen_load_this_ptr(int offset) {
+    // "this" will always be pushed last, thus always at +4
+    static auto *this_loc = new Location(Segment::fp_relative, 4, "this");
+    auto res = gen_temp_var();
+    code->append(new Load(res, this_loc, offset));
+    return res;
+}
+
 
 void CodeGenerator::gen_assign(Location *dst, Location *src)
 {
@@ -126,13 +134,16 @@ void CodeGenerator::gen_end_func() {
     code->append(new EndFunc());
 }
 
-void CodeGenerator::gen_push_param(Location *param)
-{
+void CodeGenerator::gen_push_param(Location *param) {
     code->append(new PushParam(param));
 }
 
-void CodeGenerator::gen_pop_params(int num_bytes)
-{
+void CodeGenerator::gen_push_this_param(Location *this_param) {
+    auto this_loc = new Location(this_param->GetSegment(), this_param->GetOffset(), "this");
+    code->append(new PushParam(this_loc));
+}
+
+void CodeGenerator::gen_pop_params(int num_bytes) {
     Assert(num_bytes >= 0 && num_bytes % word_size == 0); // sanity check
     if (num_bytes > 0)
         code->append(new PopParams(num_bytes));

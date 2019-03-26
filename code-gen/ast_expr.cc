@@ -349,7 +349,7 @@ Location * AssignExpr::emit() {
         auto rhs = right->emit();
         Cgen_t::shared().gen_store(lhs, rhs);
         return lhs;
-    } else {
+    }else {
         auto lhs = left->emit();
         auto rhs = right->emit();
         Cgen_t::shared().gen_assign(lhs, rhs);
@@ -366,13 +366,9 @@ Type* This::type_check() {
     }
 
     // find name of class, then look up the symbol and return its type
-    const auto &class_name = scope->name();
+    const auto &class_name = scope->get_class_scope_name();
+    auto decl = Sym_tbl_t::shared().get_scope("global").first->get_decl(class_name).first;
 
-    if (!scope->get_decl(class_name).second) {
-        return Type::errorType;
-    }
-
-    auto decl = scope->get_decl(class_name).first;
     // if the decl isn't a class this is invalid
     if (decl->get_decl_type() != DeclType::Class) {
         return Type::errorType;
@@ -502,20 +498,14 @@ Type* FieldAccess::type_check() {
 Location * FieldAccess::emit() {
     auto scope = Sym_tbl_t::shared().get_scope();
 
-    if (base) {
-        // TODO: add this when classes are finished
-        Assert(false);
-        return nullptr;
-    } else if (scope->is_class_scope()) {
-        auto var = dynamic_cast<VarDecl*>(scope->get_decl(field->get_name()).first);
-        Assert(var);
+    if (base || scope->is_class_scope()) {
         auto gscope = Sym_tbl_t::shared().get_scope("global").first;
         Assert(gscope);
         auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(scope->get_class_scope_name()).first);
         Assert(class_decl);
 
-        int offset = class_decl->get_member_offset(var->get_id()->get_name());
-        return Cgen_t::shared().gen_load(var->get_location(), offset);
+        int offset = class_decl->get_member_offset(field->get_name());
+        return Cgen_t::shared().gen_load_this_ptr(offset);
     } else {
         auto var = dynamic_cast<VarDecl*>(scope->get_decl(field->get_name()).first);
         Assert(var);
@@ -624,7 +614,7 @@ Location* Call::emit_length_call() {
     return Cgen_t::shared().gen_load(base_tmp, -4);
 }
 
-void Call::push_params() const {
+void Call::push_params(Location *this_ptr) const {
     // generate locations for parameters
     vector<Location *> params;
     params.reserve(static_cast<size_t>(actuals->size()));
@@ -635,6 +625,10 @@ void Call::push_params() const {
     // generate parameter pushing, this is done from last to first
     for (auto param_it = params.rbegin(); param_it != params.rend(); ++param_it) {
         Cgen_t::shared().gen_push_param(*param_it);
+    }
+
+    if (this_ptr) {
+        Cgen_t::shared().gen_push_this_param(this_ptr);
     }
 }
 
@@ -663,8 +657,7 @@ Location * Call::emit() {
         int method_offset = class_decl->get_method_offset(field->get_name()); // get offset of method in vtable
         auto method_addr = Cgen_t::shared().gen_load(vtable, method_offset); // get actual method address
 
-        push_params();
-        Cgen_t::shared().gen_push_param(object_loc); // push object for implicit "this" in class method
+        push_params(object_loc);
 
         auto call_ret = Cgen_t::shared().gen_a_call(method_addr, fn->has_return());
         Cgen_t::shared().gen_pop_params(fn->get_bytes() + Cgen_t::word_size);
@@ -682,12 +675,11 @@ Location * Call::emit() {
         auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(scope->get_class_scope_name()).first);
         Assert(class_decl);
 
-        auto this_ptr = Cgen_t::shared().gen_load_label(class_decl->get_id()->get_name().c_str());
+        auto this_ptr = Cgen_t::shared().gen_load_this_ptr();
         auto method_offset = class_decl->get_method_offset(field->get_name());
         auto method_addr = Cgen_t::shared().gen_load(this_ptr, method_offset);
 
-        push_params();
-        Cgen_t::shared().gen_push_param(this_ptr);
+        push_params(this_ptr);
 
         auto call_ret = Cgen_t::shared().gen_a_call(method_addr, fn->has_return());
         Cgen_t::shared().gen_pop_params(fn->get_bytes() + Cgen_t::word_size);
