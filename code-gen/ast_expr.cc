@@ -720,13 +720,7 @@ Type* NewExpr::type_check() {
 }
 
 int NewExpr::get_bytes() const {
-    // find class decl
-    auto gscope = Sym_tbl_t::shared().get_scope("global").first;
-    Assert(gscope);
-    auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(cType->get_id()->get_name()).first);
-    Assert(class_decl);
-
-    return class_decl->get_bytes() + (2 * Cgen_t::word_size);
+    return 3 * Cgen_t::word_size;
 }
 
 Location* NewExpr::emit() {

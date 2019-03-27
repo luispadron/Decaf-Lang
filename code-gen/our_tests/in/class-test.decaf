@@ -1,0 +1,12 @@
+class Dog {
+	int age;
+
+	void set_age(int a) {
+		this.age;
+	}
+}
+
+void main() {
+	Dog d;
+	d = New(Dog);
+}
