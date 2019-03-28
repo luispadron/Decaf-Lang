@@ -133,6 +133,14 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
     // extends can be NULL, impl & mem may be empty lists but cannot be NULL
     Assert(n != nullptr && imp != nullptr && m != nullptr);
     type = new NamedType(n);
+
+    // set size of class
+    bytes = Cgen_t::word_size;
+    for (int i = 0; i < m->size(); ++i) {
+        auto var = dynamic_cast<VarDecl*>(m->get(i));
+        if (var) bytes += Cgen_t::word_size;
+    }
+
     extends = ex;
     if (extends) extends->set_parent(this);
     (implements = imp)->set_parent_all(this);
@@ -213,8 +221,6 @@ void ClassDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
             Assert(method);
 
             mangled_method_names.push_back(method->get_mangled_name(scope->name()));
-        } else if (member->get_decl_type() == DeclType::Variable) {
-            bytes += Cgen_t::word_size; // increase size of class
         }
     }
 

@@ -661,12 +661,13 @@ Location* Call::emit_explicit_method_call() {
     auto fn = dynamic_cast<FnDecl *>(class_scope->get_decl(field->get_name()).first);
     Assert(fn);
 
+    auto params = gen_location_params();
     auto object_loc = base->emit();
     auto vtable = Cgen_t::shared().gen_load(object_loc); // get vtable, remember vtable is at first 4 bytes of object
     int method_offset = class_decl->get_method_offset(field->get_name()); // get offset of method in vtable
     auto method_addr = Cgen_t::shared().gen_load(vtable, method_offset); // get actual method address
 
-    push_params(object_loc);
+    push_params(params, object_loc);
 
     auto call_ret = Cgen_t::shared().gen_a_call(method_addr, fn->has_return());
     Cgen_t::shared().gen_pop_params((actuals->size() * Cgen_t::word_size) + Cgen_t::word_size);
@@ -689,16 +690,17 @@ Location* Call::emit_implicit_method_call() {
     auto fn_offset = class_decl->get_method_offset(fn->get_id()->get_name());
 
     // get this pointer location with offset of function
+    auto params = gen_location_params();
     auto this_loc = Cgen_t::shared().gen_load_this_ptr();
     auto method_addr = Cgen_t::shared().gen_load(this_loc, fn_offset);
-    push_params(this_loc);
+    push_params(params, this_loc);
 
     auto ret = Cgen_t::shared().gen_a_call(method_addr, fn->has_return());
     Cgen_t::shared().gen_pop_params((actuals->size() * Cgen_t::word_size) + Cgen_t::word_size);
     return ret;
 }
 
-void Call::push_params(Location *this_ptr) const {
+vector<Location*> Call::gen_location_params() const {
     // generate locations for parameters
     vector<Location *> params;
     params.reserve(static_cast<size_t>(actuals->size()));
@@ -706,6 +708,10 @@ void Call::push_params(Location *this_ptr) const {
         params.push_back(actuals->get(i)->emit());
     }
 
+    return params;
+}
+
+void Call::push_params(vector<Location*> params, Location *this_ptr) const {
     // generate parameter pushing, this is done from last to first
     for (auto param_it = params.rbegin(); param_it != params.rend(); ++param_it) {
         Cgen_t::shared().gen_push_param(*param_it);
@@ -732,7 +738,8 @@ Location * Call::emit() {
         auto fn = dynamic_cast<FnDecl*>(scope->get_decl(field->get_name()).first);
         Assert(fn);
 
-        push_params();
+        auto params = gen_location_params();
+        push_params(params);
         auto ret = Cgen_t::shared().gen_l_call(fn->get_mangled_name("").c_str(), fn->has_return());
         Cgen_t::shared().gen_pop_params(actuals->size() * Cgen_t::word_size);
         return ret;

@@ -16,6 +16,8 @@
 #include "ast_type.h"
 #include "list.h"
 
+#include <vector>
+
 
 class Expr : public Stmt {
 public:
@@ -319,8 +321,11 @@ private:
     /// this function emits code for an implicit method call, when in a class and calling a method like "set_age()"
     Location *emit_implicit_method_call();
 
+    /// generates locations for all the parameters
+    std::vector<Location*> gen_location_params() const;
+
     /// emits code for pushing parameters before a call, if this_ptr is set that is also pushed (pushed last)
-    void push_params(Location *this_ptr = nullptr) const;
+    void push_params(std::vector<Location*> params, Location *this_ptr = nullptr) const;
 
 protected:
     Expr *base;	// will be NULL if no explicit base

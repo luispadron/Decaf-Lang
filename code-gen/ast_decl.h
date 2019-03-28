@@ -132,7 +132,7 @@ public:
 
 class ClassDecl : public Decl {
 protected:
-    int bytes = Cgen_t::word_size; // how big the class is
+    int bytes; // how big the class is
     List<Decl*> *members;
     std::vector<std::string> mangled_method_names;
     NamedType *extends;
