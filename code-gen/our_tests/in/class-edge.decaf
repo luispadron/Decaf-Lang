@@ -1,0 +1,21 @@
+class Dog {
+    int age;
+
+	void test() {
+	    this.test();
+	}
+
+    int math(int math) {
+        this.math(0);
+    }
+
+    void set_age(int age) {
+    }
+}
+
+void main() {
+	Dog d;
+	d.test();
+	d.math(0);
+	d.set_age(10);
+}

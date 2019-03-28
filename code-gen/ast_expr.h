@@ -243,6 +243,8 @@ public:
     explicit This(yyltype loc) : Expr(loc) {}
 
     Type * type_check() override;
+
+    Location * emit() override;
 };
 
 
@@ -301,6 +303,13 @@ private:
     /// emits length of an array (.length() call)
     Location * emit_length_call();
 
+    /// this function emits code for an explicit method call, either "this.func()" or "class.func()"
+    Location *emit_explicit_method_call();
+
+    /// this function emits code for an implicit method call, when in a class and calling a method like "set_age()"
+    Location *emit_implicit_method_call();
+
+    /// emits code for pushing parameters before a call, if this_ptr is set that is also pushed (pushed last)
     void push_params(Location *this_ptr = nullptr) const;
 
 protected:

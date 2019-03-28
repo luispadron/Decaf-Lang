@@ -33,7 +33,7 @@ public:
 
     /// returns a declaration within the scope
     /// if no such declaration is found, false is returned in the pare
-    std::pair<Decl*, bool> get_decl(const std::string &name) const;
+    std::pair<Decl*, bool> get_decl(const std::string &name, bool check_class_scope = true) const;
 
     /// returns the name of the scope
     const std::string & name() const { return name_; }

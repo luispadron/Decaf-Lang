@@ -132,7 +132,6 @@ public:
     // The Decaf convention is that parameters are pushed right
     // to left (so the first argument is pushed last)
     void gen_push_param(Location *param);
-    void gen_push_this_param(Location *this_param);
 
     // Generates the Tac instruction for popping parameters to
     // clean up after an ACall or LCall instruction. All parameters

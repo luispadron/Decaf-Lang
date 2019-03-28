@@ -377,6 +377,11 @@ Type* This::type_check() {
     }
 }
 
+Location* This::emit() {
+    static auto *this_loc = new Location(Segment::fp_relative, 4, "this");
+    return this_loc;
+}
+
   
 ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
     (base = b)->set_parent(this);
@@ -591,10 +596,11 @@ int Call::get_bytes() const {
     }
 
     // handle the rest of two cases, either calling using implicit "this" or just a global function call
+    auto is_local = scope->get_decl(field->get_name(), false).second;
     auto fn = dynamic_cast<FnDecl *>(scope->get_decl(field->get_name()).first);
     Assert(fn);
 
-    if (scope->is_class_scope()) {
+    if (!is_local) {
         if (fn->has_return()) {
             return actual_bytes + (3 * Cgen_t::word_size);
         } else {
@@ -614,6 +620,54 @@ Location* Call::emit_length_call() {
     return Cgen_t::shared().gen_load(base_tmp, -4);
 }
 
+Location* Call::emit_explicit_method_call() {
+    auto class_name = base->type_check()->get_type_name();
+    auto gscope = Sym_tbl_t::shared().get_scope("global").first;
+    Assert(gscope);
+    auto class_decl = dynamic_cast<ClassDecl *>(gscope->get_decl(class_name).first);
+    Assert(class_decl);
+    auto class_scope = Sym_tbl_t::shared().get_scope(class_decl->get_id()->get_name()).first;
+    Assert(class_scope);
+    auto fn = dynamic_cast<FnDecl *>(class_scope->get_decl(field->get_name()).first);
+    Assert(fn);
+
+    auto object_loc = base->emit();
+    auto vtable = Cgen_t::shared().gen_load(object_loc); // get vtable, remember vtable is at first 4 bytes of object
+    int method_offset = class_decl->get_method_offset(field->get_name()); // get offset of method in vtable
+    auto method_addr = Cgen_t::shared().gen_load(vtable, method_offset); // get actual method address
+
+    push_params(object_loc);
+
+    auto call_ret = Cgen_t::shared().gen_a_call(method_addr, fn->has_return());
+    Cgen_t::shared().gen_pop_params((actuals->size() * Cgen_t::word_size) + Cgen_t::word_size);
+    return call_ret;
+}
+
+Location* Call::emit_implicit_method_call() {
+    auto gscope = Sym_tbl_t::shared().get_scope("global").first;
+    auto scope = Sym_tbl_t::shared().get_scope();
+
+    // get class decl
+    auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(scope->get_class_scope_name()).first);
+    Assert(class_decl);
+
+    // get function decl
+    auto fn = dynamic_cast<FnDecl*>(scope->get_decl(field->get_name()).first);
+    Assert(fn);
+
+    // find offset of method in object
+    auto fn_offset = class_decl->get_method_offset(fn->get_id()->get_name());
+
+    // get this pointer location with offset of function
+    auto this_loc = Cgen_t::shared().gen_load_this_ptr();
+    auto method_addr = Cgen_t::shared().gen_load(this_loc, fn_offset);
+    push_params(this_loc);
+
+    auto ret = Cgen_t::shared().gen_a_call(method_addr, fn->has_return());
+    Cgen_t::shared().gen_pop_params((actuals->size() * Cgen_t::word_size) + Cgen_t::word_size);
+    return ret;
+}
+
 void Call::push_params(Location *this_ptr) const {
     // generate locations for parameters
     vector<Location *> params;
@@ -628,69 +682,31 @@ void Call::push_params(Location *this_ptr) const {
     }
 
     if (this_ptr) {
-        Cgen_t::shared().gen_push_this_param(this_ptr);
+        Cgen_t::shared().gen_push_param(this_ptr);
     }
 }
 
 Location * Call::emit() {
     auto scope = Sym_tbl_t::shared().get_scope();
+    auto is_local = scope->get_decl(field->get_name(), false).second;
 
     if (base) {
-
         if (base->type_check()->is_array_type() && field->get_name() == "length") { // handle built in length call
             return emit_length_call();
+        } else {
+            return emit_explicit_method_call();
         }
-
-        // emit class method call
-        auto class_name = base->type_check()->get_type_name();
-        auto gscope = Sym_tbl_t::shared().get_scope("global").first;
-        Assert(gscope);
-        auto class_decl = dynamic_cast<ClassDecl *>(gscope->get_decl(class_name).first);
-        Assert(class_decl);
-        auto class_scope = Sym_tbl_t::shared().get_scope(class_decl->get_id()->get_name()).first;
-        Assert(class_scope);
-        auto fn = dynamic_cast<FnDecl *>(class_scope->get_decl(field->get_name()).first);
+    } else if (!is_local){
+        return emit_implicit_method_call();
+    } else {
+        // emit normal call
+        auto fn = dynamic_cast<FnDecl*>(scope->get_decl(field->get_name()).first);
         Assert(fn);
 
-        auto object_loc = base->emit();
-        auto vtable = Cgen_t::shared().gen_load(object_loc); // get vtable, remember vtable is at first 4 bytes of object
-        int method_offset = class_decl->get_method_offset(field->get_name()); // get offset of method in vtable
-        auto method_addr = Cgen_t::shared().gen_load(vtable, method_offset); // get actual method address
-
-        push_params(object_loc);
-
-        auto call_ret = Cgen_t::shared().gen_a_call(method_addr, fn->has_return());
-        Cgen_t::shared().gen_pop_params(fn->get_bytes() + Cgen_t::word_size);
-        return call_ret;
-    }
-
-    // handle other two cases, either using implicit "this", or simple global function call
-
-    auto fn = dynamic_cast<FnDecl*>(scope->get_decl(field->get_name()).first);
-    Assert(fn);
-
-    if (scope->is_class_scope()) {
-        auto gscope = Sym_tbl_t::shared().get_scope("global").first;
-        Assert(gscope);
-        auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(scope->get_class_scope_name()).first);
-        Assert(class_decl);
-
-        auto this_ptr = Cgen_t::shared().gen_load_this_ptr();
-        auto method_offset = class_decl->get_method_offset(field->get_name());
-        auto method_addr = Cgen_t::shared().gen_load(this_ptr, method_offset);
-
-        push_params(this_ptr);
-
-        auto call_ret = Cgen_t::shared().gen_a_call(method_addr, fn->has_return());
-        Cgen_t::shared().gen_pop_params(fn->get_bytes() + Cgen_t::word_size);
-        return call_ret;
-    } else {
         push_params();
-        // generate call code
-        auto call_code = Cgen_t::shared().gen_l_call(fn->get_mangled_name("").c_str(), fn->has_return());
-        // generate pop params
+        auto ret = Cgen_t::shared().gen_l_call(fn->get_id()->get_name().c_str(), fn->has_return());
         Cgen_t::shared().gen_pop_params(actuals->size() * Cgen_t::word_size);
-        return call_code;
+        return ret;
     }
 }
 
