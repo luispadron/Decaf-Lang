@@ -49,6 +49,8 @@ public:
     /// the name of the main function, which is required in all programs
     static constexpr const char * const main_func_name = "main";
 
+    static Location * this_ptr_loc;
+
 
                     /******** API ********/
 

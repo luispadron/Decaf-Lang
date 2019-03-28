@@ -14,6 +14,8 @@
 
 using namespace std;
 
+Location * CodeGenerator::this_ptr_loc = new Location(Segment::fp_relative, 4, "this");
+
 CodeGenerator::CodeGenerator() :
     code(new List<Instruction*>),
     is_main_defined(false),
@@ -68,10 +70,8 @@ Location *CodeGenerator::gen_load_label(const char *label) {
 }
 
 Location *CodeGenerator::gen_load_this_ptr(int offset) {
-    // "this" will always be pushed last, thus always at +4
-    static auto *this_loc = new Location(Segment::fp_relative, 4, "this");
     auto res = gen_temp_var();
-    code->append(new Load(res, this_loc, offset));
+    code->append(new Load(res, CodeGenerator::this_ptr_loc, offset));
     return res;
 }
 

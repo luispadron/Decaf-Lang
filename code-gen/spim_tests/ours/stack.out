@@ -1,4 +1,14 @@
 Loaded: /usr/local/Cellar/spim/9.1.19/share/exceptions.s
-The following symbols are undefined:
-main
-
+Exception occurred at PC=0x00400244
+  Bad address in data/stack read: 0x014007f8
+  Exception 7  [Bad data address]  occurred and ignored
+Exception occurred at PC=0x0040015c
+  Bad address in text read: 0x0040015d
+  Exception 6  [Bad instruction address]  occurred and ignored
+Exception occurred at PC=0x00400174
+  Bad address in data/stack read: 0x00000008
+  Exception 7  [Bad data address]  occurred and ignored
+Exception occurred at PC=0x00400180
+  Bad address in data/stack read: 0x00000004
+  Exception 7  [Bad data address]  occurred and ignored
+Read from unused memory-mapped IO address (0xfffffffc)

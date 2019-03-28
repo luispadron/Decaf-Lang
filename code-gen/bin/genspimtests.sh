@@ -18,7 +18,7 @@ do
     ./$EXEC < $file &> $OUT_DIR/$filename.tac
     echo "generating spim output for: $filename"
     {
-        spim -file $OUT_DIR/$filename.tac > $OUT_DIR/$filename.out
+        spim -file $OUT_DIR/$filename.tac &> $OUT_DIR/$filename.out
         rm $OUT_DIR/$filename.tac
     } || {
         echo "Failed to run spim for $filename"

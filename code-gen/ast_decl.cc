@@ -85,8 +85,8 @@ void FnDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
     Cgen_t::shared().gen_label(label.c_str());
     auto func_code = Cgen_t::shared().gen_begin_func();
 
-    // generate locations for parameters
-    int param_offset = Cgen_t::offset_first_param;
+    // generate locations for parameters, if method offset start is +8 otherwise +4
+    int param_offset = is_method ? Cgen_t::offset_first_param + Cgen_t::word_size : Cgen_t::offset_first_param;
     for (int i = 0; i < formals->size(); ++i) {
         auto var = formals->get(i);
         auto loc = new Location(Segment::fp_relative, param_offset, var->get_id()->get_name().c_str());
@@ -174,6 +174,13 @@ void ClassDecl::check(Scope *class_or_interface_scope) {
     for (int i = 0; i < members->size(); ++i) {
         auto decl = members->get(i);
         scope->insert_decl(decl->get_id()->get_name(), decl);
+        auto var = dynamic_cast<VarDecl*>(decl);
+        auto fn = dynamic_cast<FnDecl*>(decl);
+        if (var) {
+            var->set_is_member(true);
+        } else if (fn) {
+            fn->set_is_method(true);
+        }
     }
 
     for (int i = 0; i < members->size(); ++i) {

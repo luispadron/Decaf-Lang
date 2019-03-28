@@ -2,23 +2,27 @@ class Dog {
     int age;
 
 	void test() {
-	    this.test();
+
 	}
 
     int math(int math) {
-        this.math(0);
         math = 4;
+        age = 20;
     }
 
     void set_age(int age) {
         age = age * 10;
         this.age = age;
     }
+
+    int get_age() { return age; }
 }
 
 void main() {
 	Dog d;
+	d = New(Dog);
 	d.test();
 	d.math(0);
 	d.set_age(10);
+	Print(d.get_age());
 }

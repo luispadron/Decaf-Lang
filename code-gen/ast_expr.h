@@ -293,6 +293,12 @@ public:
     Type * type_check() override;
 
     Location *emit() override;
+
+    int get_bytes() const override;
+
+    bool is_member_access() const;
+
+    Identifier * get_field() const { return field; }
 };
 
 
@@ -329,6 +335,8 @@ public:
     int get_bytes() const override;
 
     Location *emit() override;
+
+    bool is_method_call() const;
 };
 
 

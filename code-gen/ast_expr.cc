@@ -343,13 +343,24 @@ Location * AssignExpr::emit() {
     Assert(left && right);
 
     auto arr = dynamic_cast<ArrayAccess*>(left);
+    auto fieldAccess = dynamic_cast<FieldAccess*>(left);
 
     if (arr) { // array assign is really a store and not a load
         auto lhs = arr->emit_store();
         auto rhs = right->emit();
         Cgen_t::shared().gen_store(lhs, rhs);
         return lhs;
-    }else {
+    } else if (fieldAccess && fieldAccess->is_member_access()) {
+        auto gscope = Sym_tbl_t::shared().get_scope("global").first;
+        auto scope = Sym_tbl_t::shared().get_scope();
+        auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(scope->get_class_scope_name()).first);
+        Assert(class_decl);
+
+        auto member_offset = class_decl->get_member_offset(fieldAccess->get_field()->get_name());
+        auto rhs = right->emit();
+        Cgen_t::shared().gen_store(Cgen_t::this_ptr_loc, rhs, member_offset);
+        return Cgen_t::this_ptr_loc;
+    } else {
         auto lhs = left->emit();
         auto rhs = right->emit();
         Cgen_t::shared().gen_assign(lhs, rhs);
@@ -378,8 +389,7 @@ Type* This::type_check() {
 }
 
 Location* This::emit() {
-    static auto *this_loc = new Location(Segment::fp_relative, 4, "this");
-    return this_loc;
+    return Cgen_t::this_ptr_loc;
 }
 
   
@@ -512,19 +522,31 @@ Location* FieldAccess::emit_member_access() {
 }
 
 Location * FieldAccess::emit() {
-    auto scope = Sym_tbl_t::shared().get_scope();
-    auto is_local = scope->get_decl(field->get_name(), false).second;
-
-    if (base) {
-        emit_member_access();
-    } else if (!is_local) {
-        emit_member_access();
+    if (is_member_access()) {
+        return emit_member_access();
     } else {
         // normal local/global variable access
+        auto scope = Sym_tbl_t::shared().get_scope();
         auto var = dynamic_cast<VarDecl*>(scope->get_decl(field->get_name()).first);
         Assert(var);
         return var->get_location();
     }
+}
+
+int FieldAccess::get_bytes() const {
+    if (is_member_access()) {
+        return Cgen_t::word_size;
+    } else {
+        return 0;
+    }
+}
+
+bool FieldAccess::is_member_access() const {
+    if (base) { return true; }
+
+    auto scope = Sym_tbl_t::shared().get_scope();
+    auto var_decl = dynamic_cast<VarDecl*>(scope->get_decl(field->get_name()).first);
+    return var_decl && var_decl->is_member_var();
 }
 
 
@@ -605,11 +627,10 @@ int Call::get_bytes() const {
     }
 
     // handle the rest of two cases, either calling using implicit "this" or just a global function call
-    auto is_local = scope->get_decl(field->get_name(), false).second;
     auto fn = dynamic_cast<FnDecl *>(scope->get_decl(field->get_name()).first);
     Assert(fn);
 
-    if (!is_local) {
+    if (is_method_call()) {
         if (fn->has_return()) {
             return actual_bytes + (3 * Cgen_t::word_size);
         } else {
@@ -697,7 +718,6 @@ void Call::push_params(Location *this_ptr) const {
 
 Location * Call::emit() {
     auto scope = Sym_tbl_t::shared().get_scope();
-    auto is_local = scope->get_decl(field->get_name(), false).second;
 
     if (base) {
         if (base->type_check()->is_array_type() && field->get_name() == "length") { // handle built in length call
@@ -705,7 +725,7 @@ Location * Call::emit() {
         } else {
             return emit_explicit_method_call();
         }
-    } else if (!is_local){
+    } else if (is_method_call()){
         return emit_implicit_method_call();
     } else {
         // emit normal call
@@ -713,10 +733,18 @@ Location * Call::emit() {
         Assert(fn);
 
         push_params();
-        auto ret = Cgen_t::shared().gen_l_call(fn->get_id()->get_name().c_str(), fn->has_return());
+        auto ret = Cgen_t::shared().gen_l_call(fn->get_mangled_name("").c_str(), fn->has_return());
         Cgen_t::shared().gen_pop_params(actuals->size() * Cgen_t::word_size);
         return ret;
     }
+}
+
+bool Call::is_method_call() const {
+    if (base) return true;
+
+    auto scope = Sym_tbl_t::shared().get_scope();
+    auto fn_decl = dynamic_cast<FnDecl*>(scope->get_decl(field->get_name()).first);
+    return fn_decl && fn_decl->is_method_func();
 }
 
 

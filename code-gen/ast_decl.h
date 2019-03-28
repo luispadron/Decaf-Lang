@@ -62,6 +62,7 @@ public:
 class VarDecl : public Decl {
 private:
     Location *location = nullptr;
+    bool is_member = false;
 
 public:
     VarDecl(Identifier *name, Type *type);
@@ -76,6 +77,10 @@ public:
     /// sets the memory location of this variable
     void set_location(Location *new_loc) { location = new_loc; }
 
+    void set_is_member(bool member) { is_member = member; }
+
+    bool is_member_var() const { return is_member; }
+
     void check(Scope *class_or_interface_scope) override;
 };
 
@@ -85,6 +90,8 @@ protected:
     List<VarDecl*> *formals;
     Type *returnType;
     Stmt *body;
+
+    bool is_method = false;
 
 public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
@@ -103,6 +110,10 @@ public:
     void check(Scope *class_or_interface_scope) override;
 
     void emit(Scope *class_or_interface_scope, FnDecl *curr_func) override;
+
+    void set_is_method(bool method) { is_method = method; }
+
+    bool is_method_func() const { return is_method; }
 };
 
 
