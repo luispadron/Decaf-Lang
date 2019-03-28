@@ -279,6 +279,10 @@ public:
  * and sort it out later.
  */
 class FieldAccess : public LValue {
+private:
+    /// emits code for member access, either "this.member" or "class.member" or "member = 4"
+    Location *emit_member_access();
+
 protected:
     Expr *base;	// will be NULL if no explicit base
     Identifier *field;

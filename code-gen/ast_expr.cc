@@ -500,18 +500,27 @@ Type* FieldAccess::type_check() {
     }
 }
 
+Location* FieldAccess::emit_member_access() {
+    auto scope = Sym_tbl_t::shared().get_scope();
+    auto gscope = Sym_tbl_t::shared().get_scope("global").first;
+    Assert(gscope);
+    auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(scope->get_class_scope_name()).first);
+    Assert(class_decl);
+
+    int offset = class_decl->get_member_offset(field->get_name());
+    return Cgen_t::shared().gen_load_this_ptr(offset);
+}
+
 Location * FieldAccess::emit() {
     auto scope = Sym_tbl_t::shared().get_scope();
+    auto is_local = scope->get_decl(field->get_name(), false).second;
 
-    if (base || scope->is_class_scope()) {
-        auto gscope = Sym_tbl_t::shared().get_scope("global").first;
-        Assert(gscope);
-        auto class_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(scope->get_class_scope_name()).first);
-        Assert(class_decl);
-
-        int offset = class_decl->get_member_offset(field->get_name());
-        return Cgen_t::shared().gen_load_this_ptr(offset);
+    if (base) {
+        emit_member_access();
+    } else if (!is_local) {
+        emit_member_access();
     } else {
+        // normal local/global variable access
         auto var = dynamic_cast<VarDecl*>(scope->get_decl(field->get_name()).first);
         Assert(var);
         return var->get_location();

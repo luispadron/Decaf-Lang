@@ -7,9 +7,12 @@ class Dog {
 
     int math(int math) {
         this.math(0);
+        math = 4;
     }
 
     void set_age(int age) {
+        age = age * 10;
+        this.age = age;
     }
 }
 
