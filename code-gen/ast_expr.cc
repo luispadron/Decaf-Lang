@@ -432,7 +432,7 @@ void ArrayAccess::emit_check(Location *base, Location *subscript) const {
     Cgen_t::shared().gen_ifz(check, size_pass_lbl); // generate if check for "check"
 
     // any code here will be executed if the size check fails
-    auto fail_msg = Cgen_t::shared().gen_load_constant("Decaf runtime error: Array subscript out of bounds\n");
+    auto fail_msg = Cgen_t::shared().gen_load_constant(err_arr_out_of_bounds);
     Cgen_t::shared().gen_built_in_call(PrintString, fail_msg);
     Cgen_t::shared().gen_built_in_call(Halt);
 
@@ -693,7 +693,7 @@ Location* Call::emit_implicit_method_call() {
     auto params = gen_location_params();
     auto this_loc = Cgen_t::shared().gen_load_this_ptr();
     auto method_addr = Cgen_t::shared().gen_load(this_loc, fn_offset);
-    push_params(params, this_loc);
+    push_params(params, Cgen_t::this_ptr_loc);
 
     auto ret = Cgen_t::shared().gen_a_call(method_addr, fn->has_return());
     Cgen_t::shared().gen_pop_params((actuals->size() * Cgen_t::word_size) + Cgen_t::word_size);
@@ -835,7 +835,7 @@ Location* NewArrayExpr::emit() {
     Cgen_t::shared().gen_ifz(lt_1_tmp, size_pass_lbl);
 
     // if the check fails (that is, given a size <= 0) the code below will be executed:
-    auto fail_msg = Cgen_t::shared().gen_load_constant("Decaf runtime error: Array size is <= 0\\n");
+    auto fail_msg = Cgen_t::shared().gen_load_constant(err_arr_bad_size);
     Cgen_t::shared().gen_built_in_call(PrintString, fail_msg, nullptr);
     Cgen_t::shared().gen_built_in_call(Halt, nullptr, nullptr);
 
