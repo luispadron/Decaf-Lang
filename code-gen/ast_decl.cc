@@ -191,6 +191,14 @@ void ClassDecl::check(Scope *class_or_interface_scope) {
         }
     }
 
+    if (extends) {
+        // find super class, update size of class
+        auto gscope = Sym_tbl_t::shared().get_scope("global").first;
+        auto super_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(extends->get_id()->get_name()).first);
+        Assert(super_decl);
+        bytes += super_decl->bytes - Cgen_t::word_size; // increase by size of parent object minus the vtable for parent
+    }
+
     for (int i = 0; i < members->size(); ++i) {
         members->get(i)->check(scope);
     }

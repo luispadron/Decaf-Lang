@@ -1,0 +1,16 @@
+class Animal {
+    int age;
+}
+
+class Dog extends Animal {
+    string name;
+}
+
+void main() {
+    Animal a;
+    Dog d;
+
+    a = New(Animal);
+    d = New(Dog);
+}
+
