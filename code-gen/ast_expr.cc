@@ -202,7 +202,7 @@ Location * RelationalExpr::emit() {
             return Cgen_t::shared().gen_binary_op("<", lhs, rhs);
 
         case Operator::Type::greater_than:
-            return Cgen_t::shared().gen_binary_op(">", lhs, rhs);
+            return Cgen_t::shared().gen_binary_op("<", rhs, lhs); // flip lhs and rhs and do "<" since tac doesnt support ">"
 
         case Operator::Type::less_than_eql: {
             auto lt_temp = Cgen_t::shared().gen_binary_op("<", lhs, rhs);
@@ -211,8 +211,8 @@ Location * RelationalExpr::emit() {
         }
 
         case Operator::Type::greater_than_eql: {
-            auto gt_temp = Cgen_t::shared().gen_binary_op(">", lhs, rhs);
-            auto eq_temp = Cgen_t::shared().gen_binary_op("==", lhs, rhs);
+            auto gt_temp = Cgen_t::shared().gen_binary_op("<", rhs, lhs); // again use "<" and swap lhs and rhs
+            auto eq_temp = Cgen_t::shared().gen_binary_op("==", rhs, lhs);
             return Cgen_t::shared().gen_binary_op("||", gt_temp, eq_temp);
         }
 

@@ -1,0 +1,9 @@
+Loaded: /usr/local/Cellar/spim/9.1.19/share/exceptions.s
+Exception occurred at PC=0x00400158
+  Exception 9  [Breakpoint]  occurred and ignored
+Exception occurred at PC=0x00400184
+  Exception 9  [Breakpoint]  occurred and ignored
+Exception occurred at PC=0x004001b0
+  Exception 9  [Breakpoint]  occurred and ignored
+Exception occurred at PC=0x004001dc
+  Exception 9  [Breakpoint]  occurred and ignored

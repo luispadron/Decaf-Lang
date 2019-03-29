@@ -1,0 +1,22 @@
+int math() {
+    int x;
+    int y;
+
+    x < y;
+    x > y;
+    x <= y;
+    x >= y;
+    x == y;
+    x != y;
+    x + y;
+    x - y;
+    x % y;
+    x * y;
+    x / y;
+
+    return x + y - y % x * x / y;
+}
+
+void main() {
+    math();
+}
