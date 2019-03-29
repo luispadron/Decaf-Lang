@@ -1,6 +1,6 @@
 Loaded: /usr/local/Cellar/spim/9.1.19/share/exceptions.s
 spim: (parser) syntax error on line 1 of file spim_tests/ours/t3.tac
-	  Assertion failed: (it != table.end()), function offset_for, file Vtable.cc, line 65.
+	  Assertion failed: (it != table.end()), function offset_for, file Vtable.cc, line 74.
 	            ^
 The following symbols are undefined:
 main

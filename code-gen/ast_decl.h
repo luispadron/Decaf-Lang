@@ -18,10 +18,6 @@
 #include "list.h"
 #include "Vtable.h"
 
-#include <string>
-#include <set>
-#include <map>
-
 class Identifier;
 class Stmt;
 class Expr;
@@ -130,7 +126,6 @@ public:
 
     void check(Scope *class_or_interface_scope) override;
 };
-
 
 class ClassDecl : public Decl {
 protected:

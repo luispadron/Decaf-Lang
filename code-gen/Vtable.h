@@ -6,7 +6,7 @@
 #define SEMANTIC_ANALYZER_VTABLE_H
 
 #include <string>
-#include <set>
+#include <vector>
 #include <type_traits>
 
 class ClassDecl;
@@ -21,6 +21,8 @@ struct Vtable_method {
 
 bool operator<(const Vtable_method &lhs, const Vtable_method &rhs);
 
+bool operator==(const Vtable_method &lhs, const Vtable_method &rhs);
+
 class Vtable {
 public:
     void create(ClassDecl *child, ClassDecl *parent = nullptr);
@@ -30,7 +32,7 @@ public:
     void generate_vtable_assembly(const std::string &class_name) const;
 
 private:
-    std::set<Vtable_method> table;
+    std::vector<Vtable_method> table;
 };
 
 
