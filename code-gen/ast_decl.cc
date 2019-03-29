@@ -189,6 +189,13 @@ void ClassDecl::check(Scope *class_or_interface_scope) {
         members->get(i)->check(scope);
     }
 
+    // set super scope
+    if (extends) {
+        auto class_scope = Sym_tbl_t::shared().get_scope(extends->get_id()->get_name()).first;
+        Assert(class_scope);
+        scope->set_super_scope(class_scope);
+    }
+
     Sym_tbl_t::shared().leave_scope();
 }
 

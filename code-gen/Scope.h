@@ -35,11 +35,11 @@ public:
     /// if no such declaration is found, false is returned in the pare
     std::pair<Decl*, bool> get_decl(const std::string &name) const;
 
+    /// sets the super scope (used in class hierarachy)
+    void set_super_scope(Scope *scope) { super_ptr = scope; }
+
     /// returns the name of the scope
     const std::string & name() const { return name_; }
-
-    /// returns the type of the scope
-    ScopeType scope_type() const { return type; }
 
     /// returns whether this scope is currently inside of a class scope
     bool is_class_scope() const { return this_ptr; }
