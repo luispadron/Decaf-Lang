@@ -61,7 +61,7 @@ void Program::emit() {
     for (int i = 0; i < decls->size(); ++i) {
         auto var = dynamic_cast<VarDecl*>(decls->get(i));
         if (var) {
-            auto loc = new Location(Segment::fp_relative, offset, var->get_id()->get_name().c_str());
+            auto loc = new Location(Segment::gp_relative, offset, var->get_id()->get_name().c_str());
             var->set_location(loc);
             offset += var->get_bytes();
         }
