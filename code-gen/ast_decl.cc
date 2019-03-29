@@ -148,17 +148,7 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
 }
 
 int ClassDecl::get_method_offset(const std::string &name) const {
-    int offset = 0;
-    for (int i = 0; i < members->size(); ++i) {
-        auto member = members->get(i);
-        if (member->get_decl_type() == DeclType::Function) {
-            if (member->get_id()->get_name() == name) { return offset; }
-            offset += 4;
-        }
-    }
-
-    Assert(false);
-    return -1;
+    return vtable.offset_for(name);
 }
 
 int ClassDecl::get_member_offset(const string &name) const {
@@ -166,7 +156,11 @@ int ClassDecl::get_member_offset(const string &name) const {
     for (int i = 0; i < members->size(); ++i) {
         auto member = members->get(i);
         if (member->get_decl_type() == DeclType::Variable) {
-            if (member->get_id()->get_name() == name) { return offset; }
+
+            if (member->get_id()->get_name() == name) {
+                return offset + parent_bytes;
+            }
+
             offset += 4;
         }
     }
@@ -191,14 +185,6 @@ void ClassDecl::check(Scope *class_or_interface_scope) {
         }
     }
 
-    if (extends) {
-        // find super class, update size of class
-        auto gscope = Sym_tbl_t::shared().get_scope("global").first;
-        auto super_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(extends->get_id()->get_name()).first);
-        Assert(super_decl);
-        bytes += super_decl->bytes - Cgen_t::word_size; // increase by size of parent object minus the vtable for parent
-    }
-
     for (int i = 0; i < members->size(); ++i) {
         members->get(i)->check(scope);
     }
@@ -208,6 +194,17 @@ void ClassDecl::check(Scope *class_or_interface_scope) {
 
 void ClassDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
     auto scope = Sym_tbl_t::shared().enter_scope(id->get_name());
+
+    // if we have a super class update our class size bytes and generate vtable
+    if (extends) {
+        auto gscope = Sym_tbl_t::shared().get_scope("global").first;
+        auto super_decl = dynamic_cast<ClassDecl*>(gscope->get_decl(extends->get_id()->get_name()).first);
+        Assert(super_decl);
+        parent_bytes = super_decl->get_bytes() - Cgen_t::word_size;
+        vtable.create(this, super_decl);
+    } else {
+        vtable.create(this);
+    }
 
     // generate variable locations
     int offset = 4;
@@ -223,21 +220,11 @@ void ClassDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
     for (int i = 0; i < members->size(); ++i) {
         auto member = members->get(i);
         member->emit(scope, nullptr);
-
-        if (member->get_decl_type() == DeclType::Function) {
-            auto method = dynamic_cast<FnDecl*>(member);
-            Assert(method);
-
-            mangled_method_names.push_back(method->get_mangled_name(scope->name()));
-        }
     }
 
-    // generate v table
-    List<const char*> methods;
-    for (const auto &m : mangled_method_names) {
-        methods.append(m.c_str());
-    }
-    Cgen_t::shared().gen_vtable(id->get_name().c_str(), methods);
+    // generate v table assembly
+    vtable.generate_vtable_assembly(id->get_name());
 
+    // leave scope
     Sym_tbl_t::shared().leave_scope();
 }

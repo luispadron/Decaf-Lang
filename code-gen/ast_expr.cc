@@ -664,7 +664,7 @@ Location* Call::emit_explicit_method_call() {
     auto params = gen_location_params();
     auto object_loc = base->emit();
     auto vtable = Cgen_t::shared().gen_load(object_loc); // get vtable, remember vtable is at first 4 bytes of object
-    int method_offset = class_decl->get_method_offset(field->get_name()); // get offset of method in vtable
+    int method_offset = class_decl->get_method_offset(fn->get_id()->get_name()); // get offset of method in vtable
     auto method_addr = Cgen_t::shared().gen_load(vtable, method_offset); // get actual method address
 
     push_params(params, object_loc);

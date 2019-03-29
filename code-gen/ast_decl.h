@@ -16,9 +16,11 @@
 #include "ast.h"
 #include "ast_type.h"
 #include "list.h"
+#include "Vtable.h"
 
 #include <string>
-#include <vector>
+#include <set>
+#include <map>
 
 class Identifier;
 class Stmt;
@@ -132,19 +134,25 @@ public:
 
 class ClassDecl : public Decl {
 protected:
-    int bytes; // how big the class is
+    int bytes;
+    int parent_bytes = 0;
     List<Decl*> *members;
-    std::vector<std::string> mangled_method_names;
     NamedType *extends;
     List<NamedType*> *implements;
+    Vtable vtable;
 
 public:
+
+    friend class Vtable;
+
     ClassDecl(Identifier *name, NamedType *extends,
               List<NamedType*> *implements, List<Decl*> *members);
 
     DeclType get_decl_type() const override { return DeclType::Class; }
 
-    int get_bytes() const override { return bytes; }
+    int get_bytes() const override {
+        return bytes + parent_bytes;
+    }
 
     int get_method_offset(const std::string &name) const;
 

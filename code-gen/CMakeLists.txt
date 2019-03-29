@@ -38,7 +38,7 @@ add_executable(gen
         codegen.cc
         SymbolTable.cc
         Scope.cc
-        main.cc)
+        main.cc Vtable.cc)
 
 target_link_libraries(gen
         ${FLEX_LIBRARIES}

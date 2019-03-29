@@ -1,0 +1,32 @@
+class Animal {
+    int age;
+
+    void make_noise() {
+
+    }
+
+    void set_age(int age) {
+        this.age = age;
+    }
+}
+
+class Dog extends Animal {
+    string name;
+
+    void set_name(string name) {
+        this.name = name;
+    }
+
+    void make_noise() {
+        Print("Bark! my name is ");
+        Print(name);
+    }
+}
+
+void main() {
+    Dog d;
+    d = New(Dog);
+
+    d.set_name("Fido");
+    d.make_noise();
+}

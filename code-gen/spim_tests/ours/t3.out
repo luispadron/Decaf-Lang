@@ -1,2 +1,9 @@
 Loaded: /usr/local/Cellar/spim/9.1.19/share/exceptions.s
-122 100
+spim: (parser) syntax error on line 1 of file spim_tests/ours/t3.tac
+	  Assertion failed: (it != table.end()), function offset_for, file Vtable.cc, line 65.
+	            ^
+The following symbols are undefined:
+main
+
+Instruction references undefined symbol at 0x00400014
+  [0x00400014]	0x0c000000  jal 0x00000000 [main]           ; 188: jal main
