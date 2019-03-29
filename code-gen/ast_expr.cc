@@ -357,9 +357,10 @@ Location * AssignExpr::emit() {
         Assert(class_decl);
 
         auto member_offset = class_decl->get_member_offset(fieldAccess->get_field()->get_name());
+        auto lhs = fieldAccess->get_base() ? fieldAccess->get_base()->emit() : Cgen_t::this_ptr_loc;
         auto rhs = right->emit();
-        Cgen_t::shared().gen_store(Cgen_t::this_ptr_loc, rhs, member_offset);
-        return Cgen_t::this_ptr_loc;
+        Cgen_t::shared().gen_store(lhs, rhs, member_offset);
+        return lhs;
     } else {
         auto lhs = left->emit();
         auto rhs = right->emit();
@@ -518,7 +519,13 @@ Location* FieldAccess::emit_member_access() {
     Assert(class_decl);
 
     int offset = class_decl->get_member_offset(field->get_name());
-    return Cgen_t::shared().gen_load_this_ptr(offset);
+
+    if (base) {
+        auto base_loc = base->emit();
+        return Cgen_t::shared().gen_load(base_loc, offset);
+    } else {
+        return Cgen_t::shared().gen_load_this_ptr(offset);
+    }
 }
 
 Location * FieldAccess::emit() {
@@ -619,9 +626,9 @@ int Call::get_bytes() const {
         Assert(fn);
 
         if (fn->has_return()) {
-            return actual_bytes + (3 * Cgen_t::word_size);
+            return actual_bytes + base->get_bytes() + (3 * Cgen_t::word_size);
         } else {
-            return actual_bytes + (2 * Cgen_t::word_size);
+            return actual_bytes + base->get_bytes() + (2 * Cgen_t::word_size);
         }
 
     }

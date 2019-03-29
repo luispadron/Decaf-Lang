@@ -1,0 +1,24 @@
+class QueueItem {
+  int data;
+  QueueItem next;
+  QueueItem prev;
+
+  void Init(int data, QueueItem next, QueueItem prev) {
+    this.data = data;
+    this.next = next;
+    next.prev = this;
+    this.prev = prev;
+    prev.next = this;
+  }
+}
+
+class Queue {
+  QueueItem head;
+
+  void Init() {
+    this.head = New(QueueItem);
+    this.head.Init(0, this.head, this.head);
+  }
+}
+
+void main() {}

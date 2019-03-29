@@ -298,6 +298,8 @@ public:
 
     int get_bytes() const override;
 
+    Expr* get_base() const { return base; }
+
     bool is_member_access() const;
 
     Identifier * get_field() const { return field; }
