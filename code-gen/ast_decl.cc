@@ -192,9 +192,7 @@ void ClassDecl::check(Scope *class_or_interface_scope) {
     Sym_tbl_t::shared().leave_scope();
 }
 
-void ClassDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
-    auto scope = Sym_tbl_t::shared().enter_scope(id->get_name());
-
+void ClassDecl::prepare_for_emit() {
     // if we have a super class update our class size bytes and generate vtable
     if (extends) {
         auto gscope = Sym_tbl_t::shared().get_scope("global").first;
@@ -205,6 +203,10 @@ void ClassDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
     } else {
         vtable.create(this);
     }
+}
+
+void ClassDecl::emit(Scope *class_or_interface_scope, FnDecl *curr_func) {
+    auto scope = Sym_tbl_t::shared().enter_scope(id->get_name());
 
     // generate variable locations
     int offset = 4;

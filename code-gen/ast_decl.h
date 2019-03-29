@@ -155,6 +155,8 @@ public:
 
     void check(Scope *class_or_interface_scope) override;
 
+    void prepare_for_emit();
+
     void emit(Scope *class_or_interface_scope, FnDecl *curr_func) override;
 };
 

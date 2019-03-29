@@ -67,6 +67,14 @@ void Program::emit() {
         }
     }
 
+    // perform virtual table generation and setting up of class hierarachy
+    for (int i = 0; i < decls->size(); ++i) {
+        auto class_decl = dynamic_cast<ClassDecl*>(decls->get(i));
+        if (class_decl) {
+            class_decl->prepare_for_emit();
+        }
+    }
+
     // emit code declarations
     for (int i = 0; i < decls->size(); ++i) {
         decls->get(i)->emit(nullptr, nullptr);
