@@ -52,7 +52,7 @@ void Vtable::create(ClassDecl *child, ClassDecl *parent) {
         auto it = find(table.begin(), table.end(), child_vmethod);
         if (it != table.end()) { // child overrides method, thus we need to remove parent and add child method
             table.erase(it);
-            table.push_back(child_vmethod);
+            table.insert(it, child_vmethod);
         } else {
             unique_methods.push_back(child_vmethod); // a method unique to child
         }
