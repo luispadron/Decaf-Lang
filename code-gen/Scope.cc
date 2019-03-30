@@ -26,19 +26,11 @@ pair<Decl*, bool> Scope::get_decl(const string &name) const {
         }
     }
 
-    // search "this" scope
-    if (this_ptr) {
-        auto this_it = this_ptr->symbols.find(name);
-        if (this_it != this_ptr->symbols.end()) {
-            return make_pair(this_it->second, true);
-        }
-    }
-
-    // search "super" scope
-    if (this_ptr && this_ptr->super_ptr) {
-        auto super_it = this_ptr->super_ptr->symbols.find(name);
-        if (super_it != this_ptr->super_ptr->symbols.end()) {
-            return make_pair(super_it->second, true);
+    // search through class hierarchy
+    for (auto scope = this_ptr; scope; scope = scope->super_ptr) {
+        auto it = scope->symbols.find(name);
+        if (it != scope->symbols.end()) {
+            return make_pair(it->second, true);
         }
     }
 

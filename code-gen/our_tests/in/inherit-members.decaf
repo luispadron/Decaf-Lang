@@ -19,6 +19,15 @@ class Dog extends Animal {
     }
 }
 
+class BigDog extends Dog {
+    string bigDogName;
+
+    void test() {
+        age = 100;
+        bigDogName = "test";
+    }
+}
+
 // layout should look like this:
 //
 // Animal:
