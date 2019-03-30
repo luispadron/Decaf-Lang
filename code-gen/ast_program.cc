@@ -72,6 +72,14 @@ void Program::emit() {
         auto class_decl = dynamic_cast<ClassDecl*>(decls->get(i));
         if (class_decl) {
             class_decl->prepare_for_emit();
+
+            // setup super scope
+            if (class_decl->get_extends()) {
+                auto class_scope = Sym_tbl_t::shared().get_scope(class_decl->get_id()->get_name()).first;
+                auto super_scope = Sym_tbl_t::shared().get_scope(class_decl->get_extends()->get_id()->get_name()).first;
+                Assert(class_scope && super_scope);
+                class_scope->set_super_scope(super_scope);
+            }
         }
     }
 

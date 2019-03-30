@@ -149,6 +149,8 @@ public:
         return bytes + parent_bytes;
     }
 
+    NamedType * get_extends() const { return extends; }
+
     int get_method_offset(const std::string &name) const;
 
     int get_member_offset(const std::string &name) const;

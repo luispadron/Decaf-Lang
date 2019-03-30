@@ -1,9 +1,5 @@
 Loaded: /usr/local/Cellar/spim/9.1.19/share/exceptions.s
-spim: (parser) syntax error on line 2 of file spim_tests/ours/t8.tac
-	  *** failure: Assertion failed: ast_decl.cc, line 186:
-	  ^
-The following symbols are undefined:
-main
-
-Instruction references undefined symbol at 0x00400014
-  [0x00400014]	0x0c000000  jal 0x00000000 [main]           ; 188: jal main
+mmm... veggies!
+Yum! 1
+But I don't like squash
+50
