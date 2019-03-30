@@ -1,0 +1,40 @@
+class Animal {
+    int age;
+    string name;
+    int height;
+}
+
+class Dog extends Animal {
+    string noise;
+
+    void create() {
+        age = 20;
+        name = "Fido";
+        height = 10;
+        noise = "Beep";
+    }
+
+    void output() {
+        Print(name, " ", age, " ", noise, " ", height);
+    }
+}
+
+// layout should look like this:
+//
+// Animal:
+//  age (+4)
+//  height (+8)
+//  name (+12)
+//
+// Dog:
+//  age (+4)
+//  height (+8)
+//  name (+12)
+//  noise (+16)
+
+void main() {
+    Dog d;
+    d = New(Dog);
+    d.create();
+    d.output();
+}

@@ -3,6 +3,7 @@
 //
 
 #include "Scope.h"
+#include "ast_decl.h"
 
 using namespace std;
 
@@ -42,4 +43,23 @@ pair<Decl*, bool> Scope::get_decl(const string &name) const {
     }
 
     return make_pair(nullptr, false); // not found
+}
+
+pair<int, bool> Scope::get_decl_position(const std::string &name) const {
+    auto res = super_ptr ? super_ptr->get_decl_position(name) : make_pair(1, false);
+    if (res.second) return res;
+
+    int pos = res.first;
+
+    for (const auto &symbol : symbols) {
+        if (symbol.second->get_decl_type() == DeclType::Variable) {
+            if (symbol.first == name) {
+                return make_pair(pos, true);
+            } else {
+                ++pos;
+            }
+        }
+    }
+
+    return make_pair(pos, false);
 }

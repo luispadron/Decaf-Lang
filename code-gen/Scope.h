@@ -35,6 +35,10 @@ public:
     /// if no such declaration is found, false is returned in the pare
     std::pair<Decl*, bool> get_decl(const std::string &name) const;
 
+    /// returns the position of the given decl name, that is the
+    /// position in the symbol table (in alphabetical order)
+    std::pair<int, bool> get_decl_position(const std::string &name) const;
+
     /// sets the super scope (used in class hierarachy)
     void set_super_scope(Scope *scope) { super_ptr = scope; }
 

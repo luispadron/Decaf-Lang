@@ -152,21 +152,12 @@ int ClassDecl::get_method_offset(const std::string &name) const {
 }
 
 int ClassDecl::get_member_offset(const string &name) const {
-    int offset = 4;
-    for (int i = 0; i < members->size(); ++i) {
-        auto member = members->get(i);
-        if (member->get_decl_type() == DeclType::Variable) {
+    auto class_scope = Sym_tbl_t::shared().get_scope(id->get_name()).first;
+    Assert(class_scope);
+    auto res = class_scope->get_decl_position(name);
+    Assert(res.second);
 
-            if (member->get_id()->get_name() == name) {
-                return offset + parent_bytes;
-            }
-
-            offset += 4;
-        }
-    }
-
-    Assert(false);
-    return -1;
+    return res.first * Cgen_t::word_size;
 }
 
 void ClassDecl::check(Scope *class_or_interface_scope) {
