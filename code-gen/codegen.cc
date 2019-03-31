@@ -18,7 +18,6 @@ Location * CodeGenerator::this_ptr_loc = new Location(Segment::fp_relative, 4, "
 
 CodeGenerator::CodeGenerator() :
     code(new List<Instruction*>),
-    is_main_defined(false),
     next_local_offset(CodeGenerator::offset_first_local) { }
 
 void CodeGenerator::reset_offsets() {
@@ -104,8 +103,6 @@ Location *CodeGenerator::gen_binary_op(const char *opName, Location *op1, Locati
 
 void CodeGenerator::gen_label(const char *label) {
     code->append(new Label(label));
-    // check to see if the label is the "main" label
-    is_main_defined = is_main_defined || strcmp(label, CodeGenerator::main_func_name) == 0;
 }
 
 void CodeGenerator::gen_ifz(Location *test, const char *label)
@@ -198,12 +195,6 @@ void CodeGenerator::gen_vtable(const char *className, List<const char *> methodL
 
 
 void CodeGenerator::do_final_code_gen() {
-    // if main was not defined we need to throw a linker error
-    if (!is_main_defined) {
-        ReportError::NoMainFound();
-        return;
-    }
-
     if (is_debug_on("tac")) { // if debug don't translate to mips, just print Tac
         for (int i = 0; i < code->size(); i++)
             code->get(i)->Print();

@@ -1,0 +1,64 @@
+interface Creature {
+    void makeNoise();
+}
+
+class Animal implements Creature {
+    int yearFound;
+    int age;
+
+    void makeNoise() { }
+}
+
+class Dog extends Animal {
+    int dogYears;
+    string name;
+    string noise;
+
+    void makeNoise() {
+        Print(noise);
+    }
+
+    void set_age(int age) {
+        this.age = age;
+        dogYears = age * 7;
+    }
+}
+
+class Cat extends Animal {
+    bool likesDogs;
+
+    void set_likes_dogs(bool t) {
+        likesDogs = t;
+    }
+
+    void makeNoise() {
+        Print("meow");
+    }
+}
+
+class Bobbet implements Creature {
+    int health;
+
+    void makeNoise() {
+        Print("scary!");
+    }
+}
+
+void main() {
+    Animal[] animals;
+    Dog d;
+    Cat c;
+    Bobbet b;
+    int i;
+
+    d = New(Dog);
+    c = New(Cat);
+    b = New(Bobbet);
+
+    d.set_age(100);
+    c.set_likes_dogs(true);
+
+    d.makeNoise();
+    c.makeNoise();
+    b.makeNoise();
+}

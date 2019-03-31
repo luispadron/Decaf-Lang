@@ -202,7 +202,6 @@ public:
 
 private:
     List<Instruction*> *code;
-    bool is_main_defined;
     int next_local_offset;
 
     /// creates a new code generator, private to disallow creation unless using "shared"

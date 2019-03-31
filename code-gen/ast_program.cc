@@ -56,6 +56,20 @@ void Program::check() {
 void Program::emit() {
     Sym_tbl_t::shared().enter_scope("global");
 
+    // first check that main is defined
+    bool is_main_defined = false;
+    for (int i = 0; i < decls->size(); ++i) {
+        auto decl = decls->get(i);
+        if (decl->get_decl_type() == DeclType::Function && decl->get_id()->get_name() == Cgen_t::main_func_name) {
+            is_main_defined = true;
+        }
+    }
+
+    if (!is_main_defined) {
+        ReportError::NoMainFound();
+        return;
+    }
+
     // set location for globals
     int offset = Cgen_t::offset_first_global;
     for (int i = 0; i < decls->size(); ++i) {
