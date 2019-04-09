@@ -48,4 +48,7 @@ parser/our_tests/output/*
 semantic-analyzer/sample_tests/*
 code-gen/tac_tests/*
 code-gen/sample_tests/*
+optimization/tac_tests/*
+optimization/sample_tests/*
+optimization/*.o
 
