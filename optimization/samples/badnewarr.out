@@ -1,0 +1,5 @@
+Loaded: /afs/umich.edu/user/o/l/olivertc/Public/spim-install/exceptions.s
+Decaf runtime error: Array size is <= 0
+
+Stats -- #instructions : 38
+         #reads : 5  #writes 7  #branches 5  #other 21

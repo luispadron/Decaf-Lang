@@ -1,0 +1,4 @@
+Loaded: /afs/umich.edu/user/o/l/olivertc/Public/spim-install/exceptions.s
+spots: true    height: 5
+Stats -- #instructions : 233
+         #reads : 59  #writes 50  #branches 24  #other 100
