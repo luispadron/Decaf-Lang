@@ -15,9 +15,11 @@ protected:
     List<Decl*> *decls;
 
 public:
-    Program(List<Decl*> *declList);
+    explicit Program(List<Decl*> *declList);
+
     void Check() override;
-    void Emit();
+    void Emit(CodeGenerator *cg) override;
+    void Opt() override;
 };
 
 

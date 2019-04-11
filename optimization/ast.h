@@ -49,8 +49,6 @@ public:
 
     Node *GetParent()        { return parent; }
 
-    virtual void Check() {} // not abstract, since some nodes have nothing to do
-
     typedef enum { kShallow, kDeep } lookup;
 
     virtual Decl *FindDecl(Identifier *id, lookup l = kDeep);
@@ -66,7 +64,11 @@ public:
         return nullptr;
     }
 
+    virtual void Check() {} // not abstract, since some nodes have nothing to do
+
     virtual void Emit(CodeGenerator *cg) {} // not abstract, some nodes do nothing
+
+    virtual void Opt() { } // not abstract, some nodes do nothing
 };
    
 

@@ -8,7 +8,7 @@
 #include "errors.h"
 
 Program::Program(List<Decl*> *d) {
-    Assert(d != NULL);
+    Assert(d != nullptr);
     (decls=d)->SetParentAll(this);
 }
 
@@ -17,7 +17,10 @@ void Program::Check() {
     decls->DeclareAll(nodeScope);
     decls->CheckAll();
 }
-void Program::Emit() {
+
+void Program::Emit(CodeGenerator *cg) {
+    cg = new CodeGenerator();
+
     bool found = false;
 
     for (int i=0; i < decls->NumElements(); i++) {
@@ -33,11 +36,13 @@ void Program::Emit() {
         return;
     }
 
-    auto cg = new CodeGenerator();
-
     decls->EmitAll(cg);
 
     if (ReportError::NumErrors() == 0) {
         cg->DoFinalCodeGen();
     }
+}
+
+void Program::Opt() {
+
 }
