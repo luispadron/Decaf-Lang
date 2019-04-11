@@ -48,14 +48,16 @@ protected:
     Type *type;
     
 public:
+    Location *rtLoc = nullptr;
+
     VarDecl(Identifier *name, Type *type);
-    void Check();
+
+    void Check() override;
     Type *GetDeclaredType() { return type; }
-    bool IsVarDecl() { return true; }
-    bool IsIvarDecl();
-    Location *rtLoc;
+    bool IsVarDecl() override { return true; }
+    bool IsIvarDecl() override;
     virtual bool IsReference() { return false; }
-    void Emit(CodeGenerator *cg);
+    void Emit(CodeGenerator *cg) override;
 };
 
 class ClassDecl : public Decl {

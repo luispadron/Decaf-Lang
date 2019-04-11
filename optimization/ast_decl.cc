@@ -13,31 +13,35 @@
         
          
 Decl::Decl(Identifier *n) : Node(*n->GetLocation()) {
-    Assert(n != NULL);
+    Assert(n != nullptr);
     (id=n)->SetParent(this); 
  
     offset = -555;
 }
 
 bool Decl::ConflictsWithPrevious(Decl *prev) {
-    if (prev == NULL || prev == this)
+    if (prev == nullptr || prev == this)
 	return false;
     ReportError::DeclConflict(this, prev);
     return true;
 }
 
 VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
-    Assert(n != NULL && t != NULL);
+    Assert(n != nullptr && t != nullptr);
     (type=t)->SetParent(this);
+}
+
+bool VarDecl::IsIvarDecl() {
+    return dynamic_cast<ClassDecl*>(parent) != nullptr;
 }
   
 void VarDecl::Check() {
     type->Check();
     if (type->IsError()) type = Type::errorType;
 }
-bool VarDecl::IsIvarDecl() { return dynamic_cast<ClassDecl*>(parent) != NULL;}
+
 void VarDecl::Emit(CodeGenerator *cg) { 
-    if (rtLoc != NULL) return;
+    if (rtLoc != nullptr) return;
     if (dynamic_cast<Program*>(parent)) {
         rtLoc = cg->GenGlobalVariable(GetName());
     } else if (!dynamic_cast<ClassDecl*>(parent)) {
@@ -45,9 +49,11 @@ void VarDecl::Emit(CodeGenerator *cg) {
     } 
 }
 
+
 ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
     // extends can be NULL, impl & mem may be empty lists but cannot be NULL
-    Assert(n != NULL && imp != NULL && m != NULL);     
+    Assert(n != nullptr && imp != nullptr && m != nullptr);
+
     extends = ex;
     if (extends) extends->SetParent(this);
     (implements=imp)->SetParentAll(this);
@@ -55,60 +61,70 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
     cType = new NamedType(n);
     cType->SetParent(this);
     cType->SetDeclForType(this);
-    convImp = NULL;
-    thisLocation = NULL;
+    convImp = nullptr;
+    thisLocation = nullptr;
     vtable = new List<const char*>;
     nextIvarOffset = 4;
 }
 
 void ClassDecl::Check() {
-    ClassDecl *ext = extends ? dynamic_cast<ClassDecl*>(parent->FindDecl(extends->GetId())) : NULL; 
+    ClassDecl *ext = extends ? dynamic_cast<ClassDecl*>(parent->FindDecl(extends->GetId())) : nullptr;
+
     if (extends && !ext) {
         ReportError::IdentifierNotDeclared(extends->GetId(), LookingForClass);
-        extends = NULL;
+        extends = nullptr;
     }
+
     PrepareScope();
     members->CheckAll();
+
     for (int i = 0; i < members->NumElements(); ++i) {
-	FnDecl *m = dynamic_cast<FnDecl*>(FindDecl(members->Nth(i)->GetId()));
-	if (m && m == members->Nth(i)) {
-	    for (int j = 0; j < convImp->NumElements(); ++j) {
-		FnDecl *p = dynamic_cast<FnDecl*>(convImp->Nth(j)->FindDecl(m->GetId(), kShallow));
-		if (p && !m->MatchesPrototype(p)) {
-		    ReportError::OverrideMismatch(m);
-		    break;
-		}
+	    auto m = dynamic_cast<FnDecl*>(FindDecl(members->Nth(i)->GetId()));
+
+	    if (m && m == members->Nth(i)) {
+	        for (int j = 0; j < convImp->NumElements(); ++j) {
+		    auto p = dynamic_cast<FnDecl*>(convImp->Nth(j)->FindDecl(m->GetId(), kShallow));
+
+		    if (p && !m->MatchesPrototype(p)) {
+		        ReportError::OverrideMismatch(m);
+		        break;
+		    }
 	    }
-	}
+	    }
     }
+
     for (int i = 0; i < convImp->NumElements(); i++) {
-        if (!convImp->Nth(i)->ClassMeetsObligation(this))
+        if (!convImp->Nth(i)->ClassMeetsObligation(this)) {
             ReportError::InterfaceNotImplemented(this, implements->Nth(i));
+        }
     }
 }
 
 // This is not done very cleanly. I should sit down and sort this out. Right now
 // I was using the copy-in strategy from the old compiler, but I think the link to
 // parent may be the better way now.
-Scope *ClassDecl::PrepareScope()
-{
+Scope *ClassDecl::PrepareScope() {
     if (nodeScope) return nodeScope;
-    nodeScope = new Scope();  
+    nodeScope = new Scope();
+
     if (extends) {
-        ClassDecl *ext = dynamic_cast<ClassDecl*>(parent->FindDecl(extends->GetId())); 
+        auto *ext = dynamic_cast<ClassDecl*>(parent->FindDecl(extends->GetId()));
         if (ext) nodeScope->CopyFromScope(ext->PrepareScope(), this);
     }
     convImp = new List<InterfaceDecl*>;
     for (int i = 0; i < implements->NumElements(); i++) {
-        InterfaceDecl *in = dynamic_cast<InterfaceDecl*>(parent->FindDecl(implements->Nth(i)->GetId()));
-	if (in)
-	    convImp->Append(in);
-	else
+        auto *in = dynamic_cast<InterfaceDecl*>(parent->FindDecl(implements->Nth(i)->GetId()));
+        if (in) {
+            convImp->Append(in);
+        } else {
             ReportError::IdentifierNotDeclared(implements->Nth(i)->GetId(), LookingForInterface);
+        }
     }
+
     for (int i = 0; i < members->NumElements(); i++) {
         AddField(members->Nth(i));
     }
+
     members->DeclareAll(nodeScope);
     return nodeScope;
 }
@@ -130,6 +146,7 @@ bool ClassDecl::Implements(Type *other) {
     }
     return false;
 }
+
 void ClassDecl::Emit(CodeGenerator *cg) {
     thisLocation = cg->GenParameter(0, "this");
     members->EmitAll(cg);
@@ -171,7 +188,7 @@ void ClassDecl::AddMethod(FnDecl *decl, Decl *inherited) {
 
 
 InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
-    Assert(n != NULL && m != NULL);
+    Assert(n != nullptr && m != nullptr);
     (members=m)->SetParentAll(this);
 }
 
@@ -188,20 +205,21 @@ Scope *InterfaceDecl::PrepareScope() {
 }
 bool InterfaceDecl::ClassMeetsObligation(ClassDecl *c) {
     for (int i = 0; i < members->NumElements();i++) {
-        FnDecl *m = dynamic_cast<FnDecl*>(members->Nth(i));
-        FnDecl *found = dynamic_cast<FnDecl*>(c->FindDecl(m->GetId(), kShallow));
+        auto m = dynamic_cast<FnDecl*>(members->Nth(i));
+        auto found = dynamic_cast<FnDecl*>(c->FindDecl(m->GetId(), kShallow));
         if (!found || (found->GetParent() != c && !found->MatchesPrototype(m))) {
             return false;
-	}
+	    }
     }
+
     return true;
 }
 	
 FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
-    Assert(n != NULL && r!= NULL && d != NULL);
+    Assert(n != nullptr && r!= nullptr && d != nullptr);
     (returnType=r)->SetParent(this);
     (formals=d)->SetParentAll(this);
-    body = NULL;
+    body = nullptr;
 }
 
 void FnDecl::SetFunctionBody(Stmt *b) { 
@@ -209,7 +227,7 @@ void FnDecl::SetFunctionBody(Stmt *b) {
 }
 
 void FnDecl::Check() {
-    Assert(parent != NULL);
+    Assert(parent != nullptr);
     nodeScope = new Scope();
     formals->DeclareAll(nodeScope);
     CheckPrototype();
@@ -224,7 +242,7 @@ void FnDecl::CheckPrototype() {
 }
 
 bool FnDecl::ConflictsWithPrevious(Decl *prev) {
-    if (prev == NULL || prev == this)
+    if (prev == nullptr || prev == this)
 	return false;
     // special case error for method override
     if (IsMethodDecl() && prev->IsMethodDecl() && parent != prev->GetParent()) { 
@@ -238,8 +256,10 @@ bool FnDecl::ConflictsWithPrevious(Decl *prev) {
     return true;
 }
 
-bool FnDecl::IsMethodDecl() 
-  { return dynamic_cast<ClassDecl*>(parent) != NULL || dynamic_cast<InterfaceDecl*>(parent) != NULL; }
+bool FnDecl::IsMethodDecl() {
+    return dynamic_cast<ClassDecl*>(parent) != nullptr ||
+        dynamic_cast<InterfaceDecl*>(parent) != nullptr;
+}
 
 bool FnDecl::MatchesPrototype(FnDecl *other) {
     CheckPrototype();
@@ -277,19 +297,20 @@ void FnDecl::Emit(CodeGenerator *cg) {
  * is the function name itself.  For methods, the label is the name prefixed by
  * the class name followed by a dot.  
  */
-const char *FnDecl::GetFunctionLabel()
-{
+const char *FnDecl::GetFunctionLabel() {
     ClassDecl *cd;
-    if ((cd = dynamic_cast<ClassDecl*>(parent)) != NULL) { // if parent is a class, this is is a method
+
+    if ((cd = dynamic_cast<ClassDecl*>(parent)) != nullptr) { // if parent is a class, this is is a method
         char buffer[MaxIdentLen*2+4];
         sprintf(buffer, "_%s.%s", cd->GetName(), id->GetName());
         return strdup(buffer);
-    } else if (strcmp(id->GetName(), "main")) {
-	 char buffer[strlen(id->GetName())+2];
-	 sprintf(buffer, "_%s", id->GetName());
-       return strdup(buffer);
-    } else
-	return id->GetName();
+    } else if (strcmp(id->GetName(), "main") != 0) {
+	    char buffer[strlen(id->GetName())+2];
+	    sprintf(buffer, "_%s", id->GetName());
+	    return strdup(buffer);
+    } else {
+        return id->GetName();
+    }
 }
 
 

@@ -21,8 +21,8 @@ void Program::Check() {
 void Program::Emit(CodeGenerator *cg) {
     cg = new CodeGenerator();
 
+    // make sure main is defined
     bool found = false;
-
     for (int i=0; i < decls->NumElements(); i++) {
         Decl *d = decls->Nth(i);
         if (!strcmp(d->GetName(), "main") && d->IsFnDecl()) {

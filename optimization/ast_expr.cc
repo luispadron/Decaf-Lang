@@ -39,7 +39,7 @@ void BoolConstant::Emit(CodeGenerator *cg) {
 }
 
 StringConstant::StringConstant(yyltype loc, const char *val) : Expr(loc) {
-    Assert(val != NULL);
+    Assert(val != nullptr);
     value = strdup(val);
 }
 Type *StringConstant::CheckAndComputeResultType() {
@@ -56,12 +56,12 @@ void NullConstant::Emit(CodeGenerator *cg) {
 }
 
 Operator::Operator(yyltype loc, const char *tok) : Node(loc) {
-    Assert(tok != NULL);
+    Assert(tok != nullptr);
     strncpy(tokenString, tok, sizeof(tokenString));
 }
 CompoundExpr::CompoundExpr(Expr *l, Operator *o, Expr *r) 
   : Expr(Join(l->GetLocation(), r->GetLocation())) {
-    Assert(l != NULL && o != NULL && r != NULL);
+    Assert(l != nullptr && o != nullptr && r != nullptr);
     (op=o)->SetParent(this);
     (left=l)->SetParent(this); 
     (right=r)->SetParent(this);
@@ -69,11 +69,12 @@ CompoundExpr::CompoundExpr(Expr *l, Operator *o, Expr *r)
 
 CompoundExpr::CompoundExpr(Operator *o, Expr *r) 
   : Expr(Join(o->GetLocation(), r->GetLocation())) {
-    Assert(o != NULL && r != NULL);
-    left = NULL; 
+    Assert(o != nullptr && r != nullptr);
+    left = nullptr;
     (op=o)->SetParent(this);
     (right=r)->SetParent(this);
 }
+
 void CompoundExpr::ReportErrorForIncompatibleOperands(Type *lhs, Type *rhs) {
     if (!lhs) { //unary op
         ReportError::IncompatibleOperand(op, rhs);
@@ -106,15 +107,20 @@ Type *GetResultType(Type *lhs, Type *rhs) {
 }
 
 Type*ArithmeticExpr::CheckAndComputeResultType() {
-    Type *lType = left?left->CheckAndComputeResultType():NULL, *rType = right->CheckAndComputeResultType();
-    if (!CanDoArithmetic(lType, rType))
-	ReportErrorForIncompatibleOperands(lType, rType);
+    auto lType = left?left->CheckAndComputeResultType() : nullptr;
+    auto rType = right->CheckAndComputeResultType();
+
+    if (!CanDoArithmetic(lType, rType)) {
+        ReportErrorForIncompatibleOperands(lType, rType);
+    }
+
     return GetResultType(lType, rType);
 }
+
 void ArithmeticExpr::Emit(CodeGenerator *cg) {
-    if (left)
+    if (left) {
         CompoundExpr::Emit(cg);
-    else {
+    } else {
         right->Emit(cg);
         Location *zero = cg->GenLoadConstant(0);
         result = cg->GenBinaryOp("-", zero, right->result);
@@ -122,9 +128,13 @@ void ArithmeticExpr::Emit(CodeGenerator *cg) {
 }
 
 Type* RelationalExpr::CheckAndComputeResultType() {
-    Type*lhs = left->CheckAndComputeResultType(), *rhs = right->CheckAndComputeResultType();
-    if (!CanDoArithmetic(lhs, rhs))
-	ReportErrorForIncompatibleOperands(lhs, rhs);
+    auto lhs = left->CheckAndComputeResultType();
+    auto rhs = right->CheckAndComputeResultType();
+
+    if (!CanDoArithmetic(lhs, rhs)) {
+        ReportErrorForIncompatibleOperands(lhs, rhs);
+    }
+
     return Type::boolType;
 }
 void RelationalExpr::Emit(CodeGenerator *cg) {
@@ -146,18 +156,25 @@ void RelationalExpr::Emit(CodeGenerator *cg) {
 }
 
 Type* EqualityExpr::CheckAndComputeResultType() {
-   Type*lhs = left->CheckAndComputeResultType(), *rhs = right->CheckAndComputeResultType();
-    if (!lhs->IsCompatibleWith(rhs) && !rhs->IsCompatibleWith(lhs))
-	ReportErrorForIncompatibleOperands(lhs, rhs);
+    auto lhs = left->CheckAndComputeResultType();
+    auto rhs = right->CheckAndComputeResultType();
+
+    if (!lhs->IsCompatibleWith(rhs) && !rhs->IsCompatibleWith(lhs)) {
+        ReportErrorForIncompatibleOperands(lhs, rhs);
+    }
+
     return Type::boolType;
 }
 void EqualityExpr::Emit(CodeGenerator *cg) {
     left->Emit(cg);
     right->Emit(cg);
+
     if (left->CheckAndComputeResultType() == Type::stringType) 
         result = cg->GenBuiltInCall(StringEqual, left->result, right->result);
-    else
+    else {
         result = cg->GenBinaryOp("==", left->result, right->result);
+    }
+
     if (!strcmp(op->str(), "!=")) {
         Location *zero = cg->GenLoadConstant(0);
         result = cg->GenBinaryOp("==", result, zero);
@@ -165,56 +182,77 @@ void EqualityExpr::Emit(CodeGenerator *cg) {
 }
 
 Type* LogicalExpr::CheckAndComputeResultType() {
-    Type *lhs = left ?left->CheckAndComputeResultType() :NULL, *rhs = right->CheckAndComputeResultType();
-    if ((lhs && !lhs->IsCompatibleWith(Type::boolType)) ||
-	  (!rhs->IsCompatibleWith(Type::boolType)))
-	ReportErrorForIncompatibleOperands(lhs, rhs);
+    auto lhs = left ?left->CheckAndComputeResultType() : nullptr;
+    auto rhs = right->CheckAndComputeResultType();
+
+    if ((lhs && !lhs->IsCompatibleWith(Type::boolType)) || (!rhs->IsCompatibleWith(Type::boolType))) {
+        ReportErrorForIncompatibleOperands(lhs, rhs);
+    }
+
     return Type::boolType;
 }
 void LogicalExpr::Emit(CodeGenerator *cg) {
-    if (left)
-	CompoundExpr::Emit(cg);
-    else {
-	right->Emit(cg);
-	Location *zero = cg->GenLoadConstant(0);
-	result = cg->GenBinaryOp("==", right->result, zero);
+    if (left) {
+        CompoundExpr::Emit(cg);
+    } else {
+	    right->Emit(cg);
+	    Location *zero = cg->GenLoadConstant(0);
+	    result = cg->GenBinaryOp("==", right->result, zero);
     }
 }
 
 Type * AssignExpr::CheckAndComputeResultType() {
-    Type *lhs = left->CheckAndComputeResultType(), *rhs = right->CheckAndComputeResultType();
+    auto lhs = left->CheckAndComputeResultType();
+    auto rhs = right->CheckAndComputeResultType();
+
     if (!rhs->IsCompatibleWith(lhs)) {
         ReportErrorForIncompatibleOperands(lhs, rhs);
         return Type::errorType;
     }
+
     return lhs;
 }
-  void AssignExpr::Emit(CodeGenerator *cg) {
+void AssignExpr::Emit(CodeGenerator *cg) {
     dynamic_cast<LValue *>(left)->EmitWithoutDereference(cg); //sad, but if want to be compound....
+
     right->Emit(cg);
     if (left->result->IsReference()) {
         cg->GenStore(left->result->GetReference(), right->result, left->result->GetRefOffset());
-    } else
+    } else {
         cg->GenAssign(left->result, right->result);
+    }
+
     result = left->result;
   }
-  void LValue::Emit(CodeGenerator *cg)
-  {
+
+void LValue::Emit(CodeGenerator *cg) {
     EmitWithoutDereference(cg);
-    if (result->IsReference()) 
-	result = cg->GenLoad(result->GetReference(), result->GetRefOffset());
-  }
+
+    if (result->IsReference()) {
+        result = cg->GenLoad(result->GetReference(), result->GetRefOffset());
+    }
+}
+
 Type* This::CheckAndComputeResultType() {
-    if (!enclosingClass) enclosingClass = FindSpecificParent<ClassDecl>();
-   if (!enclosingClass)  
-       ReportError::ThisOutsideClassScope(this);
-   if (!enclosingClass) return Type::errorType;
+    if (!enclosingClass) {
+        enclosingClass = FindSpecificParent<ClassDecl>();
+    }
+
+    if (!enclosingClass) {
+        ReportError::ThisOutsideClassScope(this);
+    }
+
+   if (!enclosingClass) {
+       return Type::errorType;
+   }
+
    return enclosingClass->GetDeclaredType();
 }
 
 void This::Emit(CodeGenerator *cg) {
-   if (!result)
-    result = enclosingClass->GetThisLocation();
+    if (!result) {
+        result = enclosingClass->GetThisLocation();
+    }
 }
    
   
@@ -222,12 +260,18 @@ ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
     (base=b)->SetParent(this); 
     (subscript=s)->SetParent(this);
 }
+
 Type *ArrayAccess::CheckAndComputeResultType() {
-    Type *baseT = base->CheckAndComputeResultType();
-    if ((baseT != Type::errorType) && !baseT->IsArrayType()) 
+    auto baseT = base->CheckAndComputeResultType();
+
+    if ((baseT != Type::errorType) && !baseT->IsArrayType()) {
         ReportError::BracketsOnNonArray(base);
-    if (!subscript->CheckAndComputeResultType()->IsCompatibleWith(Type::intType))
-	ReportError::SubscriptNotInteger(subscript);
+    }
+
+    if (!subscript->CheckAndComputeResultType()->IsCompatibleWith(Type::intType)) {
+        ReportError::SubscriptNotInteger(subscript);
+    }
+
     return baseT->IsArrayType() ? dynamic_cast<ArrayType*>(baseT)->GetArrayElemType() : Type::errorType;
 }
 
@@ -237,9 +281,10 @@ void ArrayAccess::EmitWithoutDereference(CodeGenerator *cg)  {
     result = cg->GenSubscript(base->result, subscript->result);
 }
      
-FieldAccess::FieldAccess(Expr *b, Identifier *f) 
-  : LValue(b? Join(b->GetLocation(), f->GetLocation()) : *f->GetLocation()) {
-    Assert(f != NULL); // b can be be NULL (just means no explicit base)
+FieldAccess::FieldAccess(Expr *b, Identifier *f)
+    : LValue(b? Join(b->GetLocation(), f->GetLocation()) : *f->GetLocation()) {
+    Assert(f != nullptr); // b can be be NULL (just means no explicit base)
+
     base = b; 
     if (base) base->SetParent(this); 
     (field=f)->SetParent(this);
@@ -247,13 +292,15 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
 
 
 Type* FieldAccess::CheckAndComputeResultType() {
-    Type *baseType = base ? base->CheckAndComputeResultType() : NULL;
-    Decl *ivar = field->GetDeclRelativeToBase(baseType);
+    auto baseType = base ? base->CheckAndComputeResultType() : nullptr;
+    auto ivar = field->GetDeclRelativeToBase(baseType);
+
     if (ivar && ivar->IsIvarDecl() && !base) { // add implicit "this"
         base = new This(*field->GetLocation());
         base->SetParent(this);
         baseType = base->CheckAndComputeResultType();
     }
+
     if (base) {
         if (baseType == Type::errorType)
             return Type::errorType;
@@ -261,8 +308,8 @@ Type* FieldAccess::CheckAndComputeResultType() {
             ReportError::FieldNotFoundInBase(field, baseType);
             return Type::errorType;
         } else {
-            ClassDecl *enclosingClass = FindSpecificParent<ClassDecl>(); // check cur scope for compatibility
-            Type *withinClass = (enclosingClass? enclosingClass->GetDeclaredType() : NULL);
+            auto enclosingClass = FindSpecificParent<ClassDecl>(); // check cur scope for compatibility
+            Type *withinClass = (enclosingClass? enclosingClass->GetDeclaredType() : nullptr);
             if (ivar && (!withinClass|| !withinClass->IsCompatibleWith(baseType))) {
                 ReportError::InaccessibleField(field, baseType);
                 return Type::errorType;
@@ -272,23 +319,26 @@ Type* FieldAccess::CheckAndComputeResultType() {
         ReportError::IdentifierNotDeclared(field, LookingForVariable);
         return Type::errorType;
     }
+
     return ivar ? (dynamic_cast<VarDecl *>(ivar))->GetDeclaredType() : Type::errorType;
   }
 
 void FieldAccess::EmitWithoutDereference(CodeGenerator *cg) {
     CheckAndComputeResultType(); // need to ensure check called to get base set
-    Decl *fd = field->GetDeclRelativeToBase(base ? base->CheckAndComputeResultType() : NULL);
+    auto fd = field->GetDeclRelativeToBase(base ? base->CheckAndComputeResultType() : nullptr);
+
     if (base) {
         base->Emit(cg);
         result = new Location(base->result, fd->GetOffset());
     } else {
-	fd->Emit(cg);
+	    fd->Emit(cg);
         result = dynamic_cast<VarDecl*>(fd)->rtLoc;
     }
 }
 
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
-    Assert(f != NULL && a != NULL); // b can be be NULL (just means no explicit base)
+    Assert(f != nullptr && a != nullptr); // b can be be NULL (just means no explicit base)
+
     base = b;
     if (base) base->SetParent(this);
     (field=f)->SetParent(this);
@@ -296,62 +346,80 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
 }
 // special-case code for length() on arrays... sigh.
 Type* Call::CheckAndComputeResultType() {
-    Type *baseType = base ? base->CheckAndComputeResultType() : NULL;
-    FnDecl *fd = dynamic_cast<FnDecl *>(field->GetDeclRelativeToBase(baseType));
+    auto baseType = base ? base->CheckAndComputeResultType() : nullptr;
+    auto fd = dynamic_cast<FnDecl *>(field->GetDeclRelativeToBase(baseType));
+
     if (fd && fd->IsMethodDecl() && !base) { // add implicit "this"
         base = new This(*field->GetLocation());
         base->SetParent(this);
         baseType = base->CheckAndComputeResultType();
-   }
-   List<Type*> aTypes;
-    for (int i = 0; i < actuals->NumElements(); i++) 
+    }
+
+    List<Type*> aTypes;
+    for (int i = 0; i < actuals->NumElements(); i++) {
         aTypes.Append(actuals->Nth(i)->CheckAndComputeResultType());
-// jdz cascade, above loop checks actuals before function confirmed.
-// what about excess actuals? what if function doesn't exist at all?
+    }
+
+    // jdz cascade, above loop checks actuals before function confirmed.
+    // what about excess actuals? what if function doesn't exist at all?
     if (baseType && baseType->IsArrayType() && strcmp(field->GetName(), "length") == 0) {
-	if (actuals->NumElements() != 0) 
-            ReportError::NumArgsMismatch(field, 0, actuals->NumElements());
-	return Type::intType;
+	    if (actuals->NumElements() != 0) {
+	        ReportError::NumArgsMismatch(field, 0, actuals->NumElements());
+	    }
+
+	    return Type::intType;
     }
+
     if (baseType == Type::errorType) {
-	return Type::errorType;
+	    return Type::errorType;
     }
+
     if (baseType && !fd) { // had receiver, but no field in receiver (not class, wrong name, etc.)
-	ReportError::FieldNotFoundInBase(field, baseType);
+	    ReportError::FieldNotFoundInBase(field, baseType);
         return Type::errorType;
     } else if (!fd) { // no base, bad function
-	ReportError::IdentifierNotDeclared(field, LookingForFunction);
+	    ReportError::IdentifierNotDeclared(field, LookingForFunction);
         return Type::errorType;
     }  
 
-    List<VarDecl*> *formals = fd->GetFormals();
+    auto formals = fd->GetFormals();
     if (formals->NumElements() != actuals->NumElements()) {
-	ReportError::NumArgsMismatch(field, formals->NumElements(), actuals->NumElements());
+	    ReportError::NumArgsMismatch(field, formals->NumElements(), actuals->NumElements());
     }
+
     for (int i = 0; i < formals->NumElements(); i++) {
-	if (i >= actuals->NumElements()) break;
-        Type *at = aTypes.Nth(i);
-        if (!at->IsCompatibleWith(formals->Nth(i)->GetDeclaredType()))
-            ReportError::ArgMismatch(actuals->Nth(i), i+1, at,
-                                    formals->Nth(i)->GetDeclaredType());
+	    if (i >= actuals->NumElements()) {
+	        break;
+	    }
+
+        auto at = aTypes.Nth(i);
+        if (!at->IsCompatibleWith(formals->Nth(i)->GetDeclaredType())) {
+            ReportError::ArgMismatch(actuals->Nth(i), i + 1, at,
+                                     formals->Nth(i)->GetDeclaredType());
+        }
     }
+
     return fd->GetReturnType();
 }
-void Call::Emit(CodeGenerator *cg)
-{
-    Type *baseType = base ? base->CheckAndComputeResultType() :NULL;
+
+void Call::Emit(CodeGenerator *cg) {
+    auto baseType = base ? base->CheckAndComputeResultType() : nullptr;
+
     if (baseType && baseType->IsArrayType()) { // assume length() (i.e. semantically correct)
-	base->Emit(cg);
-	result = cg->GenArrayLen(base->result);
-	return;
+	    base->Emit(cg);
+	    result = cg->GenArrayLen(base->result);
+	    return;
     }
+
     List<Location*> l;	// this is not convenient...
     for (int i = 0; i < actuals->NumElements(); i++) {
-	actuals->Nth(i)->Emit(cg);
-	l.Append(actuals->Nth(i)->result);
+	    actuals->Nth(i)->Emit(cg);
+	    l.Append(actuals->Nth(i)->result);
     }
-    Type *resultType = CheckAndComputeResultType(); // force base to get set
-    FnDecl *func = dynamic_cast<FnDecl *>(field->GetDeclRelativeToBase(baseType));
+
+    auto resultType = CheckAndComputeResultType(); // force base to get set
+    auto func = dynamic_cast<FnDecl *>(field->GetDeclRelativeToBase(baseType));
+
     if (base) {
         base->Emit(cg);
         result = cg->GenDynamicDispatch(base->result, func->GetOffset(), &l, !resultType->IsEquivalentTo(Type::voidType));
@@ -363,7 +431,7 @@ void Call::Emit(CodeGenerator *cg)
  
 
 NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) { 
-  Assert(c != NULL);
+  Assert(c != nullptr);
   (cType=c)->SetParent(this);
 }
 
@@ -372,25 +440,32 @@ Type* NewExpr::CheckAndComputeResultType() {
         ReportError::IdentifierNotDeclared(cType->GetId(), LookingForClass);
         return Type::errorType;
     }
+
     return cType; 
 }
 void NewExpr::Emit(CodeGenerator *cg) { 
-    ClassDecl *cd = dynamic_cast<ClassDecl*>(cType->GetDeclForType());
+    auto cd = dynamic_cast<ClassDecl*>(cType->GetDeclForType());
     result = cg->GenNew(cd->GetClassName(), cd->GetClassSize()); 
 }
 
 NewArrayExpr::NewArrayExpr(yyltype loc, Expr *sz, Type *et) : Expr(loc) {
-    Assert(sz != NULL && et != NULL);
+    Assert(sz != nullptr && et != nullptr);
     (size=sz)->SetParent(this); 
     (elemType=et)->SetParent(this);
 }
 Type *NewArrayExpr::CheckAndComputeResultType() {
-    Type *st = size->CheckAndComputeResultType();
-    if (!st->IsCompatibleWith(Type::intType))
-	ReportError::NewArraySizeNotInteger(size);
+    auto st = size->CheckAndComputeResultType();
+
+    if (!st->IsCompatibleWith(Type::intType)) {
+        ReportError::NewArraySizeNotInteger(size);
+    }
+
     elemType->Check();
-    if (elemType->IsError())
-	return Type::errorType;
+
+    if (elemType->IsError()) {
+        return Type::errorType;
+    }
+
     yyltype none;
     return new ArrayType(none, elemType);
 }
