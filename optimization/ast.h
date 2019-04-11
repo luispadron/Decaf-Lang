@@ -33,49 +33,56 @@ class Identifier;
 class Type;
 class CodeGenerator;
 
-class Node 
-{
-  protected:
+class Node {
+protected:
     yyltype *location;
     Node *parent;
     Scope *nodeScope;
 
-  public:
-    Node(yyltype loc);
+public:
+    explicit Node(yyltype loc);
     Node();
-    
+
     yyltype *GetLocation()   { return location; }
+
     void SetParent(Node *p)  { parent = p; }
+
     Node *GetParent()        { return parent; }
+
     virtual void Check() {} // not abstract, since some nodes have nothing to do
-    
+
     typedef enum { kShallow, kDeep } lookup;
+
     virtual Decl *FindDecl(Identifier *id, lookup l = kDeep);
-    virtual Scope *PrepareScope() { return NULL; }
+
+    virtual Scope *PrepareScope() { return nullptr; }
+
     template <class Specific> Specific *FindSpecificParent() {
         Node *p = parent;
         while (p) {
             if (Specific *s = dynamic_cast<Specific*>(p)) return s;
             p = p->parent;
         }
-        return NULL;
+        return nullptr;
     }
-	 
+
     virtual void Emit(CodeGenerator *cg) {} // not abstract, some nodes do nothing
 };
    
 
-class Identifier : public Node 
-{
-  protected:
+class Identifier : public Node {
+protected:
     char *name;
     Decl *cached;
     
-  public:
+public:
     Identifier(yyltype loc, const char *name);
+
     friend std::ostream& operator<<(std::ostream& out, Identifier *id) { return out << id->name; }
+
     const char *GetName() { return name; }
-    Decl *GetDeclRelativeToBase(Type *base = NULL);
+
+    Decl *GetDeclRelativeToBase(Type *base = nullptr);
 };
 
 
@@ -84,12 +91,9 @@ class Identifier : public Node
 // is discarded along with the states being popped, and an instance of
 // the Error class can stand in as the placeholder in the parse tree
 // when your parser can continue after an error.
-class Error : public Node
-{
-  public:
+class Error : public Node {
+public:
     Error() : Node() {}
 };
-
-
 
 #endif

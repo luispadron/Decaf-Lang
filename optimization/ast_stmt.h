@@ -16,17 +16,7 @@
 class Decl;
 class VarDecl;
 class Expr;
-  
-class Program : public Node
-{
-  protected:
-     List<Decl*> *decls;
-     
-  public:
-     Program(List<Decl*> *declList);
-     void Check();
-     void Emit();
-};
+
 
 class Stmt : public Node
 {

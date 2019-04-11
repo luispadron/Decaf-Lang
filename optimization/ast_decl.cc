@@ -2,6 +2,7 @@
  * -----------------
  * Implementation of Decl node classes.
  */
+#include "ast_program.h"
 #include "ast_decl.h"
 #include "ast_type.h"
 #include "ast_stmt.h"

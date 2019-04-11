@@ -11,35 +11,6 @@
 #include "codegen.h"
 
 
-Program::Program(List<Decl*> *d) {
-    Assert(d != NULL);
-    (decls=d)->SetParentAll(this);
-}
-
-void Program::Check() {
-    nodeScope = new Scope();
-    decls->DeclareAll(nodeScope);
-    decls->CheckAll();
-}
-void Program::Emit() {
-    bool found = false;
-    for (int i=0; i < decls->NumElements(); i++) {
-	Decl *d = decls->Nth(i);
-	if (!strcmp(d->GetName(), "main") && d->IsFnDecl()) {
-	  found = true;
-	  break;
-	}
-    }
-    if (!found) {
-	ReportError::NoMainFound();
-	return;
-    }
-    CodeGenerator *cg = new CodeGenerator();
-    decls->EmitAll(cg);
-    if (ReportError::NumErrors() == 0)
-        cg->DoFinalCodeGen();
-}
-
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
     (decls=d)->SetParentAll(this);
