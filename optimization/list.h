@@ -17,7 +17,7 @@
  *   int Sum(List<int> *list)
  *   {
  *       int sum = 0;
- *       for (int i = 0; i < list->size(); i++) {
+ *       for (int i = 0; i < list->NumElements(); i++) {
  *          int val = list->Nth(i);
  *          sum += val;
  *       }
@@ -28,89 +28,92 @@
 #ifndef _H_list
 #define _H_list
 
-#include "utility.h"  // for Assert()
-
 #include <deque>
 #include <algorithm>
-
+#include "utility.h"  // for Assert()
+#include "scope.h"
+  
 class Node;
+class CodeGenerator;
 
 template<class Element> class List {
 
-private:
+ private:
     std::deque<Element> elems;
 
-public:
-    /// Create a new empty list
-    List() = default;
-
-    /// Copy a list
+ public:
+           // Create a new empty list
+    List() {}
+           // Copy a list
     List(const List<Element> &lst) : elems(lst.elems) {}
 
-    /// Clear the list
-    void clear() {
-        elems.clear();
-    }
+           // Clear the list
+    void Clear() { elems.clear(); }
 
-    /// Returns count of elements currently in list
-    int size() const {
-        return static_cast<int>(elems.size());
-    }
+           // Returns count of elements currently in list
+    int NumElements() const
+	{ return elems.size(); }
 
-    /// Returns element at index in list. Indexing is 0-based.
-    /// Raises an assert if index is out of range.
-    Element get(int index) const {
-        Assert(index >= 0 && index < size());
-        return elems[index];
-    }
+          // Returns element at index in list. Indexing is 0-based.
+          // Raises an assert if index is out of range.
+    Element Nth(int index) const
+	{ Assert(index >= 0 && index < NumElements());
+	  return elems[index]; }
 
-    /// Inserts element at index, shuffling over others
-    /// Raises assert if index out of range
-    void insert(const Element &elem, int index) {
-        Assert(index >= 0 && index <= size());
-        elems.insert(elems.begin() + index, elem);
-    }
+          // Inserts element at index, shuffling over others
+          // Raises assert if index out of range
+    void InsertAt(const Element &elem, int index)
+	{ Assert(index >= 0 && index <= NumElements());
+	  elems.insert(elems.begin() + index, elem); }
 
-    /// Adds element to list end
-    void append(const Element &elem) {
-        elems.push_back(elem);
-    }
+          // Adds element to list end
+    void Append(const Element &elem)
+	{ elems.push_back(elem); }
 
-    /// Adds all elements to list end
-    void append(const List<Element> &lst) {
-        for (int i = 0; i < lst.size(); i++) {
-            append(lst.get(i));
-        }
-    }
+	  // Adds all elements to list end
+    void AppendAll(const List<Element> &lst)
+        { for (int i = 0; i < lst.NumElements(); i++)
+             Append(lst.Nth(i)); }
 
-    /// Removes element at index, shuffling down others
-    /// Raises assert if index out of range
-    void erase(int index) {
-        Assert(index >= 0 && index < size());
-        elems.erase(elems.begin() + index);
-    }
+         // Removes element at index, shuffling down others
+         // Raises assert if index out of range
+    void RemoveAt(int index)
+	{ Assert(index >= 0 && index < NumElements());
+	  elems.erase(elems.begin() + index); }
 
-    /// Removes all elements of a specific value
-    void erase(const Element &elem) {
-        elems.erase(std::remove(elems.begin(), elems.end(), elem), elems.end());
-    }
+	 // Removes all elements of a specific value
+    void Remove(const Element &elem)
+        { elems.erase(std::remove(elems.begin(), elems.end(), elem), elems.end()); }
 
-    /// Sort and remove repeated elements
-    void unique() {
-        std::sort(elems.begin(), elems.end());
-        elems.erase(std::unique(elems.begin(), elems.end()), elems.end());
-    }
+	 // Removes all elements in the given list
+    void RemoveAll(const List<Element> &lst)
+        { for (int i = 0; i < lst.NumElements(); i++)
+	     Remove(lst.Nth(i)); }
 
-    /// These are some specific methods useful for lists of ast nodes
-    /// They will only work on lists of elements that respond to the
-    /// messages, but since C++ only instantiates the template if you use
-    /// you can still have Lists of ints, chars*, as long as you
-    /// don't try to SetParentAll on that list.
-    void set_parent_all(Node *p) {
-        for (int i = 0; i < size(); i++) {
-            get(i)->set_parent(p);
-        }
-    }
+	 // Sort and remove repeated elements
+    void Unique()
+        { std::sort(elems.begin(), elems.end());
+	  elems.erase(std::unique(elems.begin(), elems.end()), elems.end()); }
+          
+       // These are some specific methods useful for lists of ast nodes
+       // They will only work on lists of elements that respond to the
+       // messages, but since C++ only instantiates the template if you use
+       // you can still have Lists of ints, chars*, as long as you 
+       // don't try to SetParentAll on that list.
+    void SetParentAll(Node *p)
+        { for (int i = 0; i < NumElements(); i++)
+             Nth(i)->SetParent(p); }
+    void DeclareAll(Scope *s)
+        { for (int i = 0; i < NumElements(); i++)
+             s->Declare(Nth(i)); }
+
+   void CheckAll()
+        { for (int i = 0; i < NumElements(); i++)
+             Nth(i)->Check(); }
+    void EmitAll(CodeGenerator *cg)
+        { for (int i = 0; i < NumElements(); i++)
+             Nth(i)->Emit(cg); }
+
 };
 
 #endif

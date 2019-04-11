@@ -32,10 +32,11 @@ void ReportError::UnderlineErrorInLine(const char *line, const yyltype *pos) {
  
 void ReportError::EmitError(yyltype *loc, string msg) {
     numErrors++;
-    if (loc)
+    if (loc) {
 	errors.insert(make_pair(*loc, msg));
-    else
-	OutputError(loc, msg);
+	return;
+    }
+    OutputError(loc, msg);
 }
 
 void ReportError::OutputError(const yyltype *loc, string msg) {
@@ -64,7 +65,7 @@ void ReportError::Formatted(yyltype *loc, const char *format, ...) {
 }
 
 void ReportError::UntermComment() {
-    EmitError(nullptr, "Input ends with unterminated comment");
+    EmitError(NULL, "Input ends with unterminated comment");
 }
 
 void ReportError::InvalidDirective(int linenum) {
@@ -93,106 +94,106 @@ void ReportError::UnrecogChar(yyltype *loc, char ch) {
 void ReportError::DeclConflict(Decl *decl, Decl *prevDecl) {
     ostringstream s;
     s << "Declaration of '" << decl << "' here conflicts with declaration on line " 
-      << prevDecl->get_location()->first_line;
-    EmitError(decl->get_location(), s.str());
+      << prevDecl->GetLocation()->first_line;
+    EmitError(decl->GetLocation(), s.str());
 }
   
 void ReportError::OverrideMismatch(Decl *fnDecl) {
     ostringstream s;
     s << "Method '" << fnDecl << "' must match inherited type signature";
-    EmitError(fnDecl->get_location(), s.str());
+    EmitError(fnDecl->GetLocation(), s.str());
 }
 
 void ReportError::InterfaceNotImplemented(Decl *cd, Type *interfaceType) {
     ostringstream s;
     s << "Class '" << cd << "' does not implement entire interface '" << interfaceType << "'";
-    EmitError(interfaceType->get_location(), s.str());
+    EmitError(interfaceType->GetLocation(), s.str());
 }
 
 void ReportError::IdentifierNotDeclared(Identifier *ident, reasonT whyNeeded) {
     ostringstream s;
     static const char *names[] =  {"type", "class", "interface", "variable", "function"};
-    Assert(whyNeeded >= 0 && whyNeeded <= sizeof(names) / sizeof(names[0]));
+    Assert(whyNeeded >= 0 && whyNeeded <= sizeof(names)/sizeof(names[0]));
     s << "No declaration found for "<< names[whyNeeded] << " '" << ident << "'";
-    EmitError(ident->get_location(), s.str());
+    EmitError(ident->GetLocation(), s.str());
 }
 
 void ReportError::IncompatibleOperands(Operator *op, Type *lhs, Type *rhs) {
     ostringstream s;
     s << "Incompatible operands: " << lhs << " " << op << " " << rhs;
-    EmitError(op->get_location(), s.str());
+    EmitError(op->GetLocation(), s.str());
 }
      
 void ReportError::IncompatibleOperand(Operator *op, Type *rhs) {
     ostringstream s;
     s << "Incompatible operand: " << op << " " << rhs;
-    EmitError(op->get_location(), s.str());
+    EmitError(op->GetLocation(), s.str());
 }
 
 void ReportError::ThisOutsideClassScope(This *th) {
-    EmitError(th->get_location(), "'this' is only valid within class scope");
+    EmitError(th->GetLocation(), "'this' is only valid within class scope");
 }
 
 void ReportError::BracketsOnNonArray(Expr *baseExpr) {
-    EmitError(baseExpr->get_location(), "[] can only be applied to arrays");
+    EmitError(baseExpr->GetLocation(), "[] can only be applied to arrays");
 }
 
 void ReportError::SubscriptNotInteger(Expr *subscriptExpr) {
-    EmitError(subscriptExpr->get_location(), "Array subscript must be an integer");
+    EmitError(subscriptExpr->GetLocation(), "Array subscript must be an integer");
 }
 
 void ReportError::NewArraySizeNotInteger(Expr *sizeExpr) {
-    EmitError(sizeExpr->get_location(), "size for NewArray must be an integer");
+    EmitError(sizeExpr->GetLocation(), "Size for NewArray must be an integer");
 }
 
 void ReportError::NumArgsMismatch(Identifier *fnIdent, int numExpected, int numGiven) {
     ostringstream s;
     s << "Function '"<< fnIdent << "' expects " << numExpected << " argument" << (numExpected==1?"":"s") 
       << " but " << numGiven << " given";
-    EmitError(fnIdent->get_location(), s.str());
+    EmitError(fnIdent->GetLocation(), s.str());
 }
 
 void ReportError::ArgMismatch(Expr *arg, int argIndex, Type *given, Type *expected) {
   ostringstream s;
   s << "Incompatible argument " << argIndex << ": " << given << " given, " << expected << " expected";
-  EmitError(arg->get_location(), s.str());
+  EmitError(arg->GetLocation(), s.str());
 }
 
 void ReportError::ReturnMismatch(ReturnStmt *rStmt, Type *given, Type *expected) {
     ostringstream s;
     s << "Incompatible return: " << given << " given, " << expected << " expected";
-    EmitError(rStmt->get_location(), s.str());
+    EmitError(rStmt->GetLocation(), s.str());
 }
 
 void ReportError::FieldNotFoundInBase(Identifier *field, Type *base) {
     ostringstream s;
     s << base << " has no such field '" << field << "'";
-    EmitError(field->get_location(), s.str());
+    EmitError(field->GetLocation(), s.str());
 }
      
 void ReportError::InaccessibleField(Identifier *field, Type *base) {
     ostringstream s;
     s  << base << " field '" << field << "' only accessible within class scope";
-    EmitError(field->get_location(), s.str());
+    EmitError(field->GetLocation(), s.str());
 }
 
 void ReportError::PrintArgMismatch(Expr *arg, int argIndex, Type *given) {
     ostringstream s;
     s << "Incompatible argument " << argIndex << ": " << given
         << " given, int/bool/string expected";
-    EmitError(arg->get_location(), s.str());
+    EmitError(arg->GetLocation(), s.str());
 }
 
 void ReportError::TestNotBoolean(Expr *expr) {
-    EmitError(expr->get_location(), "Test expression must have boolean type");
+    EmitError(expr->GetLocation(), "Test expression must have boolean type");
 }
 
 void ReportError::BreakOutsideLoop(BreakStmt *bStmt) {
-    EmitError(bStmt->get_location(), "break is only allowed inside a loop");
+    EmitError(bStmt->GetLocation(), "break is only allowed inside a loop");
 }
   
 void ReportError::NoMainFound() {
-    EmitError(nullptr, "Linker: function 'main' not defined");
+    EmitError(NULL, "Linker: function 'main' not defined");
 }
   
 /* Function: yyerror()

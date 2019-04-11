@@ -18,38 +18,38 @@
 #ifndef _H_mips
 #define _H_mips
 
-#include "tac.h"
 #include "list.h"
+
 class Location;
 
 
 class Mips {
-private:
+  public:
+    typedef enum {Add, Sub, Mul, Div, Mod, Eq, Less, And, Or, NumOps} OpCode;
+
     typedef enum {zero, at, v0, v1, a0, a1, a2, a3,
 			t0, t1, t2, t3, t4, t5, t6, t7,
 			s0, s1, s2, s3, s4, s5, s6, s7,
 			t8, t9, k0, k1, gp, sp, fp, ra, NumRegs } Register;
 
+    static const int NumGeneralPurposeRegs = 18;
+
     struct RegContents {
-	bool isDirty;
+        bool isDirty;
 	Location *var;
 	const char *name;
 	bool isGeneralPurpose;
     } regs[NumRegs];
 
+  private:
     Register rs, rt, rd;
-
-    typedef enum { ForRead, ForWrite } Reason;
-    
-    void FillRegister(Location *src, Register reg);
-    void SpillRegister(Location *dst, Register reg);
 
     void EmitCallInstr(Location *dst, const char *fn, bool isL);
     
-    static const char *mipsName[BinaryOp::NumOps];
-    static const char *NameForTac(BinaryOp::OpCode code);
+    static const char *mipsName[NumOps];
+    static const char *NameForTac(OpCode code);
 
-public:
+  public:
     
     Mips();
 
@@ -63,7 +63,7 @@ public:
     void EmitStore(Location *reference, Location *value, int offset);
     void EmitCopy(Location *dst, Location *src);
 
-    void EmitBinaryOp(BinaryOp::OpCode code, Location *dst, 
+    void EmitBinaryOp(OpCode code, Location *dst, 
 			    Location *op1, Location *op2);
 
     void EmitLabel(const char *label);
@@ -82,6 +82,9 @@ public:
     void EmitVTable(const char *label, List<const char*> *methodLabels);
 
     void EmitPreamble();
+
+    void FillRegister(Location *src, Register reg);
+    void SpillRegister(Location *dst, Register reg);
 };
 
 

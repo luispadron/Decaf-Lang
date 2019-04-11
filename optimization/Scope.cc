@@ -1,57 +1,54 @@
-//
-// Created by Luis on 2019-03-16.
-//
+/* File: scope.cc
+ * --------------     
+ * Each Scope object tracks its own hashtable and 
+ * may have additional information about the particulars for this 
+ * scope (class, fn, global, etc.)
+ */
 
-#include "Scope.h"
+#include "scope.h"
 #include "ast_decl.h"
 
-using namespace std;
 
-bool Scope::insert_decl(const string &name, Decl *decl) {
-    if (symbols.find(name) != symbols.end()) {
-        return false;
-    }
-
-    symbols.insert({name, decl});
-    return true;
+Scope::Scope()
+{
+    table = new Hashtable<Decl*>;
 }
 
 
-pair<Decl*, bool> Scope::get_decl(const string &name) const {
-    // first search current scope
-    for (auto scope = this; scope; scope = scope->parent_ptr) {
-        auto it = scope->symbols.find(name);
-        if (it != scope->symbols.end()) {
-            return make_pair(it->second, true);
-        }
-    }
-
-    // search through class hierarchy
-    for (auto scope = this_ptr; scope; scope = scope->super_ptr) {
-        auto it = scope->symbols.find(name);
-        if (it != scope->symbols.end()) {
-            return make_pair(it->second, true);
-        }
-    }
-
-    return make_pair(nullptr, false); // not found
+/* Method: Lookup
+ * --------------
+ * Looks for an identifier in this scope only. Returns NULL if
+ * not found.
+ */
+Decl *Scope::Lookup(Identifier *id)       
+{
+    return table->Lookup(id->GetName());
 }
 
-pair<int, bool> Scope::get_decl_position(const std::string &name) const {
-    auto res = super_ptr ? super_ptr->get_decl_position(name) : make_pair(1, false);
-    if (res.second) return res;
 
-    int pos = res.first;
-
-    for (const auto &symbol : symbols) {
-        if (symbol.second->get_decl_type() == DeclType::Variable) {
-            if (symbol.first == name) {
-                return make_pair(pos, true);
-            } else {
-                ++pos;
-            }
-        }
-    }
-
-    return make_pair(pos, false);
+/* Method: Declare
+ * ---------------
+ * Adds an identifier to this scope and sets scope on declaration.
+ * Prints error if declaration/definition conflicts with use of identifier
+ * in this scope and returns false. If successful, returns true.
+ */
+bool Scope::Declare(Decl *decl)
+{
+  Decl *prev = table->Lookup(decl->GetName());
+  PrintDebug("scope", "Line %d declaring %s (prev? %p)\n", decl->GetLocation()->first_line, decl->GetName(), prev);
+  if (prev && decl->ConflictsWithPrevious(prev)) // throw away second, keep first
+      return false;
+  table->Enter(decl->GetName(), decl);
+  return true;
 }
+
+void Scope::CopyFromScope(Scope *other, ClassDecl *addTo)
+{
+    Iterator<Decl*> iter = other->table->GetIterator();
+    Decl *decl;
+    while ((decl = iter.GetNextValue()) != NULL) {
+        table->Enter(decl->GetName(), decl);
+	  if (addTo) addTo->AddField(decl);
+    }
+}
+

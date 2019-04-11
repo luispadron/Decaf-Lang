@@ -23,15 +23,14 @@ void SysCallCodeGen();
  */
 int main(int argc, char *argv[])
 {
-    parse_command_line(argc, argv);
+    ParseCommandLine(argc, argv);
   
     InitScanner();
     InitParser();
     yyparse();
-    if (ReportError::NumErrors() > 0)
-	    ReportError::PrintErrors();
+    ReportError::PrintErrors();
     if (ReportError::NumErrors() == 0)
-	    SysCallCodeGen();
+	SysCallCodeGen();
     return (ReportError::NumErrors() == 0? 0 : -1);
 }
 

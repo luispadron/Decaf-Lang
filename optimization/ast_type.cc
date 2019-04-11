@@ -4,10 +4,10 @@
  */
 #include "ast_type.h"
 #include "ast_decl.h"
+#include <string.h>
 #include "errors.h"
-
-#include <cstring>
-
+#include "codegen.h"
+ 
 /* Class constants
  * ---------------
  * These are public constants for the built-in base types (int, double, etc.)
@@ -29,109 +29,86 @@ Type::Type(const char *n) {
     typeName = strdup(n);
 }
 
-bool Type::is_printable() {
-    auto type = type_check();
-    return type == intType || type == boolType || type == stringType || type == errorType;
-}
-
-bool Type::is_equal_to(Type *other) {
-    if (other->is_array_type() || other->is_named_type()) {
-        return other->is_equal_to(this);
-    } else {
-        return this == other || this == errorType || other == errorType;
-    }
-}
-
-bool Type::can_perform_arithmetic()  {
-    auto type = type_check();
-    return type == intType || type == doubleType || type == errorType;
-}
-
-bool Type::can_perform_arithmetic_with(Type *other) {
-    return can_perform_arithmetic() && is_equal_to(other);
-}
-
-bool Type::can_perform_relational_with(Type *other) {
-    auto type = type_check();
-    return (type == intType || type == doubleType || type == errorType) && is_equal_to(other);
-}
-
-bool Type::can_perform_equality_with(Type *other) {
-    return is_equal_to(other);
-}
-
-bool Type::can_perform_logical() {
-    auto type = type_check();
-    return type == boolType || type == errorType;
-}
-
-bool Type::can_perform_logical_with(Type *other) {
-    return can_perform_logical() && other->can_perform_logical();
-}
-
-bool Type::can_perform_assignment_with(Type *other) {
-    return other->is_equal_to(this);
-}
-
-Type* Type::type_check() {
-    return this;
-}
-
-
-NamedType::NamedType(Identifier *i) : Type(*i->get_location()) {
-    Assert(i != nullptr);
-    (id = i)->set_parent(this);
-}
-
-bool NamedType::is_equal_to(Type *other) {
-    if (other == errorType) return true;
-    if (other == nullType) return true;
-
-    auto named_other = dynamic_cast<NamedType*>(other);
-    if (!named_other) { return false; }
-    return id->get_name() == named_other->id->get_name();
-}
-
-bool NamedType::can_perform_equality_with(Type *other) {
-    return other == nullType || is_equal_to(other); // types must be same or comparing to null
-}
-
-
-Type* NamedType::type_check() {
-    auto scope = Sym_tbl_t::shared().get_scope();
-
-    if (!id->is_defined()) {
+ Type *Type::LesserType(Type *other) {
+    if (this == Type::errorType || other == Type::errorType)
         return Type::errorType;
-    } else {
-        // need to make sure that the identifier is used for a class/interface decl
-        auto decl = scope->get_decl(id->get_name()).first;
-        if (decl->get_decl_type() != DeclType::Class && decl->get_decl_type() != DeclType::Interface) {
-            return Type::errorType;
-        }
-    }
+    if (other == NULL)
+        return this;
+    if (IsCompatibleWith(other)) return other;
+    if (other->IsCompatibleWith(this)) return this;
+    return NULL;
+}
 
-    return Sym_tbl_t::shared().get_scope()->get_decl(id->get_name()).first->type_check();
+
+bool Type::IsCompatibleWith(Type *other) {
+    if (this == errorType || other == errorType) return true;
+    if ((this == nullType) && (other->IsNamedType()))
+        return true;
+    return IsEquivalentTo(other);
+}
+	
+NamedType::NamedType(Identifier *i) : Type(*i->GetLocation()) {
+    Assert(i != NULL);
+    (id=i)->SetParent(this);
+    declForType = NULL;
+    isError = false;
+} 
+
+void NamedType::Check() {
+    if (!GetDeclForType()) {
+        isError = true;
+        ReportError::IdentifierNotDeclared(id, LookingForType);
+    }
+}
+Decl *NamedType::GetDeclForType() {
+    if (!declForType && !isError) {
+        Decl *declForName = FindDecl(id);
+        if (declForName && (declForName->IsClassDecl() || declForName->IsInterfaceDecl())) 
+            declForType = declForName;
+    }
+    return declForType;
+}
+
+void NamedType::SetDeclForType(Decl *decl) {
+    declForType = decl;
+}
+
+bool NamedType::IsInterface() {
+    Decl *d = GetDeclForType();
+    return (d && d->IsInterfaceDecl());
+}
+
+bool NamedType::IsClass() {
+    Decl *d = GetDeclForType();
+    return (d && d->IsClassDecl());
+}
+
+bool NamedType::IsEquivalentTo(Type *other) {
+    NamedType *ot = dynamic_cast<NamedType*>(other);
+    return ot && strcmp(id->GetName(), ot->id->GetName()) == 0;
+}
+bool NamedType::IsCompatibleWith(Type *other) {
+    if (IsEquivalentTo(other)) return true;
+    if (other == errorType || isError) return true; 
+    NamedType *ot = dynamic_cast<NamedType*>(other);
+    if (!ot) return false;
+    if (ot->isError) return true;
+    ClassDecl *cd = dynamic_cast<ClassDecl*>(GetDeclForType());
+    return cd && cd->IsCompatibleWith(other);
 }
 
 
 ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
-    Assert(et != nullptr);
-    (elemType = et)->set_parent(this);
+    Assert(et != NULL);
+    (elemType=et)->SetParent(this);
 }
 
-bool ArrayType::is_equal_to(Type *other) {
-    if (other == errorType) { return true; }
-
-    auto array_other = dynamic_cast<ArrayType*>(other);
-    if (!array_other) {
-        return elemType->is_equal_to(other);
-    } else {
-        return elemType->is_equal_to(array_other->elemType);
-    }
+void ArrayType::Check() {
+    elemType->Check();
 }
 
-Type* ArrayType::type_check() {
-    return elemType;
+bool ArrayType::IsEquivalentTo(Type *other) {
+    ArrayType *o = dynamic_cast<ArrayType*>(other);
+    return (o && elemType->IsEquivalentTo(o->elemType));
 }
-
 

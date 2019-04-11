@@ -1,9 +1,9 @@
-/** File: ast_expr.h
+/* File: ast_expr.h
  * ----------------
  * The Expr class and its subclasses are used to represent
  * expressions in the parse tree.  For each expression in the
  * language (add, call, New, etc.) there is a corresponding
- * node class for that construct.
+ * node class for that construct. 
  */
 
 
@@ -11,398 +11,259 @@
 #define _H_ast_expr
 
 #include "ast.h"
-#include "ast_decl.h"
 #include "ast_stmt.h"
-#include "ast_type.h"
 #include "list.h"
 
-#include <vector>
+class NamedType; // for new
+class Type; // for NewArray
+class ClassDecl; // for This
+class Location;
 
 
-class Expr : public Stmt {
-public:
-    explicit Expr(yyltype loc) : Stmt(loc) {}
-    Expr() : Stmt() {}
+class Expr : public Stmt 
+{
+  public:
+    Expr(yyltype loc) : Stmt(loc) { result = NULL; }
+    Expr() : Stmt() { result = NULL; }
+    void Check() { CheckAndComputeResultType(); }
+    virtual Type* CheckAndComputeResultType() = 0;
+    Location *result;
+    Location *GetResult() { return result; }
 };
 
-
-/**
- * This node type is used for those places where an expression is optional.
+/* This node type is used for those places where an expression is optional.
  * We could use a NULL pointer, but then it adds a lot of checking for
- * NULL. By using a valid, but no-op, node, we save that trouble
- */
-class EmptyExpr : public Expr {
-public:
-    Type * type_check() override { return Type::voidType; }
+ * NULL. By using a valid, but no-op, node, we save that trouble */
+class EmptyExpr : public Expr
+{
+  public:
+    Type* CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg) { result = NULL; }
 };
 
-
-class IntConstant : public Expr {
-protected:
+class IntConstant : public Expr 
+{
+  protected:
     int value;
   
-public:
+  public:
     IntConstant(yyltype loc, int val);
-
-    Type * type_check() override;
-
-    int get_bytes() const override { return CodeGenerator::word_size; }
-
-    Location *emit() override;
+    Type *CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class DoubleConstant : public Expr {
-protected:
+class DoubleConstant : public Expr 
+{
+  protected:
     double value;
     
-public:
+  public:
     DoubleConstant(yyltype loc, double val);
-
-    Type * type_check() override;
-
-    int get_bytes() const override { return CodeGenerator::word_size; }
-
-    Location *emit() override;
+    Type *CheckAndComputeResultType();
 };
 
-
-class BoolConstant : public Expr {
-protected:
+class BoolConstant : public Expr 
+{
+  protected:
     bool value;
     
-public:
+  public:
     BoolConstant(yyltype loc, bool val);
-
-    Type * type_check() override;
-
-    int get_bytes() const override { return CodeGenerator::word_size; }
-
-    Location *emit() override;
+    Type *CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class StringConstant : public Expr {
-protected:
+class StringConstant : public Expr 
+{ 
+  protected:
     char *value;
     
-public:
+  public:
     StringConstant(yyltype loc, const char *val);
-
-    Type * type_check() override;
-
-    int get_bytes() const override { return CodeGenerator::word_size; }
-
-    Location *emit() override;
+    Type *CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class NullConstant: public Expr {
-public:
-    explicit NullConstant(yyltype loc) : Expr(loc) { }
-
-    Type * type_check() override;
-
-    int get_bytes() const override { return CodeGenerator::word_size; }
-
-    Location *emit() override;
+class NullConstant: public Expr 
+{
+  public: 
+    NullConstant(yyltype loc) : Expr(loc) {}
+    Type *CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class Operator : public Node {
-protected:
+class Operator : public Node 
+{
+  protected:
     char tokenString[4];
     
-public:
-
-    enum class Type {
-        less_than,
-        greater_than,
-        less_than_eql,
-        greater_than_eql,
-        assign,
-        equal,
-        not_equal,
-        notOp,
-        orOp,
-        andOp,
-        plus,
-        minus,
-        divide,
-        multiply,
-        mod
-    };
-
+  public:
     Operator(yyltype loc, const char *tok);
-
     friend std::ostream& operator<<(std::ostream& out, Operator *o) { return out << o->tokenString; }
-
-    const char * get_op_token() const { return tokenString; }
-
-    Type get_op_type() const;
-};
-
-
-class CompoundExpr : public Expr {
-protected:
+    const char *str() { return tokenString; }
+ };
+ 
+class CompoundExpr : public Expr
+{
+  protected:
     Operator *op;
     Expr *left, *right; // left will be NULL if unary
-
-    virtual bool validate() { return false; }
-
-public:
-    CompoundExpr(Expr *lhs, Operator *op, Expr *rhs);  // for binary
+    
+  public:
+    CompoundExpr(Expr *lhs, Operator *op, Expr *rhs); // for binary
     CompoundExpr(Operator *op, Expr *rhs);             // for unary
+    void ReportErrorForIncompatibleOperands(Type *lhs, Type *rhs);
+    bool CanDoArithmetic(Type *lhs, Type *rhs);
+    void Emit(CodeGenerator *cg);
 };
 
-
-class ArithmeticExpr : public CompoundExpr {
-protected:
-    bool validate() override;
-
-public:
+class ArithmeticExpr : public CompoundExpr 
+{
+  public:
     ArithmeticExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     ArithmeticExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
-
-    Type * type_check() override;
-
-    int get_bytes() const override;
-
-    Location *emit() override;
+    Type* CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class RelationalExpr : public CompoundExpr {
-protected:
-    bool validate() override;
-
-public:
+class RelationalExpr : public CompoundExpr 
+{
+  public:
     RelationalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
-
-    Type * type_check() override;
-
-    int get_bytes() const override;
-
-    Location *emit() override;
+    Type* CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class EqualityExpr : public CompoundExpr {
-protected:
-    bool validate() override;
-
-public:
+class EqualityExpr : public CompoundExpr 
+{
+  public:
     EqualityExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
-
-    Type * type_check() override;
-
-    int get_bytes() const override;
-
-    Location *emit() override;
+    const char *GetPrintNameForNode() { return "EqualityExpr"; }
+    Type* CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class LogicalExpr : public CompoundExpr {
-protected:
-    bool validate() override;
-
-public:
+class LogicalExpr : public CompoundExpr 
+{
+  public:
     LogicalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
-
     LogicalExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
-
-    Type * type_check() override;
-
-    int get_bytes() const override;
-
-    Location *emit() override;
+    const char *GetPrintNameForNode() { return "LogicalExpr"; }
+    Type* CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class AssignExpr : public CompoundExpr {
-protected:
-    bool validate() override;
-
-public:
+class AssignExpr : public CompoundExpr 
+{
+  public:
     AssignExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
-
-    Type * type_check() override;
-
-    int get_bytes() const override;
-
-    Location *emit() override;
+    const char *GetPrintNameForNode() { return "AssignExpr"; }
+    Type* CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class LValue : public Expr {
-public:
-    explicit LValue(yyltype loc) : Expr(loc) {}
+class LValue : public Expr 
+{
+  public:
+    LValue(yyltype loc) : Expr(loc) {}
+    void Emit(CodeGenerator *cg);
+    virtual void EmitWithoutDereference(CodeGenerator *cg){}
 };
 
-
-class This : public Expr {
-public:
-    explicit This(yyltype loc) : Expr(loc) {}
-
-    Type * type_check() override;
-
-    Location * emit() override;
+class This : public Expr 
+{
+  protected:
+    ClassDecl *enclosingClass;
+    
+  public:
+    This(yyltype loc) : Expr(loc), enclosingClass(NULL)  {}
+    Type* CheckAndComputeResultType();
+     void Emit(CodeGenerator *cg);
 };
 
-
-class ArrayAccess : public LValue {
-private:
-
-    void emit_check(Location *base, Location *subscript) const;
-
-protected:
+class ArrayAccess : public LValue 
+{
+  protected:
     Expr *base, *subscript;
     
-public:
+  public:
     ArrayAccess(yyltype loc, Expr *base, Expr *subscript);
-
-    Type * type_check() override;
-
-    int get_bytes() const override;
-
-    int get_bytes_store() const;
-
-    Location * emit()  override;
-
-    Location * emit_store() const;
+    Type *CheckAndComputeResultType();
+     void EmitWithoutDereference(CodeGenerator *cg);
 };
 
-
-/**
- * Note that field access is used both for qualified names
+/* Note that field access is used both for qualified names
  * base.field and just field without qualification. We don't
  * know for sure whether there is an implicit "this." in
  * front until later on, so we use one node type for either
- * and sort it out later.
- */
-class FieldAccess : public LValue {
-private:
-    /// emits code for member access, either "this.member" or "class.member" or "member = 4"
-    Location *emit_member_access();
-
-protected:
+ * and sort it out later. */
+class FieldAccess : public LValue 
+{
+  protected:
     Expr *base;	// will be NULL if no explicit base
     Identifier *field;
-
-public:
+    
+  public:
     FieldAccess(Expr *base, Identifier *field); //ok to pass NULL base
-
-    Type * type_check() override;
-
-    Location *emit() override;
-
-    int get_bytes() const override;
-
-    Expr* get_base() const { return base; }
-
-    bool is_member_access() const;
-
-    Identifier * get_field() const { return field; }
+    Type* CheckAndComputeResultType();
+     void EmitWithoutDereference(CodeGenerator *cg);
 };
 
-
-/**
- * Like field access, call is used both for qualified base.field()
+/* Like field access, call is used both for qualified base.field()
  * and unqualified field().  We won't figure out until later
  * whether we need implicit "this." so we use one node type for either
- * and sort it out later.
- */
-class Call : public Expr {
-private:
-    /// emits length of an array (.length() call)
-    Location * emit_length_call();
-
-    /// this function emits code for an explicit method call, either "this.func()" or "class.func()"
-    Location *emit_explicit_method_call();
-
-    /// this function emits code for an implicit method call, when in a class and calling a method like "set_age()"
-    Location *emit_implicit_method_call();
-
-    /// generates locations for all the parameters
-    std::vector<Location*> gen_location_params() const;
-
-    /// emits code for pushing parameters before a call, if this_ptr is set that is also pushed (pushed last)
-    void push_params(std::vector<Location*> params, Location *this_ptr = nullptr) const;
-
-protected:
+ * and sort it out later. */
+class Call : public Expr 
+{
+  protected:
     Expr *base;	// will be NULL if no explicit base
     Identifier *field;
     List<Expr*> *actuals;
     
-public:
+  public:
     Call(yyltype loc, Expr *base, Identifier *field, List<Expr*> *args);
-
-    Type * type_check() override;
-
-    int get_bytes() const override;
-
-    Location *emit() override;
-
-    bool is_method_call() const;
+    Decl *GetFnDecl();
+    Type *CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class NewExpr : public Expr {
-private:
-    bool validate();
-
-protected:
+class NewExpr : public Expr
+{
+  protected:
     NamedType *cType;
     
-public:
+  public:
     NewExpr(yyltype loc, NamedType *clsType);
-
-    Type * type_check() override;
-
-    int get_bytes() const override;
-
-    Location * emit() override;
+    Type* CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class NewArrayExpr : public Expr {
-protected:
+class NewArrayExpr : public Expr
+{
+  protected:
     Expr *size;
     Type *elemType;
-    ArrayType *arrayType;
     
-public:
+  public:
     NewArrayExpr(yyltype loc, Expr *sizeExpr, Type *elemType);
-
-    Type * type_check() override;
-
-    int get_bytes() const override;
-
-    Location * emit()  override;
+    Type* CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class ReadIntegerExpr : public Expr {
-public:
-    explicit ReadIntegerExpr(yyltype loc) : Expr(loc) {}
-
-    Type * type_check() override;
-
-    int get_bytes() const override;
-
-    Location * emit()  override;
+class ReadIntegerExpr : public Expr
+{
+  public:
+    ReadIntegerExpr(yyltype loc) : Expr(loc) {}
+    Type *CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class ReadLineExpr : public Expr {
-public:
-    explicit ReadLineExpr(yyltype loc) : Expr (loc) {}
-
-    Type * type_check() override;
-
-    int get_bytes() const override;
-
-    Location * emit()  override;
+class ReadLineExpr : public Expr
+{
+  public:
+    ReadLineExpr(yyltype loc) : Expr (loc) {}
+    Type *CheckAndComputeResultType();
+    void Emit(CodeGenerator *cg);
 };
 
     

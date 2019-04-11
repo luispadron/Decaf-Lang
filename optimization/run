@@ -6,7 +6,7 @@
 # Compiles decaf-file and executes (spim).
 #
 
-SPIM=/afs/umich.edu/user/o/l/olivertc/Public/spim
+SPIM=/afs/umich.edu/user/c/h/chhsiao/Public/spim
 COMPILER=dcc
 
 if [ $# -lt 1 ]; then
@@ -34,7 +34,7 @@ fi
 
 echo "-- spim -file tmp.asm"
 echo " "
-$SPIM -keepstats -file tmp.asm
+$SPIM -file tmp.asm
 
 echo " "
 echo " "

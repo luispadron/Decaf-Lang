@@ -4,9 +4,6 @@
  * statements in the parse tree.  For each statment in the
  * language (for, if, return, etc.) there is a corresponding
  * node class for that construct. 
- *
- * pp3: You will need to extend the Stmt classes to implement
- * semantic analysis for rules pertaining to statements.
  */
 
 
@@ -16,145 +13,126 @@
 #include "list.h"
 #include "ast.h"
 
-#include <string>
-
 class Decl;
-class FnDecl;
 class VarDecl;
 class Expr;
-
-
-class Stmt : public Node {
-public:
-    Stmt() : Node() {}
-    explicit Stmt(yyltype loc) : Node(loc) {}
-
-    virtual void check() { }
-
-    virtual Location *emit() { return nullptr; }
-
-    virtual int get_bytes() const { return 0; }
+  
+class Program : public Node
+{
+  protected:
+     List<Decl*> *decls;
+     
+  public:
+     Program(List<Decl*> *declList);
+     void Check();
+     void Emit();
 };
 
+class Stmt : public Node
+{
+  public:
+     Stmt() : Node() {}
+     Stmt(yyltype loc) : Node(loc) {}
+};
 
-class StmtBlock : public Stmt {
-private:
-    static int next_block_id;
-
-protected:
+class StmtBlock : public Stmt 
+{
+  protected:
     List<VarDecl*> *decls;
     List<Stmt*> *stmts;
-    const int block_id;
     
-public:
+  public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
-
-    /// returns the mangled name of the block, for example:
-    /// if "_block1", where 1 is a unique id
-    std::string get_mangled_name() const;
-
-    int get_bytes() const override;
-
-    void check() override;
-
-    Location *emit() override;
+    void Check();
+  
+    void Emit(CodeGenerator *cg);
 };
 
   
-class ConditionalStmt : public Stmt {
-protected:
+class ConditionalStmt : public Stmt
+{
+  protected:
     Expr *test;
     Stmt *body;
   
-public:
+  public:
     ConditionalStmt(Expr *testExpr, Stmt *body);
-
-    void check() override;
+    void Check();
 };
 
-
-class LoopStmt : public ConditionalStmt {
-protected:
-    char * done_label = nullptr;
-
-public:
-
-    LoopStmt(Expr *testExpr, Stmt *body) : ConditionalStmt(testExpr, body) {}
-
-    const char * get_done_label() const { return done_label; }
+class LoopStmt : public ConditionalStmt 
+{
+  protected:
+    const char *afterLoopLabel;
+  public:
+    LoopStmt(Expr *testExpr, Stmt *body)
+            : ConditionalStmt(testExpr, body) {}
+    const char *GetLoopExitLabel() { return afterLoopLabel; }
 };
 
-
-class ForStmt : public LoopStmt {
-protected:
-    Expr *init;
-    Expr *step;
+class ForStmt : public LoopStmt 
+{
+  protected:
+    Expr *init, *step;
   
-public:
+  public:
     ForStmt(Expr *init, Expr *test, Expr *step, Stmt *body);
-
-    int get_bytes() const override;
-
-    Location * emit() override;
+    void Check();
+    void Emit(CodeGenerator *cg);
 };
 
-
-class WhileStmt : public LoopStmt {
-public:
+class WhileStmt : public LoopStmt 
+{
+  public:
     WhileStmt(Expr *test, Stmt *body) : LoopStmt(test, body) {}
-
-    int get_bytes() const override;
-
-    Location * emit() override;
+  
+    void Emit(CodeGenerator *cg);
 };
 
-
-class IfStmt : public ConditionalStmt {
-protected:
+class IfStmt : public ConditionalStmt 
+{
+  protected:
     Stmt *elseBody;
   
-public:
+  public:
     IfStmt(Expr *test, Stmt *thenBody, Stmt *elseBody);
-
-    void check() override;
-
-    int get_bytes() const override;
-
-    Location * emit() override;
+    void Check();
+  
+    void Emit(CodeGenerator *cg);
 };
 
-
-class BreakStmt : public Stmt {
-public:
-    explicit BreakStmt(yyltype loc) : Stmt(loc) {}
-
-    Location * emit() override;
+class BreakStmt : public Stmt 
+{
+  public:
+    BreakStmt(yyltype loc) : Stmt(loc) {}
+    void Check();
+  
+    void Emit(CodeGenerator *cg);
 };
 
-
-class ReturnStmt : public Stmt {
-protected:
+class ReturnStmt : public Stmt  
+{
+  protected:
     Expr *expr;
   
-public:
+  public:
     ReturnStmt(yyltype loc, Expr *expr);
-
-    int get_bytes() const override;
-
-    Location * emit()  override;
+    void Check();
+  
+    void Emit(CodeGenerator *cg);
 };
 
-
-class PrintStmt : public Stmt {
-protected:
+class PrintStmt : public Stmt
+{
+  protected:
     List<Expr*> *args;
     
-public:
-    explicit PrintStmt(List<Expr*> *arguments);
-
-    int get_bytes() const override;
-
-    Location * emit() override;
+  public:
+    PrintStmt(List<Expr*> *arguments);
+    void Check();
+  
+    void Emit(CodeGenerator *cg);
 };
+
 
 #endif
