@@ -20,13 +20,12 @@ class InterfaceDecl;
 #include "ast_stmt.h"
 class Location;
 
-class Decl : public Node 
-{
-  protected:
+class Decl : public Node {
+protected:
     Identifier *id;
   
-  public:
-    Decl(Identifier *name);
+public:
+    explicit Decl(Identifier *name);
     friend std::ostream& operator<<(std::ostream& out, Decl *d) { return out << d->id; }
     Identifier *GetId() { return id; }
     const char *GetName() { return id->GetName(); }
@@ -44,12 +43,11 @@ class Decl : public Node
     int GetOffset() { return offset; }
 };
 
-class VarDecl : public Decl 
-{
-  protected:
+class VarDecl : public Decl {
+protected:
     Type *type;
     
-  public:
+public:
     VarDecl(Identifier *name, Type *type);
     void Check();
     Type *GetDeclaredType() { return type; }
@@ -60,9 +58,8 @@ class VarDecl : public Decl
     void Emit(CodeGenerator *cg);
 };
 
-class ClassDecl : public Decl 
-{
-  protected:
+class ClassDecl : public Decl {
+protected:
     List<Decl*> *members;
     NamedType *extends;
     List<NamedType*> *implements;
@@ -72,18 +69,18 @@ class ClassDecl : public Decl
     List<const char*> *vtable;
     int nextIvarOffset;
 
-  public:
+public:
     ClassDecl(Identifier *name, NamedType *extends, 
               List<NamedType*> *implements, List<Decl*> *members);
-    void Check();
-    bool IsClassDecl() { return true; }
-    Scope *PrepareScope();
+    void Check() override;
+    bool IsClassDecl() override { return true; }
+    Scope *PrepareScope() override;
     List<InterfaceDecl*> *GetImplementedInterfaces() { return convImp; }
     bool IsCompatibleWith(Type *type);
     bool Implements(Type *intf);
     Type *GetDeclaredType() { return cType; } //  used by "this"
     const char *GetClassName() { return id->GetName(); }
-    void Emit(CodeGenerator *cg);
+    void Emit(CodeGenerator *cg) override;
     void AddMethod(FnDecl*d, Decl *p);
     void AddIvar(VarDecl*d, Decl *p);
     void AddField(Decl*d);
@@ -91,39 +88,37 @@ class ClassDecl : public Decl
     int GetClassSize() { return nextIvarOffset; }
 };
 
-class InterfaceDecl : public Decl 
-{
-  protected:
+class InterfaceDecl : public Decl{
+protected:
     List<Decl*> *members;
     
-  public:
+public:
     InterfaceDecl(Identifier *name, List<Decl*> *members);
-    void Check();
-    bool IsInterfaceDecl() { return true; }
-    Scope *PrepareScope();
+    void Check() override;
+    bool IsInterfaceDecl() override { return true; }
+    Scope *PrepareScope() override;
     bool ClassMeetsObligation(ClassDecl *c);
 };
 
-class FnDecl : public Decl 
-{
-  protected:
+class FnDecl : public Decl {
+protected:
     List<VarDecl*> *formals;
     Type *returnType;
     Stmt *body;
     
-  public:
+public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
     void SetFunctionBody(Stmt *b);
-    void Check();
+    void Check() override;
     void CheckPrototype();
-    bool IsFnDecl() { return true; }
-    bool IsMethodDecl();
-    bool ConflictsWithPrevious(Decl *prev);
+    bool IsFnDecl() override { return true; }
+    bool IsMethodDecl() override;
+    bool ConflictsWithPrevious(Decl *prev) override;
     bool MatchesPrototype(FnDecl *other);
     Type *GetReturnType() {return returnType; }
     List<VarDecl*> *GetFormals() { return formals; }
     const char *GetFunctionLabel();
-    void Emit(CodeGenerator *cg);
+    void Emit(CodeGenerator *cg) override;
 };
 
 #endif

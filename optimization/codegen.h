@@ -20,12 +20,12 @@ typedef enum { Alloc, ReadLine, ReadInteger, StringEqual,
                PrintInt, PrintString, PrintBool, Halt, NumBuiltIns } BuiltIn;
 
 class CodeGenerator {
-  private:
+private:
     List<Instruction*> *code;
     int curStackOffset, curGlobalOffset;
     int insideFn;
 
-  public:
+public:
            // Here are some class constants to remind you of the offsets
            // used for globals, locals, and parameters. You will be
            // responsible for using these when assigning Locations.
@@ -173,6 +173,8 @@ class CodeGenerator {
     Location *GenDynamicDispatch(Location *obj, int vtableOffset, List<Location*> *args, bool hasReturnValue);
     Location *GenSubscript(Location *array, Location *index);
     Location *GenFunctionCall(const char *fnLabel, List<Location*> *args, bool hasReturnValue);
+
+private:
     // private helper, not for public user
     Location *GenMethodCall(Location*rcvr, Location*meth, List<Location*> *args, bool hasReturnValue);
     void GenHaltWithMessage(const char *msg);

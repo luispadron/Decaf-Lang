@@ -14,17 +14,16 @@
 #include <iostream>
 
 
-class Type : public Node 
-{
-  protected:
-    char *typeName;
+class Type : public Node {
+protected:
+    char *typeName = nullptr;
 
-  public :
+public :
     static Type *intType, *doubleType, *boolType, *voidType,
                 *nullType, *stringType, *errorType;
 
-    Type(yyltype loc) : Node(loc) {}
-    Type(const char *str);
+    explicit Type(yyltype loc) : Node(loc) {}
+    explicit Type(const char *str);
     
     virtual void PrintToStream(std::ostream& out) { out << typeName; }
     friend std::ostream& operator<<(std::ostream& out, Type *t) { t->PrintToStream(out); return out; }
@@ -36,46 +35,46 @@ class Type : public Node
     virtual bool IsError() { return false;}
     virtual Type *LesserType(Type *other);
 	 
-     void Emit(CodeGenerator *cg) {}  
+     void Emit(CodeGenerator *cg) override {}
 };
 
-class NamedType : public Type 
-{
-  protected:
+class NamedType : public Type {
+protected:
     Identifier *id;
     Decl *declForType; // either class or inteface
     bool isError;
     
-  public:
-    NamedType(Identifier *i);
+public:
+    explicit NamedType(Identifier *i);
     
-    void PrintToStream(std::ostream& out) { out << id; }
-    void Check();
+    void PrintToStream(std::ostream& out) override { out << id; }
     Decl *GetDeclForType();
     void SetDeclForType(Decl *decl);
     bool IsInterface();
     bool IsClass();
     Identifier *GetId() { return id; }
-    bool IsEquivalentTo(Type *other);
-    bool IsNamedType() { return true; }
-    bool IsCompatibleWith(Type *other);
-    bool IsError() { return isError;}
+    bool IsEquivalentTo(Type *other) override;
+    bool IsNamedType() override { return true; }
+    bool IsCompatibleWith(Type *other) override;
+    bool IsError() override { return isError;}
+
+    void Check() override;
 };
 
-class ArrayType : public Type 
-{
-  protected:
+class ArrayType : public Type {
+protected:
     Type *elemType;
 
-  public:
+public:
     ArrayType(yyltype loc, Type *elemType);
     
-    void PrintToStream(std::ostream& out) { out << elemType << "[]"; }
-    void Check();
-    bool IsEquivalentTo(Type *other);
-    bool IsArrayType() { return true; }
-    bool IsError() { return elemType->IsError(); }
+    void PrintToStream(std::ostream& out) override { out << elemType << "[]"; }
+    bool IsEquivalentTo(Type *other) override;
+    bool IsArrayType() override { return true; }
+    bool IsError() override { return elemType->IsError(); }
     Type *GetArrayElemType() { return elemType; }
+
+    void Check() override;
 };
 
  

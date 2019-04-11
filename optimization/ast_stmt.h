@@ -18,110 +18,102 @@ class VarDecl;
 class Expr;
 
 
-class Stmt : public Node
-{
+class Stmt : public Node {
   public:
      Stmt() : Node() {}
-     Stmt(yyltype loc) : Node(loc) {}
+     explicit Stmt(yyltype loc) : Node(loc) {}
 };
 
-class StmtBlock : public Stmt 
-{
-  protected:
+class StmtBlock : public Stmt {
+protected:
     List<VarDecl*> *decls;
     List<Stmt*> *stmts;
     
-  public:
+public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
-    void Check();
-  
-    void Emit(CodeGenerator *cg);
+    void Check() override;
+    void Emit(CodeGenerator *cg) override;
 };
 
   
-class ConditionalStmt : public Stmt
-{
-  protected:
+class ConditionalStmt : public Stmt {
+protected:
     Expr *test;
     Stmt *body;
   
-  public:
+public:
     ConditionalStmt(Expr *testExpr, Stmt *body);
-    void Check();
+
+    void Check() override;
 };
 
-class LoopStmt : public ConditionalStmt 
-{
-  protected:
-    const char *afterLoopLabel;
-  public:
-    LoopStmt(Expr *testExpr, Stmt *body)
-            : ConditionalStmt(testExpr, body) {}
+class LoopStmt : public ConditionalStmt {
+protected:
+    const char *afterLoopLabel = nullptr;
+
+public:
+    LoopStmt(Expr *testExpr, Stmt *body) : ConditionalStmt(testExpr, body) {}
+
     const char *GetLoopExitLabel() { return afterLoopLabel; }
 };
 
-class ForStmt : public LoopStmt 
-{
-  protected:
+class ForStmt : public LoopStmt {
+protected:
     Expr *init, *step;
   
-  public:
+public:
     ForStmt(Expr *init, Expr *test, Expr *step, Stmt *body);
-    void Check();
-    void Emit(CodeGenerator *cg);
+
+    void Check() override;
+    void Emit(CodeGenerator *cg) override;
 };
 
-class WhileStmt : public LoopStmt 
-{
-  public:
+class WhileStmt : public LoopStmt {
+public:
     WhileStmt(Expr *test, Stmt *body) : LoopStmt(test, body) {}
   
-    void Emit(CodeGenerator *cg);
+    void Emit(CodeGenerator *cg) override;
 };
 
-class IfStmt : public ConditionalStmt 
-{
-  protected:
+class IfStmt : public ConditionalStmt {
+protected:
     Stmt *elseBody;
   
-  public:
+public:
     IfStmt(Expr *test, Stmt *thenBody, Stmt *elseBody);
-    void Check();
-  
-    void Emit(CodeGenerator *cg);
+
+    void Check() override;
+    void Emit(CodeGenerator *cg) override;
 };
 
-class BreakStmt : public Stmt 
-{
-  public:
-    BreakStmt(yyltype loc) : Stmt(loc) {}
-    void Check();
-  
-    void Emit(CodeGenerator *cg);
+class BreakStmt : public Stmt {
+public:
+    explicit BreakStmt(yyltype loc) : Stmt(loc) {}
+
+    void Check() override;
+    void Emit(CodeGenerator *cg) override;
 };
 
-class ReturnStmt : public Stmt  
-{
-  protected:
+class ReturnStmt : public Stmt {
+protected:
     Expr *expr;
   
-  public:
+public:
     ReturnStmt(yyltype loc, Expr *expr);
-    void Check();
-  
-    void Emit(CodeGenerator *cg);
+
+    void Check() override;
+    void Emit(CodeGenerator *cg) override;
 };
 
-class PrintStmt : public Stmt
-{
-  protected:
+class PrintStmt : public Stmt {
+protected:
     List<Expr*> *args;
     
-  public:
-    PrintStmt(List<Expr*> *arguments);
-    void Check();
-  
-    void Emit(CodeGenerator *cg);
+public:
+    explicit PrintStmt(List<Expr*> *arguments);
+
+    void Check() override;
+    void Emit(CodeGenerator *cg) override;
 };
 
 
