@@ -9,8 +9,7 @@
 #include <deque>
 
 Location::Location(Segment s, int o, const char *name) :
-  variableName(strdup(name)), segment(s), offset(o),
-  reference(NULL) {}
+  variableName(strdup(name)), segment(s), offset(o), reg(Mips::zero) {}
 
 bool Location::IsEqualTo(Location *other) {
     return (this == other ||
@@ -19,7 +18,6 @@ bool Location::IsEqualTo(Location *other) {
              && GetSegment() == other->GetSegment()
              && GetOffset() == other->GetOffset()));
 }
-
  
 void Instruction::Print() {
   printf("\t%s ;", printed);
@@ -170,6 +168,8 @@ void BeginFunc::SetFrameSize(int numBytesForAllLocalsAndTemps) {
 }
 void BeginFunc::EmitSpecific(Mips *mips) {
   mips->EmitBeginFunction(frameSize);
+  /* pp5: need to load all parameters to the allocated registers.
+   */
 }
 
 
@@ -217,6 +217,9 @@ LCall::LCall(const char *l, Location *d)
   sprintf(printed, "%s%sLCall %s", dst? dst->GetName(): "", dst?" = ":"", label);
 }
 void LCall::EmitSpecific(Mips *mips) {
+  /* pp5: need to save registers before a function call
+   * and restore them back after the call.
+   */
   mips->EmitLCall(dst, label);
 }
 
@@ -228,6 +231,9 @@ ACall::ACall(Location *ma, Location *d)
 	    methodAddr->GetName());
 }
 void ACall::EmitSpecific(Mips *mips) {
+  /* pp5: need to save registers before a function call
+   * and restore them back after the call.
+   */
   mips->EmitACall(dst, methodAddr);
 } 
 

@@ -24,7 +24,7 @@ class Location;
 
 
 class Mips {
-  public:
+public:
     typedef enum {Add, Sub, Mul, Div, Mod, Eq, Less, And, Or, NumOps} OpCode;
 
     typedef enum {zero, at, v0, v1, a0, a1, a2, a3,
@@ -35,13 +35,13 @@ class Mips {
     static const int NumGeneralPurposeRegs = 18;
 
     struct RegContents {
-        bool isDirty;
-	Location *var;
-	const char *name;
-	bool isGeneralPurpose;
-    } regs[NumRegs];
+	    const char *name;
+	    bool isGeneralPurpose;
+    }
 
-  private:
+    regs[NumRegs];
+
+private:
     Register rs, rt, rd;
 
     void EmitCallInstr(Location *dst, const char *fn, bool isL);
@@ -49,7 +49,7 @@ class Mips {
     static const char *mipsName[NumOps];
     static const char *NameForTac(OpCode code);
 
-  public:
+public:
     
     Mips();
 

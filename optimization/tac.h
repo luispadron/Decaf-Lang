@@ -6,7 +6,7 @@
  *
  * Each instruction is mostly just a little struct with a
  * few fields, but each responds polymorphically to the methods
- * Print and Emit, the first is used to print liveout the TAC form of
+ * Print and Emit, the first is used to print out the TAC form of
  * the instruction (helpful when debugging) and the second to
  * convert to the appropriate MIPS assembly.
  *
@@ -28,10 +28,10 @@
 
     // A Location object is used to identify the operands to the
     // various TAC instructions. A Location is either fp or gp
-    // relative (depending on whether livein stack or global segemnt)
+    // relative (depending on whether in stack or global segemnt)
     // and has an offset relative to the base of that segment.
     // For example, a declaration for integer num as the first local
-    // variable livein a function would be assigned a Location object
+    // variable in a function would be assigned a Location object
     // with name "num", segment fpRelative, and offset -8. 
  
 typedef enum {fpRelative, gpRelative} Segment;
@@ -43,20 +43,28 @@ protected:
     int offset;
     Location *reference;
     int refOffset;
-	  
+
+    // The register allocated to this location.
+    // A "zero" indicates that no register has been allocated.
+    Mips::Register reg = Mips::Register::zero;
+
 public:
     Location(Segment seg, int offset, const char *name);
+
     Location(Location *base, int refOff) :
-	variableName(base->variableName), segment(base->segment),
-	offset(base->offset), reference(base), refOffset(refOff) {}
- 
+        variableName(base->variableName), segment(base->segment),
+        offset(base->offset), reference(base), refOffset(refOff) {}
+
+    bool IsEqualTo(Location *other);
+
     const char *GetName()           { return variableName; }
     Segment GetSegment()            { return segment; }
     int GetOffset()                 { return offset; }
-    bool IsReference()              { return reference != NULL; }
+    void SetRegister(Mips::Register r)    { reg = r; }
+    Mips::Register GetRegister()          { return reg; }
+    bool IsReference()              { return reference != nullptr; }
     Location *GetReference()        { return reference; }
     int GetRefOffset()              { return refOffset; }
-    bool IsEqualTo(Location *other);
 };
  
 
