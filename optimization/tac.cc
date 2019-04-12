@@ -12,6 +12,14 @@ Location::Location(Segment s, int o, const char *name) :
   variableName(strdup(name)), segment(s), offset(o),
   reference(NULL) {}
 
+bool Location::IsEqualTo(Location *other) {
+    return (this == other ||
+            (other
+             && !strcmp(GetName(), other->GetName())
+             && GetSegment() == other->GetSegment()
+             && GetOffset() == other->GetOffset()));
+}
+
  
 void Instruction::Print() {
   printf("\t%s ;", printed);

@@ -26,19 +26,6 @@
 #include <string.h>
 
 
-
-// Helper to check if two variable locations are one and the same
-// (same name, segment, and offset)
-static bool LocationsAreSame(Location *var1, Location *var2)
-{
-   return (var1 == var2 ||
-	     (var1 && var2
-		&& !strcmp(var1->GetName(), var2->GetName())
-		&& var1->GetSegment()  == var2->GetSegment()
-		&& var1->GetOffset() == var2->GetOffset()));
-}
-
-
 /* Method: SpillRegister
  * ---------------------
  * Used to spill a register from reg to dst.  All it does is emit a store

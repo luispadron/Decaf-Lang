@@ -36,16 +36,15 @@
  
 typedef enum {fpRelative, gpRelative} Segment;
 
-class Location
-{
-  protected:
+class Location {
+protected:
     const char *variableName;
     Segment segment;
     int offset;
     Location *reference;
     int refOffset;
 	  
-  public:
+public:
     Location(Segment seg, int offset, const char *name);
     Location(Location *base, int refOff) :
 	variableName(base->variableName), segment(base->segment),
@@ -57,6 +56,7 @@ class Location
     bool IsReference()              { return reference != NULL; }
     Location *GetReference()        { return reference; }
     int GetRefOffset()              { return refOffset; }
+    bool IsEqualTo(Location *other);
 };
  
 

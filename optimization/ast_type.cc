@@ -32,11 +32,11 @@ Type::Type(const char *n) {
  Type *Type::LesserType(Type *other) {
     if (this == Type::errorType || other == Type::errorType)
         return Type::errorType;
-    if (other == NULL)
+    if (other == nullptr)
         return this;
     if (IsCompatibleWith(other)) return other;
     if (other->IsCompatibleWith(this)) return this;
-    return NULL;
+    return nullptr;
 }
 
 
@@ -48,9 +48,9 @@ bool Type::IsCompatibleWith(Type *other) {
 }
 	
 NamedType::NamedType(Identifier *i) : Type(*i->GetLocation()) {
-    Assert(i != NULL);
+    Assert(i != nullptr);
     (id=i)->SetParent(this);
-    declForType = NULL;
+    declForType = nullptr;
     isError = false;
 } 
 
@@ -84,22 +84,22 @@ bool NamedType::IsClass() {
 }
 
 bool NamedType::IsEquivalentTo(Type *other) {
-    NamedType *ot = dynamic_cast<NamedType*>(other);
+    auto ot = dynamic_cast<NamedType*>(other);
     return ot && strcmp(id->GetName(), ot->id->GetName()) == 0;
 }
 bool NamedType::IsCompatibleWith(Type *other) {
     if (IsEquivalentTo(other)) return true;
     if (other == errorType || isError) return true; 
-    NamedType *ot = dynamic_cast<NamedType*>(other);
+    auto ot = dynamic_cast<NamedType*>(other);
     if (!ot) return false;
     if (ot->isError) return true;
-    ClassDecl *cd = dynamic_cast<ClassDecl*>(GetDeclForType());
+    auto cd = dynamic_cast<ClassDecl*>(GetDeclForType());
     return cd && cd->IsCompatibleWith(other);
 }
 
 
 ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
-    Assert(et != NULL);
+    Assert(et != nullptr);
     (elemType=et)->SetParent(this);
 }
 
@@ -108,7 +108,7 @@ void ArrayType::Check() {
 }
 
 bool ArrayType::IsEquivalentTo(Type *other) {
-    ArrayType *o = dynamic_cast<ArrayType*>(other);
+    auto o = dynamic_cast<ArrayType*>(other);
     return (o && elemType->IsEquivalentTo(o->elemType));
 }
 
