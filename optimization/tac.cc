@@ -8,7 +8,10 @@
 #include "cfg.h"
 
 #include <string>
+#include <cstring>
 #include <deque>
+
+using namespace std;
 
 Location::Location(Segment s, int o, const char *name) :
   variableName(strdup(name)), segment(s), offset(o), reg(Mips::zero) {}
@@ -27,14 +30,21 @@ void Instruction::Print() {
 }
 
 void Instruction::Emit(Mips *mips) {
-  if (*printed)
-    mips->Emit("# %s", printed);   // emit TAC as comment into assembly
+  if (*printed) {
+      mips->Emit("# %s", printed);   // emit TAC as comment into assembly
+  }
+
   EmitSpecific(mips);
 }
 
-void Instruction::GenCFG(CFGraph &cfg, CFBlock *&cb) {
-    if (!cb) return;
-    cb->add_instruction(this);
+vector<Instruction*> Instruction::GetSucc(List<Instruction *> &instructions, int pos) const {
+    vector<Instruction*> successors;
+
+    if (pos + 1 < instructions.NumElements()) {
+        successors.push_back(instructions.Nth(pos + 1));
+    }
+
+    return successors;
 }
 
 LoadConstant::LoadConstant(Location *d, int v)
@@ -133,64 +143,92 @@ void BinaryOp::EmitSpecific(Mips *mips) {
 
 
 Label::Label(const char *l) : label(strdup(l)) {
-  Assert(label != NULL);
-  *printed = '\0';
-}
-void Label::Print() {
-  printf("%s:\n", label);
-}
-void Label::EmitSpecific(Mips *mips) {
-  mips->EmitLabel(label);
+    Assert(label != nullptr);
+    *printed = '\0';
 }
 
+void Label::Print() {
+    printf("%s:\n", label);
+}
+
+void Label::EmitSpecific(Mips *mips) {
+    mips->EmitLabel(label);
+}
 
  
 Goto::Goto(const char *l) : label(strdup(l)) {
-  Assert(label != NULL);
-  sprintf(printed, "Goto %s", label);
+    Assert(label != nullptr);
+    sprintf(printed, "Goto %s", label);
 }
-void Goto::EmitSpecific(Mips *mips) {	  
-  mips->EmitGoto(label);
+
+void Goto::EmitSpecific(Mips *mips) {
+    mips->EmitGoto(label);
+}
+
+vector<Instruction*> Goto::GetSucc(List<Instruction *> &instructions, int pos) const {
+    vector<Instruction*> successors;
+    // find next instruction which is the label that this goto has
+    for (int i = pos; i < instructions.NumElements(); ++i) {
+        auto ilbl = dynamic_cast<Label*>(instructions.Nth(i));
+        if (ilbl && strcmp(ilbl->GetLabel(), label) == 0) {
+            successors.push_back(ilbl);
+        }
+    }
+
+    Assert(successors.size() == 1);
+    return successors;
 }
 
 
-IfZ::IfZ(Location *te, const char *l)
-   : test(te), label(strdup(l)) {
-  Assert(test != NULL && label != NULL);
-  sprintf(printed, "IfZ %s Goto %s", test->GetName(), label);
-}
-void IfZ::EmitSpecific(Mips *mips) {	  
-  mips->EmitIfZ(test, label);
+IfZ::IfZ(Location *te, const char *l) : test(te), label(strdup(l)) {
+    Assert(test != nullptr && label != nullptr);
+    sprintf(printed, "IfZ %s Goto %s", test->GetName(), label);
 }
 
+void IfZ::EmitSpecific(Mips *mips) {
+    mips->EmitIfZ(test, label);
+}
+
+vector<Instruction*> IfZ::GetSucc(List<Instruction *> &instructions, int pos) const {
+    vector<Instruction *> successors;
+    successors.push_back(instructions.Nth(pos + 1));
+
+    // find exit label
+    for (int i = pos; i < instructions.NumElements(); ++i) {
+        auto ilbl = dynamic_cast<Label*>(instructions.Nth(i));
+        if (ilbl && strcmp(ilbl->GetLabel(), label) == 0) {
+            successors.push_back(ilbl);
+        }
+    }
+
+    Assert(successors.size() == 2);
+    return successors;
+}
 
 
 BeginFunc::BeginFunc() {
   sprintf(printed,"BeginFunc (unassigned)");
   frameSize = -555; // used as sentinel to recognized unassigned value
 }
+
 void BeginFunc::SetFrameSize(int numBytesForAllLocalsAndTemps) {
   frameSize = numBytesForAllLocalsAndTemps; 
   sprintf(printed,"BeginFunc %d", frameSize);
 }
+
 void BeginFunc::EmitSpecific(Mips *mips) {
   mips->EmitBeginFunction(frameSize);
   /* pp5: need to load all parameters to the allocated registers.
    */
-}
-void BeginFunc::GenCFG(CFGraph &cfg, CFBlock *&cb) {
-    cb = new CFBlock();
 }
 
 
 EndFunc::EndFunc() : Instruction() {
   sprintf(printed, "EndFunc");
 }
+
 void EndFunc::EmitSpecific(Mips *mips) {
   mips->EmitEndFunction();
-}
-void EndFunc::GenCFG(CFGraph &cfg, CFBlock *&cb) {
-    cfg.add_block(cb);
 }
 
  

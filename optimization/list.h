@@ -28,10 +28,12 @@
 #ifndef _H_list
 #define _H_list
 
-#include <deque>
-#include <algorithm>
 #include "utility.h"  // for Assert()
 #include "scope.h"
+
+#include <deque>
+#include <algorithm>
+#include <vector>
   
 class Node;
 class CodeGenerator;
@@ -111,8 +113,12 @@ template<class Element> class List {
         { for (int i = 0; i < NumElements(); i++)
              Nth(i)->Check(); }
     void EmitAll(CodeGenerator *cg)
-        { for (int i = 0; i < NumElements(); i++)
-             Nth(i)->Emit(cg); }
+    { for (int i = 0; i < NumElements(); i++)
+         Nth(i)->Emit(cg); }
+
+    std::vector<Element> ToVector() {
+       return std::vector<Element>(elems.begin(), elems.end());
+    }
 
 };
 

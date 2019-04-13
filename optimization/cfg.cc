@@ -11,37 +11,57 @@
 
 using namespace std;
 
-void CFBlock::add_instruction(Instruction *instr) {
-    code.push_back(instr);
-}
-
-void CFBlock::add_exit(CFBlock *exit) {
-    exits.push_back(exit);
-}
-
-void CFBlock::print() const {
-    for (const auto &instr : code) {
-        instr->Print();
+void CFInstruction::print() {
+    cout << "instruction: " << typeid(*instruction).name() << endl;
+    cout << "\tsuccessors:";
+    for (auto &s : successors) {
+        cout << "\t\t" << typeid(*(s->instruction)).name() << " ";
     }
 
-    cout << "exits: " << exits.size() << endl;
+    cout << "\n\tpredecessors:";
+    for (auto &p : predecessors) {
+        cout << "\t\t" << typeid(*(p->instruction)).name() << " ";
+    }
+
+    cout << "\n\n";
 }
 
-CFGraph::~CFGraph() {
-    for (const auto *block : blocks) {
-        delete block;
+void SuccessorTree::add_instruction(CFInstruction *instr) {
+    if (!root) {
+        root = instr;
+        curr = root;
+    } else {
+        curr = instr;
     }
 }
 
-void CFGraph::add_block(CFBlock *block) {
-    blocks.push_back(block);
+void SuccessorTree::add_successor(CFInstruction *instr) {
+    Assert(curr);
+    curr->successors.push_back(instr);
 }
 
-void CFGraph::print() const {
-    int id = 0;
-    for (const auto &block : blocks) {
-        cout << "block: " << id << endl;
-        block->print();
-        cout << endl;
+void SuccessorTree::add_predecessor(CFInstruction *instr) {
+    curr->predecessors.push_back(instr);
+}
+
+void SuccessorTree::print() {
+    print_impl(root);
+}
+
+void SuccessorTree::print_impl(CFInstruction *node) {
+    cout << "instruction: " << typeid(*node).name() << endl;
+
+    cout << "\tsuccessors:";
+    for (auto &s : node->successors) {
+        cout << "\t\t" << typeid(*(s->instruction)).name() << endl;
+    }
+
+    cout << "\tpredecessors:";
+    for (auto &p : node->predecessors) {
+        cout << "\t\t" << typeid(*(p->instruction)).name() << endl;
+    }
+
+    for (auto &s : node->successors) {
+        print_impl(s);
     }
 }

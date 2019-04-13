@@ -25,6 +25,9 @@
 
 #include "list.h" // for VTable
 #include "mips.h"
+#include "cfg.h"
+
+#include <utility>
 
 class CFBlock;
 class CFGraph;
@@ -78,13 +81,13 @@ public:
   
 class Instruction {
 protected:
-        char printed[128];
+    char printed[128];
 	  
 public:
 	virtual void Print();
 	virtual void EmitSpecific(Mips *mips) = 0;
 	virtual void Emit(Mips *mips);
-	virtual void GenCFG(CFGraph &, CFBlock *&);
+    virtual std::vector<Instruction*> GetSucc(List<Instruction *> &instructions, int pos) const;
 };
 
   
@@ -177,28 +180,30 @@ class BinaryOp: public Instruction {
 
 class Label: public Instruction {
     const char *label;
-  public:
-    Label(const char *label);
-    void Print();
-    void EmitSpecific(Mips *mips);
+public:
+    explicit Label(const char *label);
+    void Print() override;
+    void EmitSpecific(Mips *mips) override;
     const char *GetLabel() { return label; }
 };
 
 class Goto: public Instruction {
     const char *label;
-  public:
+public:
     explicit Goto(const char *label);
     void EmitSpecific(Mips *mips) override;
     const char *GetLabel() { return label; }
+    std::vector<Instruction*> GetSucc(List<Instruction *> &instructions, int pos) const override;
 };
 
 class IfZ: public Instruction {
     Location *test;
     const char *label;
-  public:
+public:
     IfZ(Location *test, const char *label);
     void EmitSpecific(Mips *mips) override;
     const char *GetLabel() { return label; }
+    std::vector<Instruction*> GetSucc(List<Instruction *> &instructions, int pos) const override;
 };
 
 class BeginFunc: public Instruction {
@@ -208,14 +213,12 @@ class BeginFunc: public Instruction {
     // used to backpatch the instruction with frame size once known
     void SetFrameSize(int numBytesForAllLocalsAndTemps);
     void EmitSpecific(Mips *mips) override;
-    void GenCFG(CFGraph &, CFBlock *&) override;
 };
 
 class EndFunc: public Instruction {
   public:
     EndFunc();
     void EmitSpecific(Mips *mips) override;
-    void GenCFG(CFGraph &, CFBlock *&) override;
 };
 
 class Return: public Instruction {

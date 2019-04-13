@@ -9,46 +9,30 @@
 
 class Instruction;
 
-/**
- * Control flow block
- *
- * A block is defined as a single executable list of instructions.
- * blocks cannot contain branches or gotos
- *
- */
-class CFBlock {
-public:
+struct CFInstruction {
+    Instruction *instruction;
+    std::vector<CFInstruction *> successors;
+    std::vector<CFInstruction *> predecessors;
 
-    void add_instruction(Instruction *);
-
-    void add_exit(CFBlock *);
-
-    void print() const;
-
-private:
-    std::vector<Instruction *> code;
-    std::vector<CFBlock *> exits;
+    void print();
 };
 
-
-/**
- * Control flow graph
- *
- * Contains a graph of blocks.
- *  - An edge between a block and another block define the next piece of executions.
- *
- */
-class CFGraph {
+class SuccessorTree {
 public:
 
-    ~CFGraph();
+    void add_instruction(CFInstruction *);
 
-    void add_block(CFBlock *);
+    void add_successor(CFInstruction *);
 
-    void print() const;
+    void add_predecessor(CFInstruction *);
+
+    void print();
 
 private:
-    std::vector<CFBlock *> blocks;
+    CFInstruction *root = nullptr;
+    CFInstruction *curr = nullptr;
+
+    void print_impl(CFInstruction *node);
 };
 
 

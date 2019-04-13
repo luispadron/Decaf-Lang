@@ -12,8 +12,10 @@
 #include "errors.h"
 #include "cfg.h"
 
+#include <cstring>
 #include <iostream>
 #include <string>
+#include <stack>
 
 using namespace std;
   
@@ -336,12 +338,55 @@ void CodeGenerator::GenHaltWithMessage(const char *message)
 }
 
 void CodeGenerator::DoOptimization() {
-    CFGraph cfg;
-    CFBlock *current_block = nullptr;
+    GenSuccessorTree();
+}
 
-    for (int i = 0; i < code->NumElements(); ++i) {
-        code->Nth(i)->GenCFG(cfg, current_block);
+void CodeGenerator::GenSuccessorTree() {
+    vector<CFInstruction *> instructions(code->NumElements());
+    for (int i = 0; i < instructions.size(); ++i) {
+        instructions[i] = new CFInstruction;
+        instructions[i]->instruction = code->Nth(i);
     }
 
-    cfg.print();
+    auto tree = GenSucessorTreeImpl(0, instructions);
+    for (auto &instr : instructions) {
+        instr->print();
+    }
+}
+
+CFInstruction * CodeGenerator::GenSucessorTreeImpl(int pos, const vector<CFInstruction*> &instructions, CFInstruction *predecessor) {
+    if (pos >= code->NumElements()) return nullptr;
+
+    auto cfi = instructions[pos];
+
+    if (predecessor) {
+        cfi->predecessors.push_back(predecessor);
+        predecessor->successors.push_back(cfi);
+    }
+
+    auto ifz = dynamic_cast<IfZ*>(cfi->instruction);
+    auto goTo = dynamic_cast<Goto*>(cfi->instruction);
+
+    if (ifz) {
+        GenSucessorTreeImpl(pos + 1, instructions, cfi);
+        GenSucessorTreeImpl(GetPosOfLabel(ifz->GetLabel()), instructions, cfi);
+    } else if (goTo) {
+        GenSucessorTreeImpl(GetPosOfLabel(goTo->GetLabel()), instructions, cfi);
+    } else {
+        GenSucessorTreeImpl(pos + 1, instructions, cfi);
+    }
+
+    return cfi;
+}
+
+int CodeGenerator::GetPosOfLabel(const char *label) const {
+    for (int i = 0; i < code->NumElements(); ++i) {
+        auto ilabel = dynamic_cast<Label*>(code->Nth(i));
+        if (ilabel && strcmp(ilabel->GetLabel(), label) == 0) {
+            return i;
+        }
+    }
+
+    Assert(false);
+    return -1;
 }
