@@ -360,8 +360,8 @@ CFInstruction * CodeGenerator::GenSucessorTreeImpl(int pos, const vector<CFInstr
     auto cfi = instructions[pos];
 
     if (predecessor) {
-        cfi->predecessors.push_back(predecessor);
-        predecessor->successors.push_back(cfi);
+        cfi->predecessors.insert(predecessor);
+        predecessor->successors.insert(cfi);
     }
 
     auto ifz = dynamic_cast<IfZ*>(cfi->instruction);
