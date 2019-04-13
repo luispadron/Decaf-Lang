@@ -184,8 +184,9 @@ private:
     // private helper, not for public user
     Location *GenMethodCall(Location*rcvr, Location*meth, List<Location*> *args, bool hasReturnValue);
     void GenHaltWithMessage(const char *msg);
-    void GenSuccessorTree();
-    CFInstruction * GenSucessorTreeImpl(int pos, const std::vector<CFInstruction*> &instructions, CFInstruction *predecessor = nullptr);
+    CFInstruction * GenSuccessorTree();
+    CFInstruction * GenSuccessorTreeImpl(int pos, const std::vector<CFInstruction *> &instructions,
+                                         CFInstruction *predecessor = nullptr);
     int GetPosOfLabel(const char *label) const;
 };
 

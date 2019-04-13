@@ -338,42 +338,56 @@ void CodeGenerator::GenHaltWithMessage(const char *message)
 }
 
 void CodeGenerator::DoOptimization() {
-    GenSuccessorTree();
+    auto successor_tree = GenSuccessorTree();
+    auto cfg = CFGraph(successor_tree);
+    cfg.print();
 }
 
-void CodeGenerator::GenSuccessorTree() {
+CFInstruction * CodeGenerator::GenSuccessorTree() {
     vector<CFInstruction *> instructions(code->NumElements());
     for (int i = 0; i < instructions.size(); ++i) {
         instructions[i] = new CFInstruction;
         instructions[i]->instruction = code->Nth(i);
     }
 
-    auto tree = GenSucessorTreeImpl(0, instructions);
+    auto tree = GenSuccessorTreeImpl(0, instructions);
     for (auto &instr : instructions) {
         instr->print();
     }
+
+    return tree;
 }
 
-CFInstruction * CodeGenerator::GenSucessorTreeImpl(int pos, const vector<CFInstruction*> &instructions, CFInstruction *predecessor) {
+CFInstruction * CodeGenerator::GenSuccessorTreeImpl(int pos, const vector<CFInstruction *> &instructions,
+                                                    CFInstruction *predecessor) {
     if (pos >= code->NumElements()) return nullptr;
 
     auto cfi = instructions[pos];
 
     if (predecessor) {
-        cfi->predecessors.insert(predecessor);
-        predecessor->successors.insert(cfi);
+        if (!cfi->predecessors.first && cfi->predecessors.second != predecessor) {
+            cfi->predecessors.first = predecessor;
+        } else if (!cfi->predecessors.second && cfi->predecessors.first != predecessor) {
+            cfi->predecessors.second = predecessor;
+        }
+
+        if (!predecessor->successors.first && predecessor->successors.second != cfi) {
+            predecessor->successors.first = cfi;
+        } else if (!predecessor->successors.second && predecessor->successors.first != cfi) {
+            predecessor->successors.second = cfi;
+        }
     }
 
     auto ifz = dynamic_cast<IfZ*>(cfi->instruction);
     auto goTo = dynamic_cast<Goto*>(cfi->instruction);
 
     if (ifz) {
-        GenSucessorTreeImpl(pos + 1, instructions, cfi);
-        GenSucessorTreeImpl(GetPosOfLabel(ifz->GetLabel()), instructions, cfi);
+        GenSuccessorTreeImpl(pos + 1, instructions, cfi);
+        GenSuccessorTreeImpl(GetPosOfLabel(ifz->GetLabel()), instructions, cfi);
     } else if (goTo) {
-        GenSucessorTreeImpl(GetPosOfLabel(goTo->GetLabel()), instructions, cfi);
+        GenSuccessorTreeImpl(GetPosOfLabel(goTo->GetLabel()), instructions, cfi);
     } else {
-        GenSucessorTreeImpl(pos + 1, instructions, cfi);
+        GenSuccessorTreeImpl(pos + 1, instructions, cfi);
     }
 
     return cfi;
