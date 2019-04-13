@@ -21,11 +21,13 @@ public:
 
     void add_instruction(Instruction *);
 
+    void add_exit(CFBlock *);
+
     void print() const;
 
 private:
     std::vector<Instruction *> code;
-    std::vector<Instruction *> exits;
+    std::vector<CFBlock *> exits;
 };
 
 
@@ -39,12 +41,14 @@ private:
 class CFGraph {
 public:
 
-    void add_block(CFBlock);
+    ~CFGraph();
+
+    void add_block(CFBlock *);
 
     void print() const;
 
 private:
-    std::vector<CFBlock> blocks;
+    std::vector<CFBlock *> blocks;
 };
 
 

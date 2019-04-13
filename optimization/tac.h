@@ -26,6 +26,10 @@
 #include "list.h" // for VTable
 #include "mips.h"
 
+class CFBlock;
+class CFGraph;
+
+
     // A Location object is used to identify the operands to the
     // various TAC instructions. A Location is either fp or gp
     // relative (depending on whether in stack or global segemnt)
@@ -73,13 +77,14 @@ public:
   // has the interface for the 2 polymorphic messages: Print & Emit
   
 class Instruction {
-    protected:
+protected:
         char printed[128];
 	  
-    public:
+public:
 	virtual void Print();
 	virtual void EmitSpecific(Mips *mips) = 0;
 	virtual void Emit(Mips *mips);
+	virtual void GenCFG(CFGraph &, CFBlock *&);
 };
 
   
@@ -182,8 +187,8 @@ class Label: public Instruction {
 class Goto: public Instruction {
     const char *label;
   public:
-    Goto(const char *label);
-    void EmitSpecific(Mips *mips);
+    explicit Goto(const char *label);
+    void EmitSpecific(Mips *mips) override;
     const char *GetLabel() { return label; }
 };
 
@@ -192,7 +197,7 @@ class IfZ: public Instruction {
     const char *label;
   public:
     IfZ(Location *test, const char *label);
-    void EmitSpecific(Mips *mips);
+    void EmitSpecific(Mips *mips) override;
     const char *GetLabel() { return label; }
 };
 
@@ -202,20 +207,22 @@ class BeginFunc: public Instruction {
     BeginFunc();
     // used to backpatch the instruction with frame size once known
     void SetFrameSize(int numBytesForAllLocalsAndTemps);
-    void EmitSpecific(Mips *mips);
+    void EmitSpecific(Mips *mips) override;
+    void GenCFG(CFGraph &, CFBlock *&) override;
 };
 
 class EndFunc: public Instruction {
   public:
     EndFunc();
-    void EmitSpecific(Mips *mips);
+    void EmitSpecific(Mips *mips) override;
+    void GenCFG(CFGraph &, CFBlock *&) override;
 };
 
 class Return: public Instruction {
     Location *val;
   public:
-    Return(Location *val);
-    void EmitSpecific(Mips *mips);
+    explicit Return(Location *val);
+    void EmitSpecific(Mips *mips) override;
 };   
 
 class PushParam: public Instruction {

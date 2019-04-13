@@ -5,7 +5,9 @@
   
 #include "tac.h"
 #include "mips.h"
-#include <string.h>
+#include "cfg.h"
+
+#include <string>
 #include <deque>
 
 Location::Location(Segment s, int o, const char *name) :
@@ -28,6 +30,11 @@ void Instruction::Emit(Mips *mips) {
   if (*printed)
     mips->Emit("# %s", printed);   // emit TAC as comment into assembly
   EmitSpecific(mips);
+}
+
+void Instruction::GenCFG(CFGraph &cfg, CFBlock *&cb) {
+    if (!cb) return;
+    cb->add_instruction(this);
 }
 
 LoadConstant::LoadConstant(Location *d, int v)
@@ -171,6 +178,9 @@ void BeginFunc::EmitSpecific(Mips *mips) {
   /* pp5: need to load all parameters to the allocated registers.
    */
 }
+void BeginFunc::GenCFG(CFGraph &cfg, CFBlock *&cb) {
+    cb = new CFBlock();
+}
 
 
 EndFunc::EndFunc() : Instruction() {
@@ -179,7 +189,9 @@ EndFunc::EndFunc() : Instruction() {
 void EndFunc::EmitSpecific(Mips *mips) {
   mips->EmitEndFunction();
 }
-
+void EndFunc::GenCFG(CFGraph &cfg, CFBlock *&cb) {
+    cfg.add_block(cb);
+}
 
  
 Return::Return(Location *v) : val(v) {

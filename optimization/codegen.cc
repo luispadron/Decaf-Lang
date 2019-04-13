@@ -337,12 +337,11 @@ void CodeGenerator::GenHaltWithMessage(const char *message)
 
 void CodeGenerator::DoOptimization() {
     CFGraph cfg;
+    CFBlock *current_block = nullptr;
 
-    CFBlock current_block;
     for (int i = 0; i < code->NumElements(); ++i) {
-        current_block.add_instruction(code->Nth(i));
+        code->Nth(i)->GenCFG(cfg, current_block);
     }
 
-    cfg.add_block(current_block);
     cfg.print();
 }
