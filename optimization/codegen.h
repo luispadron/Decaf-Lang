@@ -159,6 +159,9 @@ public:
     void GenVTable(const char *className, List<const char*> *methodLabels);
 
 
+    void DoOptimization();
+
+
          // Emits the final "object code" for the program by
          // translating the sequence of Tac instructions into their mips
          // equivalent and printing them out to stdout. If the debug

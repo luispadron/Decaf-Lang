@@ -38,11 +38,13 @@ void Program::Emit(CodeGenerator *cg) {
 
     decls->EmitAll(cg);
 
+    RunOptimization(cg);
+
     if (ReportError::NumErrors() == 0) {
         cg->DoFinalCodeGen();
     }
 }
 
-void Program::Opt() {
-
+void Program::RunOptimization(CodeGenerator *cg) {
+    cg->DoOptimization();
 }

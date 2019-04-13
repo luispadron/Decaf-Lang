@@ -67,8 +67,6 @@ public:
     virtual void Check() {} // not abstract, since some nodes have nothing to do
 
     virtual void Emit(CodeGenerator *cg) {} // not abstract, some nodes do nothing
-
-    virtual void Opt() { } // not abstract, some nodes do nothing
 };
    
 

@@ -38,6 +38,7 @@ add_executable(opt
         main.cc
         ast_program.cc
         scope.cc
+        cfg.cc
         )
 
 target_link_libraries(opt

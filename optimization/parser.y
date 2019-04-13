@@ -105,9 +105,6 @@ Program   :    DeclList            {
 
                                       if (ReportError::NumErrors() == 0)
                                           program->Emit(nullptr);
-
-                                      if (ReportError::NumErrors() == 0)
-                                     	  program->Opt();
                                     }
           ;
 

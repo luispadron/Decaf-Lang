@@ -6,11 +6,16 @@
  */
 
 #include "codegen.h"
-#include <string.h>
 #include "tac.h"
 #include "mips.h"
 #include "ast_decl.h"
 #include "errors.h"
+#include "cfg.h"
+
+#include <iostream>
+#include <string>
+
+using namespace std;
   
 CodeGenerator::CodeGenerator()
 {
@@ -238,17 +243,23 @@ void CodeGenerator::GenVTable(const char *className, List<const char *> *methodL
 }
 
 
-void CodeGenerator::DoFinalCodeGen()
-{
-  if (IsDebugOn("tac")) { // if debug don't translate to mips, just print Tac
-    for (int i = 0; i < code->NumElements(); i++)
-      code->Nth(i)->Print();
-  } else {
-    Mips mips;
-    mips.EmitPreamble();
-    for (int i = 0; i < code->NumElements(); i++)
-      code->Nth(i)->Emit(&mips);
-  }
+void CodeGenerator::DoFinalCodeGen() {
+
+    if (IsDebugOn("opt")) { // prints out code names
+        for (int i = 0; i < code->NumElements(); i++) {
+            cout << typeid(*code->Nth(i)).name() << endl;
+        }
+    } else if (IsDebugOn("tac")) { // if debug don't translate to mips, just print Tac
+        for (int i = 0; i < code->NumElements(); i++) {
+            code->Nth(i)->Print();
+        }
+    } else {
+        Mips mips;
+        mips.EmitPreamble();
+        for (int i = 0; i < code->NumElements(); i++) {
+            code->Nth(i)->Emit(&mips);
+        }
+    }
 }
 
 
@@ -321,6 +332,17 @@ void CodeGenerator::GenHaltWithMessage(const char *message)
 {
    Location *msg = GenLoadConstant(message);
    GenBuiltInCall(PrintString, msg);
-   GenBuiltInCall(Halt, NULL);
+   GenBuiltInCall(Halt, nullptr);
 }
 
+void CodeGenerator::DoOptimization() {
+    CFGraph cfg;
+
+    CFBlock current_block;
+    for (int i = 0; i < code->NumElements(); ++i) {
+        current_block.add_instruction(code->Nth(i));
+    }
+
+    cfg.add_block(current_block);
+    cfg.print();
+}
