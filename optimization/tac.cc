@@ -7,6 +7,8 @@
 #include "mips.h"
 #include "cfg.h"
 
+#include <algorithm>
+#include <functional>
 #include <string>
 #include <cstring>
 #include <deque>
@@ -47,13 +49,14 @@ vector<Instruction*> Instruction::GetSucc(List<Instruction *> &instructions, int
     return successors;
 }
 
-LoadConstant::LoadConstant(Location *d, int v)
-  : dst(d), val(v) {
-  Assert(dst != NULL);
-  sprintf(printed, "%s = %d", dst->GetName(), val);
+
+LoadConstant::LoadConstant(Location *d, int v) : dst(d), val(v) {
+    Assert(dst != NULL);
+    sprintf(printed, "%s = %d", dst->GetName(), val);
 }
+
 void LoadConstant::EmitSpecific(Mips *mips) {
-  mips->EmitLoadConstant(dst, val);
+    mips->EmitLoadConstant(dst, val);
 }
 
 LoadStringConstant::LoadStringConstant(Location *d, const char *s)
@@ -81,14 +84,13 @@ void LoadLabel::EmitSpecific(Mips *mips) {
 }
 
 
-
-Assign::Assign(Location *d, Location *s)
-  : dst(d), src(s) {
-  Assert(dst != NULL && src != NULL);
-  sprintf(printed, "%s = %s", dst->GetName(), src->GetName());
+Assign::Assign(Location *d, Location *s) : dst(d), src(s) {
+    Assert(dst != nullptr && src != nullptr);
+    sprintf(printed, "%s = %s", dst->GetName(), src->GetName());
 }
+
 void Assign::EmitSpecific(Mips *mips) {
-  mips->EmitCopy(dst, src);
+    mips->EmitCopy(dst, src);
 }
 
 

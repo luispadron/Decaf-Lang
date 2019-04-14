@@ -28,10 +28,6 @@ struct CFInstruction {
 
 class CFBlock {
 public:
-
-    template<typename F>
-    static void traverse(CFBlock *start, F fn);
-
     void add_instruction(CFInstruction *instruction);
 
     void add_exit(CFBlock *block);
@@ -63,8 +59,8 @@ public:
 
     explicit CFGraph(CFInstruction *root);
 
-    template <typename  T, typename F, typename I>
-    void analyze(Direction d, std::vector<T> &values, F transform, std::vector<I> &initial);
+    template <typename I, typename F>
+    void analyze(CFGraph::Direction d, std::vector<I> &initial, std::vector<std::vector<I>> &results, F transform);
 
     template <typename F>
     void traverse(F fn);
@@ -82,50 +78,49 @@ private:
 //////////// implementations ///////////////////
 
 template<typename F>
-void CFBlock::traverse(CFBlock *start, F fn) {
-    std::queue<CFBlock *> blocks;
-    std::set<CFBlock *> visited;
-
-    CFBlock::traverse_impl(start, blocks, visited);
-
-    while (!blocks.empty()) {
-        fn(blocks.front());
-        blocks.pop();
-    }
-}
-
-template<typename F>
 void CFBlock::traverse_code(F fn)  {
-    for (auto *line : code) {
-        fn(line);
+    for (int i = 0; i < code.size(); ++i) {
+        fn(i, code[i]);
     }
 }
 
 template<typename F>
 void CFBlock::rtraverse_code(F fn) {
     for (auto it = code.rbegin(); it != code.rend(); ++it) {
-        fn(*it);
+        fn(it - code.rbegin(), *it);
     }
 }
 
 
-template <typename  T, typename F, typename I>
-void CFGraph::analyze(CFGraph::Direction d, std::vector<T> &values, F transform, std::vector<I> &initial)  {
+template <typename I, typename F>
+void CFGraph::analyze(CFGraph::Direction d, std::vector<I> &initial, std::vector<std::vector<I>> &results, F transform)  {
     if (!start) return;
 
-    CFBlock::traverse(start, [&](CFBlock *block) { // for each block
+    traverse([&](CFBlock *block) { // for each block
         if (d == Direction::forward) {
-            block->traverse_code([&](CFInstruction *instr) { // for each line of code in a block, in forward manner
-                auto out = transform(initial, values, instr);
-                values = out;
-            });
-        } else {
-            block->rtraverse_code([&](CFInstruction *instr) { // for each line of code in a block, in backward manner
-                auto out = transform(initial, values, instr);
-                values = out;
-            });
-        }
+            std::vector<std::vector<I>> output;
+            output.push_back(initial);
 
+            block->traverse_code([&](int index, CFInstruction *instr) { // for each line of code in a block, in forward manner
+                auto in = output[index];
+                auto out = transform(instr, in);
+                output.push_back(out);
+            });
+
+            results.push_back(*output.rbegin());
+
+        } else {
+            std::vector<std::vector<I>> input;
+            input.push_back(initial);
+
+            block->rtraverse_code([&](int index, CFInstruction *instr) { // for each line of code in a block, in backward manner
+                auto in = input[index];
+                auto out = transform(instr, in);
+                input.push_back(out);
+            });
+
+            results.push_back(*input.rbegin());
+        }
     });
 }
 

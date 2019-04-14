@@ -139,9 +139,11 @@ class LoadLabel: public Instruction {
 
 class Assign: public Instruction {
     Location *dst, *src;
-  public:
+public:
     Assign(Location *dst, Location *src);
-    void EmitSpecific(Mips *mips);
+    void EmitSpecific(Mips *mips) override;
+    Location *GetDst() { return dst; }
+    Location *GetSrc() { return src; }
 };
 
 class Load: public Instruction {

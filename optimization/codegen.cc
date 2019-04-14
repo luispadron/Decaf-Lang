@@ -12,6 +12,7 @@
 #include "errors.h"
 #include "cfg.h"
 
+#include <algorithm>
 #include <cstring>
 #include <iostream>
 #include <string>
@@ -340,7 +341,25 @@ void CodeGenerator::GenHaltWithMessage(const char *message)
 void CodeGenerator::DoOptimization() {
     auto successor_tree = GenSuccessorTree();
     auto cfg = CFGraph(successor_tree);
-    cfg.print();
+
+    std::vector<std::vector<Location*>> results;
+    std::vector<Location*> initial;
+
+    cfg.analyze(
+            CFGraph::Direction::backward,
+            initial,
+            results,
+            bind(mem_fn(&CodeGenerator::DoLiveAnalyses), this, placeholders::_1, placeholders::_2)
+    );
+
+    cout << "Live analyses results: " << endl;
+    for (const auto &vec : results) {
+        for (const auto &res : vec) {
+            cout << res->GetName() << endl;
+        }
+
+
+    cout << endl;}
 }
 
 CFInstruction * CodeGenerator::GenSuccessorTree() {
@@ -403,4 +422,21 @@ int CodeGenerator::GetPosOfLabel(const char *label) const {
 
     Assert(false);
     return -1;
+}
+
+std::vector<Location *> CodeGenerator::DoLiveAnalyses(CFInstruction *instr, std::vector<Location *> in) {
+    auto assign = dynamic_cast<Assign*>(instr->instruction);
+    if (!assign) return in;
+
+    auto lhs_index = find_if(in.begin(), in.end(), bind(mem_fn(&Location::IsEqualTo), assign->GetDst(), placeholders::_1));
+    if (lhs_index != in.end()) {
+        in.erase(lhs_index);
+    }
+
+    in.push_back(assign->GetSrc());
+
+    auto last = unique(in.begin(), in.end());
+    in.erase(last, in.end());
+
+    return in;
 }
