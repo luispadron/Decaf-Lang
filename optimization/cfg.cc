@@ -7,6 +7,7 @@
 #include <iostream>
 #include <utility>
 #include <queue>
+#include <functional>
 
 #include "tac.h"
 
@@ -78,29 +79,16 @@ CFGraph::CFGraph(CFInstruction *root) {
 
 
 void CFGraph::print() {
-    queue<CFBlock *> blocks;
-    blocks.push(start);
-
-    while (!blocks.empty()) {
-        auto block = blocks.front();
-        blocks.pop();
-        block->print();
-
-        for (auto &exit : block->exits) {
-            blocks.push(exit);
-        }
-    }
+    traverse(mem_fn(&CFBlock::print));
 }
 
 void CFGraph::gen_graph(CFInstruction *root) {
     set<CFInstruction*> visited;
-    start = gen_graph_impl(root, new CFBlock, visited);
+    start = gen_graph_impl(root, new CFBlock, nullptr, visited);
 }
 
-CFBlock * CFGraph::gen_graph_impl(CFInstruction *curr_instr, CFBlock *curr_block, set<CFInstruction *> &visited) {
-    auto seen = visited.find(curr_instr) != visited.end();
-
-    if (!curr_instr || seen) return nullptr;
+CFBlock * CFGraph::gen_graph_impl(CFInstruction *curr_instr, CFBlock *curr_block, CFBlock *else_block, set<CFInstruction *> &visited) {
+    if (!curr_instr || visited.find(curr_instr) != visited.end()) return nullptr;
 
     visited.insert(curr_instr);
 
@@ -113,18 +101,20 @@ CFBlock * CFGraph::gen_graph_impl(CFInstruction *curr_instr, CFBlock *curr_block
         curr_block->add_exit(block1);
         curr_block->add_exit(block2);
 
-        gen_graph_impl(curr_instr->successors.first, block1, visited);
-        gen_graph_impl(curr_instr->successors.second, block2, visited);
+        gen_graph_impl(curr_instr->successors.first, block1, block2, visited);
+        gen_graph_impl(curr_instr->successors.second, block2, else_block, visited);
     } else if (curr_instr->predecessors.first && curr_instr->predecessors.second) {
         auto block = new CFBlock;
         block->add_instruction(curr_instr);
 
         curr_block->add_exit(block);
+        Assert(else_block);
+        else_block->add_exit(block);
 
-        gen_graph_impl(curr_instr->successors.first, block, visited);
+        gen_graph_impl(curr_instr->successors.first, block, else_block, visited);
     } else {
         curr_block->add_instruction(curr_instr);
-        gen_graph_impl(curr_instr->successors.first, curr_block, visited);
+        gen_graph_impl(curr_instr->successors.first, curr_block, else_block, visited);
     }
 
     return curr_block;

@@ -340,6 +340,7 @@ void CodeGenerator::GenHaltWithMessage(const char *message)
 void CodeGenerator::DoOptimization() {
     auto successor_tree = GenSuccessorTree();
     auto cfg = CFGraph(successor_tree);
+    cfg.print();
 }
 
 CFInstruction * CodeGenerator::GenSuccessorTree() {

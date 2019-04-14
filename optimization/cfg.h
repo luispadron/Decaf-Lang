@@ -64,9 +64,10 @@ public:
     explicit CFGraph(CFInstruction *root);
 
     template <typename  T, typename F, typename I>
-    void analyze(Direction d, std::set<T> &values, F transform, std::set<I> &initial) {
+    void analyze(Direction d, std::vector<T> &values, F transform, std::vector<I> &initial);
 
-    }
+    template <typename F>
+    void traverse(F fn);
 
     void print();
 
@@ -74,7 +75,7 @@ private:
     CFBlock *start = nullptr;
 
     void gen_graph(CFInstruction *root);
-    CFBlock * gen_graph_impl(CFInstruction *curr_instr, CFBlock *curr_block, std::set<CFInstruction *> &);
+    CFBlock * gen_graph_impl(CFInstruction *curr_instr, CFBlock *curr_block, CFBlock *else_block, std::set<CFInstruction *> &);
 };
 
 
@@ -104,6 +105,49 @@ template<typename F>
 void CFBlock::rtraverse_code(F fn) {
     for (auto it = code.rbegin(); it != code.rend(); ++it) {
         fn(*it);
+    }
+}
+
+
+template <typename  T, typename F, typename I>
+void CFGraph::analyze(CFGraph::Direction d, std::vector<T> &values, F transform, std::vector<I> &initial)  {
+    if (!start) return;
+
+    CFBlock::traverse(start, [&](CFBlock *block) { // for each block
+        if (d == Direction::forward) {
+            block->traverse_code([&](CFInstruction *instr) { // for each line of code in a block, in forward manner
+                auto out = transform(initial, values, instr);
+                values = out;
+            });
+        } else {
+            block->rtraverse_code([&](CFInstruction *instr) { // for each line of code in a block, in backward manner
+                auto out = transform(initial, values, instr);
+                values = out;
+            });
+        }
+
+    });
+}
+
+template <typename F>
+void CFGraph::traverse(F fn) {
+    std::set<CFBlock *> visited;
+    std::queue<CFBlock *> blocks;
+    blocks.push(start);
+
+    while (!blocks.empty()) {
+        auto block = blocks.front();
+        blocks.pop();
+
+        if (visited.find(block) != visited.end()) continue;
+
+        visited.insert(block);
+
+        fn(block);
+
+        for (auto &exit : block->exits) {
+            blocks.push(exit);
+        }
     }
 }
 
