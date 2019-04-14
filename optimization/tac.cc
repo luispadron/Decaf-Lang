@@ -49,6 +49,14 @@ vector<Instruction*> Instruction::GetSucc(List<Instruction *> &instructions, int
     return successors;
 }
 
+vector<Location *> Instruction::GetKillSet() const {
+    return vector<Location *>();
+}
+
+vector<Location *> Instruction::GetGenSet() const {
+    return vector<Location *>();
+}
+
 
 LoadConstant::LoadConstant(Location *d, int v) : dst(d), val(v) {
     Assert(dst != nullptr);
@@ -93,55 +101,71 @@ void Assign::EmitSpecific(Mips *mips) {
     mips->EmitCopy(dst, src);
 }
 
-
-
-Load::Load(Location *d, Location *s, int off)
-  : dst(d), src(s), offset(off) {
-  Assert(dst != NULL && src != NULL);
-  if (offset) 
-    sprintf(printed, "%s = *(%s + %d)", dst->GetName(), src->GetName(), offset);
-  else
-    sprintf(printed, "%s = *(%s)", dst->GetName(), src->GetName());
+vector<Location *> Assign::GetKillSet() const {
+    return vector<Location *>{dst};
 }
+
+vector<Location *> Assign::GetGenSet() const {
+    return vector<Location *>{src};
+}
+
+
+Load::Load(Location *d, Location *s, int off) : dst(d), src(s), offset(off) {
+    Assert(dst != nullptr && src != nullptr);
+    if (offset)
+        sprintf(printed, "%s = *(%s + %d)", dst->GetName(), src->GetName(), offset);
+    else
+        sprintf(printed, "%s = *(%s)", dst->GetName(), src->GetName());
+}
+
 void Load::EmitSpecific(Mips *mips) {
   mips->EmitLoad(dst, src, offset);
 }
 
 
-
-Store::Store(Location *d, Location *s, int off)
-  : dst(d), src(s), offset(off) {
-  Assert(dst != NULL && src != NULL);
-  if (offset)
-    sprintf(printed, "*(%s + %d) = %s", dst->GetName(), offset, src->GetName());
-  else
-    sprintf(printed, "*(%s) = %s", dst->GetName(), src->GetName());
+Store::Store(Location *d, Location *s, int off) : dst(d), src(s), offset(off) {
+    Assert(dst != nullptr && src != nullptr);
+    if (offset)
+        sprintf(printed, "*(%s + %d) = %s", dst->GetName(), offset, src->GetName());
+    else
+        sprintf(printed, "*(%s) = %s", dst->GetName(), src->GetName());
 }
+
 void Store::EmitSpecific(Mips *mips) {
-  mips->EmitStore(dst, src, offset);
+    mips->EmitStore(dst, src, offset);
 }
 
- 
+
 const char * const BinaryOp::opName[Mips::NumOps]  = {"+", "-", "*", "/", "%", "==", "<", "&&", "||"};;
 
 Mips::OpCode BinaryOp::OpCodeForName(const char *name) {
-  for (int i = 0; i < Mips::NumOps; i++) 
-    if (opName[i] && !strcmp(opName[i], name))
-	return (Mips::OpCode)i;
-  Failure("Unrecognized Tac operator: '%s'\n", name);
-  return Mips::Add; // can't get here, but compiler doesn't know that
+    for (int i = 0; i < Mips::NumOps; i++) {
+        if (opName[i] && !strcmp(opName[i], name)) {
+            return (Mips::OpCode) i;
+        }
+    }
+
+    Failure("Unrecognized Tac operator: '%s'\n", name);
+    return Mips::Add; // can't get here, but compiler doesn't know that
 }
 
-BinaryOp::BinaryOp(Mips::OpCode c, Location *d, Location *o1, Location *o2)
-  : code(c), dst(d), op1(o1), op2(o2) {
-  Assert(dst != NULL && op1 != NULL && op2 != NULL);
-  Assert(code >= 0 && code < Mips::NumOps);
-  sprintf(printed, "%s = %s %s %s", dst->GetName(), op1->GetName(), opName[code], op2->GetName());
-}
-void BinaryOp::EmitSpecific(Mips *mips) {	  
-  mips->EmitBinaryOp(code, dst, op1, op2);
+BinaryOp::BinaryOp(Mips::OpCode c, Location *d, Location *o1, Location *o2) : code(c), dst(d), op1(o1), op2(o2) {
+    Assert(dst != nullptr && op1 != nullptr && op2 != nullptr);
+    Assert(code >= 0 && code < Mips::NumOps);
+    sprintf(printed, "%s = %s %s %s", dst->GetName(), op1->GetName(), opName[code], op2->GetName());
 }
 
+void BinaryOp::EmitSpecific(Mips *mips) {
+    mips->EmitBinaryOp(code, dst, op1, op2);
+}
+
+vector<Location *> BinaryOp::GetKillSet() const {
+    return vector<Location *>{dst};
+}
+
+vector<Location *> BinaryOp::GetGenSet() const {
+    return vector<Location *>{op1, op2};
+}
 
 
 Label::Label(const char *l) : label(strdup(l)) {

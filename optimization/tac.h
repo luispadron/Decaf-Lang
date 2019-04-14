@@ -26,6 +26,7 @@
 #include "list.h" // for VTable
 #include "mips.h"
 
+#include <vector>
 #include <utility>
 
 
@@ -69,7 +70,7 @@ public:
     Location *GetReference()        { return reference; }
     int GetRefOffset()              { return refOffset; }
 };
- 
+
 
 
   // base class from which all Tac instructions derived
@@ -84,6 +85,8 @@ public:
 	virtual void EmitSpecific(Mips *mips) = 0;
 	virtual void Emit(Mips *mips);
     virtual std::vector<Instruction*> GetSucc(List<Instruction *> &instructions, int pos) const;
+    virtual std::vector<Location *> GetKillSet() const;
+    virtual std::vector<Location *> GetGenSet() const;
 };
 
   
@@ -116,9 +119,9 @@ public:
 class LoadConstant: public Instruction {
     Location *dst;
     int val;
-  public:
+public:
     LoadConstant(Location *dst, int val);
-    void EmitSpecific(Mips *mips);
+    void EmitSpecific(Mips *mips) override;
 };
 
 class LoadStringConstant: public Instruction {
@@ -126,7 +129,7 @@ class LoadStringConstant: public Instruction {
     char *str;
   public:
     LoadStringConstant(Location *dst, const char *s);
-    void EmitSpecific(Mips *mips);
+    void EmitSpecific(Mips *mips) override;
 };
     
 class LoadLabel: public Instruction {
@@ -134,46 +137,53 @@ class LoadLabel: public Instruction {
     const char *label;
   public:
     LoadLabel(Location *dst, const char *label);
-    void EmitSpecific(Mips *mips);
+    void EmitSpecific(Mips *mips) override;
 };
 
 class Assign: public Instruction {
     Location *dst, *src;
+
 public:
     Assign(Location *dst, Location *src);
     void EmitSpecific(Mips *mips) override;
     Location *GetDst() { return dst; }
     Location *GetSrc() { return src; }
+    std::vector<Location *> GetKillSet() const override;
+    std::vector<Location *> GetGenSet() const override;
 };
 
 class Load: public Instruction {
     Location *dst, *src;
     int offset;
-  public:
+
+public:
     Load(Location *dst, Location *src, int offset = 0);
-    void EmitSpecific(Mips *mips);
+    void EmitSpecific(Mips *mips) override;
 };
 
 class Store: public Instruction {
     Location *dst, *src;
     int offset;
-  public:
+
+public:
     Store(Location *d, Location *s, int offset = 0);
-    void EmitSpecific(Mips *mips);
+    void EmitSpecific(Mips *mips) override;
 };
 
 class BinaryOp: public Instruction {
 
-  public:
+public:
     static const char * const opName[Mips::NumOps];
     static Mips::OpCode OpCodeForName(const char *name);
-    
-  protected:
+
+    BinaryOp(Mips::OpCode c, Location *dst, Location *op1, Location *op2);
+    void EmitSpecific(Mips *mips) override;
+    std::vector<Location *> GetKillSet() const override;
+    std::vector<Location *> GetGenSet() const override;
+
+protected:
     Mips::OpCode code;
     Location *dst, *op1, *op2;
-  public:
-    BinaryOp(Mips::OpCode c, Location *dst, Location *op1, Location *op2);
-    void EmitSpecific(Mips *mips);
 };
 
 class Label: public Instruction {

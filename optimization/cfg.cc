@@ -19,6 +19,10 @@ CFInstruction::CFInstruction() : instruction{nullptr} {
 }
 
 void CFInstruction::print() {
+    cout << "instruction: ";
+    instruction->Print();
+    cout << endl;
+
     cout << "IN: \n";
     for (auto loc : in) {
         cout << "\t" << loc->GetName();
@@ -81,6 +85,16 @@ void CFBlock::print() {
     cout << "---------------" << endl << endl;
 }
 
+// resets all in/out vectors of the blocks
+void CFGraph::prepare() {
+    traverse([](CFBlock *block) {
+       block->traverse_code([](CFInstruction *instr, CFInstruction *prev) {
+          instr->in.clear();
+          instr->out.clear();
+       });
+    });
+}
+
 CFGraph::CFGraph(CFInstruction *root) {
     gen_graph(root);
 }
@@ -89,10 +103,6 @@ CFGraph::~CFGraph() {
     traverse([](CFBlock *block) {
         delete block;
     });
-}
-
-void CFGraph::print() {
-    traverse(mem_fn(&CFBlock::print));
 }
 
 void CFGraph::gen_graph(CFInstruction *root) {

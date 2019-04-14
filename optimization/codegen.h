@@ -189,7 +189,7 @@ private:
     CFInstruction * GenSuccessorTreeImpl(int pos, const std::vector<CFInstruction *> &instructions,
                                          CFInstruction *predecessor = nullptr);
     int GetPosOfLabel(const char *label) const;
-    std::vector<Location *> DoLiveAnalyses(CFInstruction *instr);
+    void DoLiveAnalyses(CFInstruction *tree);
 };
 
 #endif

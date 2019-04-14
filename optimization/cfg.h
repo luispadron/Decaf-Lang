@@ -18,6 +18,9 @@ struct CFInstruction {
 
     CFInstruction();
 
+    template <typename F>
+    static void traverse(CFInstruction *root, F fn);
+
     void print();
 
     using CFIPair = std::pair<CFInstruction *, CFInstruction *>;
@@ -73,17 +76,42 @@ public:
     template <typename F>
     void traverse(F fn);
 
-    void print();
-
 private:
     CFBlock *start = nullptr;
 
+    void prepare();
     void gen_graph(CFInstruction *root);
     CFBlock * gen_graph_impl(CFInstruction *curr_instr, CFBlock *curr_block, CFBlock *else_block, std::set<CFInstruction *> &);
 };
 
 
 //////////// implementations ///////////////////
+
+template <typename F>
+void CFInstruction::traverse(CFInstruction *root, F fn) {
+    std::set<CFInstruction *> visited;
+    std::queue<CFInstruction *> code;
+    code.push(root);
+
+    while (!code.empty()) {
+        auto instr = code.front();
+        code.pop();
+
+        if (visited.find(instr) != visited.end()) continue;
+
+        visited.insert(instr);
+
+        fn(instr);
+
+        if (instr->successors.first) {
+            code.push(instr->successors.first);
+        }
+
+        if (instr->successors.second) {
+            code.push(instr->successors.second);
+        }
+    }
+}
 
 template<typename F>
 void CFBlock::traverse_code(F fn)  {
@@ -104,10 +132,13 @@ template <typename I, typename F>
 void CFGraph::analyze(CFGraph::Direction d, std::vector<I> &initial, F transform)  {
     if (!start) return;
 
+    prepare();
+
     traverse([&](CFBlock *block) { // for each block
         if (d == Direction::forward) {
             // prime entry
-            block->code[0]->out = initial;
+            auto entry = *block->code.begin();
+            entry->out = initial;
 
             // for each line of code in a block, in forward manner
             block->traverse_code([&](CFInstruction *curr, CFInstruction *prev) {
@@ -116,7 +147,8 @@ void CFGraph::analyze(CFGraph::Direction d, std::vector<I> &initial, F transform
             });
         } else {
             // prime entry
-            block->code[0]->in = initial;
+            auto exit = *block->code.rbegin();
+            exit->in = initial;
 
             // for each line of code in a block, in backward manner
             block->rtraverse_code([&](CFInstruction *curr, CFInstruction *prev) {

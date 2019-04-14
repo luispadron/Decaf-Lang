@@ -340,23 +340,6 @@ void CodeGenerator::GenHaltWithMessage(const char *message)
 
 void CodeGenerator::DoOptimization() {
     auto successor_tree = GenSuccessorTree();
-    auto cfg = CFGraph(successor_tree);
-
-    std::vector<Location*> initial;
-
-    cfg.analyze(
-            CFGraph::Direction::backward,
-            initial,
-            bind(mem_fn(&CodeGenerator::DoLiveAnalyses), this, placeholders::_1)
-    );
-
-    cout << "completed analysis!\n";
-
-    cfg.traverse([](CFBlock *block) {
-       block->traverse_code([](CFInstruction *instr, CFInstruction *prev) {
-            instr->print();
-       });
-    });
 }
 
 CFInstruction * CodeGenerator::GenSuccessorTree() {
@@ -367,6 +350,13 @@ CFInstruction * CodeGenerator::GenSuccessorTree() {
     }
 
     auto tree = GenSuccessorTreeImpl(0, instructions);
+
+    CFInstruction::traverse(tree, [](CFInstruction *curr) {
+        curr->print();
+    });
+
+    DoLiveAnalyses(tree);
+
     for (auto &instr : instructions) {
         instr->print();
     }
@@ -421,20 +411,52 @@ int CodeGenerator::GetPosOfLabel(const char *label) const {
     return -1;
 }
 
-std::vector<Location *> CodeGenerator::DoLiveAnalyses(CFInstruction *instr) {
-    auto &in = instr->out;
-    auto assign = dynamic_cast<Assign*>(instr->instruction);
-    if (!assign) return in;
+void CodeGenerator::DoLiveAnalyses(CFInstruction *tree) {
+    bool changed = true;
 
-    auto lhs_index = find_if(in.begin(), in.end(), bind(mem_fn(&Location::IsEqualTo), assign->GetDst(), placeholders::_1));
-    if (lhs_index != in.end()) {
-        in.erase(lhs_index);
+    while (changed) {
+        changed = false;
+
+        // for each TAC
+        CFInstruction::traverse(tree, [&](CFInstruction *curr) {
+            vector<Location *> succ;
+
+            if (curr->successors.first) {
+                succ.insert(succ.end(), curr->successors.first->in.begin(), curr->successors.first->in.end());
+            }
+
+            if (curr->successors.second) {
+                succ.insert(succ.end(), curr->successors.second->in.begin(), curr->successors.second->in.end());
+            }
+
+            curr->out = succ;
+
+            auto kill = curr->instruction->GetKillSet();
+            auto gen = curr->instruction->GetGenSet();
+
+            // erase anything in the succ set that is in the kill set
+            auto ebegin = remove_if(succ.begin(), succ.end(), [&](Location *loc) {
+               return find_if(kill.begin(), kill.end(), bind(mem_fn(&Location::IsEqualTo), loc, placeholders::_1)) != kill.end();
+            });
+            succ.erase(ebegin, succ.end());
+
+            // add anything in the gen set into the succ set, if its not already added
+            for (auto *loc : gen) {
+                auto found = find_if(
+                        succ.begin(),
+                        succ.end(),
+                        bind(mem_fn(&Location::IsEqualTo), loc, placeholders::_1)) != succ.end();
+
+                if (!found) {
+                    succ.push_back(loc);
+                }
+            }
+
+            // if succ and curr->in set are not equal, set succ equal to curr->in and set changed to true
+            if (succ != curr->in) {
+                changed = true;
+                curr->in = succ;
+            }
+        });
     }
-
-    in.push_back(assign->GetSrc());
-
-    auto last = unique(in.begin(), in.end());
-    in.erase(last, in.end());
-
-    return in;
 }
