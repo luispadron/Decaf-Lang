@@ -34,6 +34,20 @@ void CFInstruction::print() {
     cout << "\n\n";
 }
 
+
+void CFBlock::traverse_impl(CFBlock *start, queue<CFBlock *> &blocks, set<CFBlock *> &visited) {
+    if (!start) return;
+
+    auto seen = visited.find(start) != visited.end();
+    if (seen) return;
+
+    blocks.push(start);
+
+    for (auto *exit : start->exits) {
+        CFBlock::traverse_impl(exit, blocks, visited);
+    }
+}
+
 void CFBlock::add_instruction(CFInstruction *instruction) {
     code.push_back(instruction);
 }

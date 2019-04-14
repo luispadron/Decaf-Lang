@@ -29,28 +29,26 @@ struct CFInstruction {
 class CFBlock {
 public:
 
+    template<typename F>
+    static void traverse(CFBlock *start, F fn);
+
     void add_instruction(CFInstruction *instruction);
 
     void add_exit(CFBlock *block);
 
     template <typename F>
-    void traverse_code(F fn) {
-        for (auto *line : code) {
-            fn(line);
-        }
-    }
+    void traverse_code(F fn);
 
     template <typename F>
-    void rtraverse_code(F fn) {
-        for (auto it = code.rbegin(); it != code.rend(); ++it) {
-            fn(*it);
-        }
-    }
+    void rtraverse_code(F fn);
 
     void print();
 
 private:
+    static void traverse_impl(CFBlock *start, std::queue<CFBlock *> &blocks, std::set<CFBlock *> &visited);
+
     friend class CFGraph;
+
     std::vector<CFInstruction *> code;
     std::vector<CFBlock *> exits;
 };
@@ -79,5 +77,34 @@ private:
     CFBlock * gen_graph_impl(CFInstruction *curr_instr, CFBlock *curr_block, std::set<CFInstruction *> &);
 };
 
+
+//////////// implementations ///////////////////
+
+template<typename F>
+void CFBlock::traverse(CFBlock *start, F fn) {
+    std::queue<CFBlock *> blocks;
+    std::set<CFBlock *> visited;
+
+    CFBlock::traverse_impl(start, blocks, visited);
+
+    while (!blocks.empty()) {
+        fn(blocks.front());
+        blocks.pop();
+    }
+}
+
+template<typename F>
+void CFBlock::traverse_code(F fn)  {
+    for (auto *line : code) {
+        fn(line);
+    }
+}
+
+template<typename F>
+void CFBlock::rtraverse_code(F fn) {
+    for (auto it = code.rbegin(); it != code.rend(); ++it) {
+        fn(*it);
+    }
+}
 
 #endif //OPTIMIZATION_CFG_H
