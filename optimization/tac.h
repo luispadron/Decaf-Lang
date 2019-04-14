@@ -25,12 +25,8 @@
 
 #include "list.h" // for VTable
 #include "mips.h"
-#include "cfg.h"
 
 #include <utility>
-
-class CFBlock;
-class CFGraph;
 
 
     // A Location object is used to identify the operands to the

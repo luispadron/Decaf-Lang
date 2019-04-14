@@ -16,6 +16,7 @@
 #include <vector>
 
 class FnDecl;
+class CFInstruction;
  
 
               // These codes are used to identify the built-in functions

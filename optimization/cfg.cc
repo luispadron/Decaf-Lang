@@ -4,14 +4,13 @@
 
 #include "cfg.h"
 
-#include "tac.h"
-
 #include <iostream>
 #include <utility>
 #include <queue>
 
-using namespace std;
+#include "tac.h"
 
+using namespace std;
 
 CFInstruction::CFInstruction() : instruction{nullptr} {
     successors = std::make_pair(nullptr, nullptr);
@@ -35,13 +34,12 @@ void CFInstruction::print() {
     cout << "\n\n";
 }
 
-
 void CFBlock::add_instruction(CFInstruction *instruction) {
-    code.insert(instruction);
+    code.push_back(instruction);
 }
 
 void CFBlock::add_exit(CFBlock *block) {
-    exits.insert(block);
+    exits.push_back(block);
 }
 
 void CFBlock::print() {
@@ -64,6 +62,7 @@ CFGraph::CFGraph(CFInstruction *root) {
     gen_graph(root);
 }
 
+
 void CFGraph::print() {
     queue<CFBlock *> blocks;
     blocks.push(start);
@@ -80,13 +79,16 @@ void CFGraph::print() {
 }
 
 void CFGraph::gen_graph(CFInstruction *root) {
-    start = gen_graph_impl(root, new CFBlock);
+    set<CFInstruction*> visited;
+    start = gen_graph_impl(root, new CFBlock, visited);
 }
 
-CFBlock * CFGraph::gen_graph_impl(CFInstruction *curr_instr, CFBlock *curr_block) {
-    if (!curr_instr || curr_instr->visited) return nullptr;
+CFBlock * CFGraph::gen_graph_impl(CFInstruction *curr_instr, CFBlock *curr_block, set<CFInstruction *> &visited) {
+    auto seen = visited.find(curr_instr) != visited.end();
 
-    curr_instr->visited = true;
+    if (!curr_instr || seen) return nullptr;
+
+    visited.insert(curr_instr);
 
     if (curr_instr->successors.first && curr_instr->successors.second) {
         auto block1 = new CFBlock;
@@ -97,18 +99,18 @@ CFBlock * CFGraph::gen_graph_impl(CFInstruction *curr_instr, CFBlock *curr_block
         curr_block->add_exit(block1);
         curr_block->add_exit(block2);
 
-        gen_graph_impl(curr_instr->successors.first, block1);
-        gen_graph_impl(curr_instr->successors.second, block2);
+        gen_graph_impl(curr_instr->successors.first, block1, visited);
+        gen_graph_impl(curr_instr->successors.second, block2, visited);
     } else if (curr_instr->predecessors.first && curr_instr->predecessors.second) {
         auto block = new CFBlock;
         block->add_instruction(curr_instr);
 
         curr_block->add_exit(block);
 
-        gen_graph_impl(curr_instr->successors.first, block);
+        gen_graph_impl(curr_instr->successors.first, block, visited);
     } else {
         curr_block->add_instruction(curr_instr);
-        gen_graph_impl(curr_instr->successors.first, curr_block);
+        gen_graph_impl(curr_instr->successors.first, curr_block, visited);
     }
 
     return curr_block;
