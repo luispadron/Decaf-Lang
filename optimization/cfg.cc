@@ -19,22 +19,30 @@ CFInstruction::CFInstruction() : instruction{nullptr} {
 }
 
 void CFInstruction::print() {
-    cout << "instruction: " << typeid(*instruction).name() << endl;
-    cout << "\tsuccessors:";
-    if (successors.first)
-        cout << "\t\t" << typeid(*(successors.first->instruction)).name() << " ";
-    if (successors.second)
-        cout << "\t\t" << typeid(*(successors.second->instruction)).name() << " ";
+    cout << "IN: \n";
+    for (auto loc : in) {
+        cout << "\t" << loc->GetName();
+    }
 
-    cout << "\n\tpredecessors:";
-    if (predecessors.first)
-        cout << "\t\t" << typeid(*(predecessors.first->instruction)).name() << " ";
-    if (predecessors.second)
-        cout << "\t\t" << typeid(*(predecessors.second->instruction)).name() << " ";
+    cout << "\nOUT: \n";
+    for (auto loc : out) {
+        cout << "\t" << loc->GetName();
+    }
 
-    cout << "\n\n";
+    cout << "\n==================\n\n";
 }
 
+
+CFBlock::CFBlock() {
+    code.push_back(new CFInstruction);
+    code.push_back(new CFInstruction);
+}
+
+CFBlock::~CFBlock() {
+    traverse_code([](CFInstruction *instr, CFInstruction *prev) {
+       delete instr;
+    });
+}
 
 void CFBlock::traverse_impl(CFBlock *start, queue<CFBlock *> &blocks, set<CFBlock *> &visited) {
     if (!start) return;
@@ -44,17 +52,17 @@ void CFBlock::traverse_impl(CFBlock *start, queue<CFBlock *> &blocks, set<CFBloc
 
     blocks.push(start);
 
-    for (auto *exit : start->exits) {
+    for (auto *exit : start->edges) {
         CFBlock::traverse_impl(exit, blocks, visited);
     }
 }
 
 void CFBlock::add_instruction(CFInstruction *instruction) {
-    code.push_back(instruction);
+    code.insert(prev(code.end()), instruction);
 }
 
 void CFBlock::add_exit(CFBlock *block) {
-    exits.push_back(block);
+    edges.push_back(block);
 }
 
 void CFBlock::print() {
@@ -66,7 +74,7 @@ void CFBlock::print() {
     }
 
     cout << "exits: \n";
-    for (auto &exit : exits) {
+    for (auto &exit : edges) {
         cout << "\t" << exit << endl;
     }
 
@@ -77,6 +85,11 @@ CFGraph::CFGraph(CFInstruction *root) {
     gen_graph(root);
 }
 
+CFGraph::~CFGraph() {
+    traverse([](CFBlock *block) {
+        delete block;
+    });
+}
 
 void CFGraph::print() {
     traverse(mem_fn(&CFBlock::print));

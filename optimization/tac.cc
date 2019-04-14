@@ -51,7 +51,7 @@ vector<Instruction*> Instruction::GetSucc(List<Instruction *> &instructions, int
 
 
 LoadConstant::LoadConstant(Location *d, int v) : dst(d), val(v) {
-    Assert(dst != NULL);
+    Assert(dst != nullptr);
     sprintf(printed, "%s = %d", dst->GetName(), val);
 }
 

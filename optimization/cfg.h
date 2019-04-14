@@ -12,6 +12,7 @@
 #include <iostream>
 
 class Instruction;
+class Location;
 
 struct CFInstruction {
 
@@ -24,10 +25,16 @@ struct CFInstruction {
     Instruction *instruction;
     CFIPair successors;
     CFIPair predecessors;
+
+    std::vector<Location *> in;
+    std::vector<Location *> out;
 };
 
 class CFBlock {
 public:
+    CFBlock();
+    ~CFBlock();
+
     void add_instruction(CFInstruction *instruction);
 
     void add_exit(CFBlock *block);
@@ -46,7 +53,7 @@ private:
     friend class CFGraph;
 
     std::vector<CFInstruction *> code;
-    std::vector<CFBlock *> exits;
+    std::vector<CFBlock *> edges;
 };
 
 class CFGraph {
@@ -58,9 +65,10 @@ public:
     };
 
     explicit CFGraph(CFInstruction *root);
+    ~CFGraph();
 
     template <typename I, typename F>
-    void analyze(CFGraph::Direction d, std::vector<I> &initial, std::vector<std::vector<I>> &results, F transform);
+    void analyze(CFGraph::Direction d, std::vector<I> &initial, F transform);
 
     template <typename F>
     void traverse(F fn);
@@ -79,47 +87,42 @@ private:
 
 template<typename F>
 void CFBlock::traverse_code(F fn)  {
-    for (int i = 0; i < code.size(); ++i) {
-        fn(i, code[i]);
+    for (int i = 1; i < code.size(); ++i) {
+        fn(code[i], code[i - 1]);
     }
 }
 
 template<typename F>
 void CFBlock::rtraverse_code(F fn) {
-    for (auto it = code.rbegin(); it != code.rend(); ++it) {
-        fn(it - code.rbegin(), *it);
+    for (int i = code.size() - 2; i >= 1; --i) {
+        fn(code[i], code[i + 1]);
     }
 }
 
 
 template <typename I, typename F>
-void CFGraph::analyze(CFGraph::Direction d, std::vector<I> &initial, std::vector<std::vector<I>> &results, F transform)  {
+void CFGraph::analyze(CFGraph::Direction d, std::vector<I> &initial, F transform)  {
     if (!start) return;
 
     traverse([&](CFBlock *block) { // for each block
         if (d == Direction::forward) {
-            std::vector<std::vector<I>> output;
-            output.push_back(initial);
+            // prime entry
+            block->code[0]->out = initial;
 
-            block->traverse_code([&](int index, CFInstruction *instr) { // for each line of code in a block, in forward manner
-                auto in = output[index];
-                auto out = transform(instr, in);
-                output.push_back(out);
+            // for each line of code in a block, in forward manner
+            block->traverse_code([&](CFInstruction *curr, CFInstruction *prev) {
+                curr->in = prev->out;
+                curr->out = transform(curr);
             });
-
-            results.push_back(*output.rbegin());
-
         } else {
-            std::vector<std::vector<I>> input;
-            input.push_back(initial);
+            // prime entry
+            block->code[0]->in = initial;
 
-            block->rtraverse_code([&](int index, CFInstruction *instr) { // for each line of code in a block, in backward manner
-                auto in = input[index];
-                auto out = transform(instr, in);
-                input.push_back(out);
+            // for each line of code in a block, in backward manner
+            block->rtraverse_code([&](CFInstruction *curr, CFInstruction *prev) {
+                curr->out = prev->in;
+                curr->in = transform(curr);
             });
-
-            results.push_back(*input.rbegin());
         }
     });
 }
@@ -140,7 +143,7 @@ void CFGraph::traverse(F fn) {
 
         fn(block);
 
-        for (auto &exit : block->exits) {
+        for (auto &exit : block->edges) {
             blocks.push(exit);
         }
     }

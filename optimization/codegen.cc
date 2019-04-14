@@ -342,24 +342,21 @@ void CodeGenerator::DoOptimization() {
     auto successor_tree = GenSuccessorTree();
     auto cfg = CFGraph(successor_tree);
 
-    std::vector<std::vector<Location*>> results;
     std::vector<Location*> initial;
 
     cfg.analyze(
             CFGraph::Direction::backward,
             initial,
-            results,
-            bind(mem_fn(&CodeGenerator::DoLiveAnalyses), this, placeholders::_1, placeholders::_2)
+            bind(mem_fn(&CodeGenerator::DoLiveAnalyses), this, placeholders::_1)
     );
 
-    cout << "Live analyses results: " << endl;
-    for (const auto &vec : results) {
-        for (const auto &res : vec) {
-            cout << res->GetName() << endl;
-        }
+    cout << "completed analysis!\n";
 
-
-    cout << endl;}
+    cfg.traverse([](CFBlock *block) {
+       block->traverse_code([](CFInstruction *instr, CFInstruction *prev) {
+            instr->print();
+       });
+    });
 }
 
 CFInstruction * CodeGenerator::GenSuccessorTree() {
@@ -424,7 +421,8 @@ int CodeGenerator::GetPosOfLabel(const char *label) const {
     return -1;
 }
 
-std::vector<Location *> CodeGenerator::DoLiveAnalyses(CFInstruction *instr, std::vector<Location *> in) {
+std::vector<Location *> CodeGenerator::DoLiveAnalyses(CFInstruction *instr) {
+    auto &in = instr->out;
     auto assign = dynamic_cast<Assign*>(instr->instruction);
     if (!assign) return in;
 
