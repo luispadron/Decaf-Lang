@@ -39,6 +39,7 @@ add_executable(opt
         ast_program.cc
         scope.cc
         cfg.cc
+        adj_list.cc
         )
 
 target_link_libraries(opt

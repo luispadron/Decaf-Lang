@@ -5,6 +5,7 @@
  * classes and append them to the list.
  */
 
+#include "adj_list.h"
 #include "codegen.h"
 #include "tac.h"
 #include "mips.h"
@@ -345,8 +346,9 @@ void CodeGenerator::DoOptimization() {
     DoLiveAnalyses(successor_tree);
 
     successor_tree.traverse([](CFInstruction *instr) {
-       instr->print();
+        instr->print();
     });
+
 }
 
 
