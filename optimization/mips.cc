@@ -418,6 +418,15 @@ const char *Mips::NameForTac(OpCode code)
   return name;
 }
 
+/// returns a general purpose register for any position given in the range [1-18].
+Mips::Register Mips::GetGenPurposeReg(int pos) {
+    Assert(pos >= 1 && pos <= 18);
+    static Register gen_purpose[18] = {t0, t1, t2, t3, t4, t5, t6, t7,
+                                       s0, s1, s2, s3, s4, s5, s6, s7,
+                                       t8, t9};
+    return gen_purpose[pos - 1];
+}
+
 /* Constructor
  * ----------
  * Constructor sets up the mips names and register descriptors to

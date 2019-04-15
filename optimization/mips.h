@@ -41,6 +41,8 @@ public:
 
     regs[NumRegs];
 
+    static Register GetGenPurposeReg(int pos);
+
 private:
     Register rs, rt, rd;
 

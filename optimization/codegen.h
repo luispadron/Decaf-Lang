@@ -9,7 +9,7 @@
 #ifndef _H_codegen
 #define _H_codegen
 
-#include <stdlib.h>
+#include "adj_list.h"
 #include "list.h"
 #include "tac.h"
 
@@ -185,7 +185,9 @@ private:
     // private helper, not for public user
     Location *GenMethodCall(Location*rcvr, Location*meth, List<Location*> *args, bool hasReturnValue);
     void GenHaltWithMessage(const char *msg);
-    void DoLiveAnalyses(SuccessorTree &tree);
+    AdjacencyList<Location *> DoLiveAnalyses(SuccessorTree &tree);
+    void PerformRegisterAllocOpt(AdjacencyList<Location *> list);
+    int GetValidColor(Location *vertex, const AdjacencyList<Location *> &list, int colors);
 };
 
 #endif

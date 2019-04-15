@@ -5,7 +5,6 @@
  * classes and append them to the list.
  */
 
-#include "adj_list.h"
 #include "codegen.h"
 #include "tac.h"
 #include "mips.h"
@@ -343,16 +342,12 @@ void CodeGenerator::GenHaltWithMessage(const char *message)
 
 void CodeGenerator::DoOptimization() {
     SuccessorTree successor_tree(*code);
-    DoLiveAnalyses(successor_tree);
-
-    successor_tree.traverse([](CFInstruction *instr) {
-        instr->print();
-    });
-
+    auto list = DoLiveAnalyses(successor_tree);
+    PerformRegisterAllocOpt(list);
 }
 
 
-void CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
+AdjacencyList<Location*> CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
     struct LocComp { // comparator for location pointers
         bool operator()(const Location *lhs, const Location *rhs) const {
             if (lhs->IsEqualTo(rhs)) return false;
@@ -407,4 +402,96 @@ void CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
             }
         });
     }
+
+    // now that we have all the in & out sets, lets create the adjacency list
+
+    // create adjacency list which basically will add an edge between everything
+    // KILL(instr) U OUT(instr)
+    AdjacencyList<Location *> list;
+    tree.traverse([&](CFInstruction *instr) {
+        auto kill = instr->instruction->GetKillSet();
+
+        for (auto *k : kill) {
+            for (auto *o : instr->out) {
+                if (k == o) return;
+                list.add_edge(k, o);
+            }
+        }
+    });
+
+    return list;
+}
+
+void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list) {
+    using Edges = AdjacencyList<Location *>::Edges;
+
+    constexpr int k = Mips::NumGeneralPurposeRegs; // for k-coloring
+    bool has_less_k = true;
+    AdjacencyList<Location *> graph = list;
+    stack<Location *> removed;
+
+    // remove nodes with degree < k until there a no such nodes to remove
+    while (has_less_k) {
+        has_less_k = false;
+
+        for (auto it = list.begin(); it != list.end();) {
+            if (list.get_degrees(it->first) < k) {
+                has_less_k = true;
+                removed.push(it->first);
+                it = list.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+
+    // if all nodes had degrees < k, then we can perform a k graph coloring
+    // otherwise we need to find a node to remove and leave it out of the grap
+    // and rerun this algorithm
+
+    if (list.empty()) { // perform coloring
+        while (!removed.empty()) {
+            auto *vertex = removed.top();
+            removed.pop();
+
+            auto color = GetValidColor(vertex, graph, k);
+            graph.set_color(vertex, color);
+        }
+
+        // assign registers based on color
+        for (auto it = graph.begin(); it != graph.end(); ++it) {
+            auto reg = graph.get_color(it->first);
+            it->first->SetRegister(Mips::GetGenPurposeReg(reg));
+        };
+    } else { // find location to spill, and rerun this algorithm
+        // for this case we will simply remove the node with highest degree
+        auto max_vertex = list.begin();
+        for (auto it = list.begin(); it != list.end(); ++it) {
+            if (list.get_degrees(max_vertex->first) < list.get_degrees(it->first)) {
+                max_vertex = it;
+            }
+        }
+
+        list.erase(max_vertex);
+        PerformRegisterAllocOpt(list);
+    }
+}
+
+int CodeGenerator::GetValidColor(Location *vertex, const AdjacencyList<Location *> &list, int colors) {
+    set<int> assigned_colors;
+    for (const auto &edge : list.get_edges(vertex)) {
+        auto color = list.get_color(edge);
+        if (color != 0) {
+            assigned_colors.insert(color);
+        }
+    }
+
+    for (int i = 1; i <= colors; ++i) {
+        if (assigned_colors.find(i) == assigned_colors.end()) {
+            return i;
+        }
+    }
+
+    Assert(false);
+    return -1;
 }
