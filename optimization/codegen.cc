@@ -13,10 +13,12 @@
 #include "cfg.h"
 
 #include <algorithm>
+#include <functional>
 #include <cstring>
 #include <iostream>
 #include <string>
 #include <stack>
+#include <iterator>
 
 using namespace std;
   
@@ -339,123 +341,67 @@ void CodeGenerator::GenHaltWithMessage(const char *message)
 }
 
 void CodeGenerator::DoOptimization() {
-    auto successor_tree = GenSuccessorTree();
-}
+    SuccessorTree successor_tree(*code);
+    DoLiveAnalyses(successor_tree);
 
-CFInstruction * CodeGenerator::GenSuccessorTree() {
-    vector<CFInstruction *> instructions(code->NumElements());
-    for (int i = 0; i < instructions.size(); ++i) {
-        instructions[i] = new CFInstruction;
-        instructions[i]->instruction = code->Nth(i);
-    }
-
-    auto tree = GenSuccessorTreeImpl(0, instructions);
-
-    CFInstruction::traverse(tree, [](CFInstruction *curr) {
-        curr->print();
+    successor_tree.traverse([](CFInstruction *instr) {
+       instr->print();
     });
-
-    DoLiveAnalyses(tree);
-
-    for (auto &instr : instructions) {
-        instr->print();
-    }
-
-    return tree;
 }
 
-CFInstruction * CodeGenerator::GenSuccessorTreeImpl(int pos, const vector<CFInstruction *> &instructions,
-                                                    CFInstruction *predecessor) {
-    if (pos >= code->NumElements()) return nullptr;
 
-    auto cfi = instructions[pos];
-
-    if (predecessor) {
-        if (!cfi->predecessors.first && cfi->predecessors.second != predecessor) {
-            cfi->predecessors.first = predecessor;
-        } else if (!cfi->predecessors.second && cfi->predecessors.first != predecessor) {
-            cfi->predecessors.second = predecessor;
+void CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
+    struct LocComp { // comparator for location pointers
+        bool operator()(const Location *lhs, const Location *rhs) const {
+            if (lhs->IsEqualTo(rhs)) return false;
+            else return lhs < rhs;
         }
+    };
 
-        if (!predecessor->successors.first && predecessor->successors.second != cfi) {
-            predecessor->successors.first = cfi;
-        } else if (!predecessor->successors.second && predecessor->successors.first != cfi) {
-            predecessor->successors.second = cfi;
-        }
-    }
-
-    auto ifz = dynamic_cast<IfZ*>(cfi->instruction);
-    auto goTo = dynamic_cast<Goto*>(cfi->instruction);
-
-    if (ifz) {
-        GenSuccessorTreeImpl(pos + 1, instructions, cfi);
-        GenSuccessorTreeImpl(GetPosOfLabel(ifz->GetLabel()), instructions, cfi);
-    } else if (goTo) {
-        GenSuccessorTreeImpl(GetPosOfLabel(goTo->GetLabel()), instructions, cfi);
-    } else {
-        GenSuccessorTreeImpl(pos + 1, instructions, cfi);
-    }
-
-    return cfi;
-}
-
-int CodeGenerator::GetPosOfLabel(const char *label) const {
-    for (int i = 0; i < code->NumElements(); ++i) {
-        auto ilabel = dynamic_cast<Label*>(code->Nth(i));
-        if (ilabel && strcmp(ilabel->GetLabel(), label) == 0) {
-            return i;
-        }
-    }
-
-    Assert(false);
-    return -1;
-}
-
-void CodeGenerator::DoLiveAnalyses(CFInstruction *tree) {
     bool changed = true;
-
     while (changed) {
         changed = false;
 
-        // for each TAC
-        CFInstruction::traverse(tree, [&](CFInstruction *curr) {
-            vector<Location *> succ;
-
-            if (curr->successors.first) {
-                succ.insert(succ.end(), curr->successors.first->in.begin(), curr->successors.first->in.end());
+        // for each tac
+        tree.traverse([&](CFInstruction *curr) {
+            // get the successors set, which is all the in sets of all the successors
+            set<Location *> succ_set;
+            for (auto *successor : curr->successors) {
+                set_union(succ_set.begin(), succ_set.end(),
+                          successor->in.begin(), successor->in.end(),
+                          inserter(succ_set, succ_set.end()),
+                          LocComp());
             }
 
-            if (curr->successors.second) {
-                succ.insert(succ.end(), curr->successors.second->in.begin(), curr->successors.second->in.end());
-            }
+            curr->out = succ_set;
 
-            curr->out = succ;
-
+            // get the KILL(curr) and GEN(curr) sets
             auto kill = curr->instruction->GetKillSet();
             auto gen = curr->instruction->GetGenSet();
 
-            // erase anything in the succ set that is in the kill set
-            auto ebegin = remove_if(succ.begin(), succ.end(), [&](Location *loc) {
-               return find_if(kill.begin(), kill.end(), bind(mem_fn(&Location::IsEqualTo), loc, placeholders::_1)) != kill.end();
-            });
-            succ.erase(ebegin, succ.end());
+            // remove anything from KILL(curr) from succ_set, this becomes new_in set
+            set<Location *> new_in;
+            set_difference(succ_set.begin(), succ_set.end(),
+                           kill.begin(), kill.end(),
+                           inserter(new_in, new_in.begin()),
+                           LocComp());
 
-            // add anything in the gen set into the succ set, if its not already added
-            for (auto *loc : gen) {
-                auto found = find_if(
-                        succ.begin(),
-                        succ.end(),
-                        bind(mem_fn(&Location::IsEqualTo), loc, placeholders::_1)) != succ.end();
+            // finally add anything from gen set into diff_set
+            set_union(new_in.begin(), new_in.end(),
+                      gen.begin(), gen.end(),
+                      inserter(new_in, new_in.begin()),
+                      LocComp());
 
-                if (!found) {
-                    succ.push_back(loc);
-                }
-            }
+            // if the new set and current set are different there is a change, thus modify and continue
+            set<Location *> diff;
+            set_difference(new_in.begin(), new_in.end(),
+                           curr->in.begin(), curr->in.end(),
+                           inserter(diff, diff.begin()),
+                           LocComp());
 
-            // if succ and curr->in set are not equal, set succ equal to curr->in and set changed to true
-            if (succ != curr->in) {
+            if (!diff.empty()) {
+                curr->in = new_in;
                 changed = true;
-                curr->in = succ;
             }
         });
     }

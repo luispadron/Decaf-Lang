@@ -26,6 +26,7 @@
 #include "list.h" // for VTable
 #include "mips.h"
 
+#include <set>
 #include <vector>
 #include <utility>
 
@@ -59,11 +60,11 @@ public:
         variableName(base->variableName), segment(base->segment),
         offset(base->offset), reference(base), refOffset(refOff) {}
 
-    bool IsEqualTo(Location *other);
+    bool IsEqualTo(const Location *other) const;
 
-    const char *GetName()           { return variableName; }
-    Segment GetSegment()            { return segment; }
-    int GetOffset()                 { return offset; }
+    const char *GetName() const { return variableName; }
+    Segment GetSegment() const { return segment; }
+    int GetOffset() const { return offset; }
     void SetRegister(Mips::Register r)    { reg = r; }
     Mips::Register GetRegister()          { return reg; }
     bool IsReference()              { return reference != nullptr; }
@@ -85,8 +86,8 @@ public:
 	virtual void EmitSpecific(Mips *mips) = 0;
 	virtual void Emit(Mips *mips);
     virtual std::vector<Instruction*> GetSucc(List<Instruction *> &instructions, int pos) const;
-    virtual std::vector<Location *> GetKillSet() const;
-    virtual std::vector<Location *> GetGenSet() const;
+    virtual std::set<Location *> GetKillSet() const;
+    virtual std::set<Location *> GetGenSet() const;
 };
 
   
@@ -148,8 +149,8 @@ public:
     void EmitSpecific(Mips *mips) override;
     Location *GetDst() { return dst; }
     Location *GetSrc() { return src; }
-    std::vector<Location *> GetKillSet() const override;
-    std::vector<Location *> GetGenSet() const override;
+    std::set<Location *> GetKillSet() const override;
+    std::set<Location *> GetGenSet() const override;
 };
 
 class Load: public Instruction {
@@ -178,8 +179,8 @@ public:
 
     BinaryOp(Mips::OpCode c, Location *dst, Location *op1, Location *op2);
     void EmitSpecific(Mips *mips) override;
-    std::vector<Location *> GetKillSet() const override;
-    std::vector<Location *> GetGenSet() const override;
+    std::set<Location *> GetKillSet() const override;
+    std::set<Location *> GetGenSet() const override;
 
 protected:
     Mips::OpCode code;

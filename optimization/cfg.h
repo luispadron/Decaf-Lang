@@ -5,34 +5,71 @@
 #ifndef OPTIMIZATION_CFG_H
 #define OPTIMIZATION_CFG_H
 
+#include <algorithm>
 #include <utility>
 #include <set>
 #include <queue>
-
+#include <vector>
 #include <iostream>
 
 class Instruction;
 class Location;
+template<typename T>
+class List;
 
+
+/**
+ * CFInstruction
+ */
 struct CFInstruction {
 
-    CFInstruction();
+    explicit CFInstruction(Instruction *instruction_);
 
-    template <typename F>
-    static void traverse(CFInstruction *root, F fn);
+    /// prints out the content of this type
+    void print();
+
+    /// resets the in and out sets for use with traversal
+    void reset();
+
+    using Edges = std::vector<CFInstruction*>;
+    using SetType = std::set<Location*>;
+
+    Instruction *instruction;
+    Edges successors;
+    Edges predecessors;
+
+    SetType in;
+    SetType out;
+};
+
+
+/**
+ * SuccessorTree
+ */
+class SuccessorTree {
+public:
+    explicit SuccessorTree(List<Instruction *> &code);
+
+    template<typename F>
+    void traverse(F fn);
 
     void print();
 
-    using CFIPair = std::pair<CFInstruction *, CFInstruction *>;
+private:
+    CFInstruction *root = nullptr;
+    std::vector<CFInstruction *> code;
 
-    Instruction *instruction;
-    CFIPair successors;
-    CFIPair predecessors;
+    static CFInstruction * generate(int pos, List<Instruction *> &code,
+                                    const std::vector<CFInstruction *> &instructions, CFInstruction *predecessor);
+    static int get_pos_of_label(const char *label, List<Instruction *> &code);
 
-    std::vector<Location *> in;
-    std::vector<Location *> out;
+    void reset();
 };
 
+
+/**
+ * CFBlock
+ */
 class CFBlock {
 public:
     CFBlock();
@@ -59,6 +96,10 @@ private:
     std::vector<CFBlock *> edges;
 };
 
+
+/**
+ * CFGraph
+ */
 class CFGraph {
 public:
 
@@ -88,29 +129,8 @@ private:
 //////////// implementations ///////////////////
 
 template <typename F>
-void CFInstruction::traverse(CFInstruction *root, F fn) {
-    std::set<CFInstruction *> visited;
-    std::queue<CFInstruction *> code;
-    code.push(root);
-
-    while (!code.empty()) {
-        auto instr = code.front();
-        code.pop();
-
-        if (visited.find(instr) != visited.end()) continue;
-
-        visited.insert(instr);
-
-        fn(instr);
-
-        if (instr->successors.first) {
-            code.push(instr->successors.first);
-        }
-
-        if (instr->successors.second) {
-            code.push(instr->successors.second);
-        }
-    }
+void SuccessorTree::traverse(F fn) {
+    std::for_each(code.begin(), code.end(), fn);
 }
 
 template<typename F>

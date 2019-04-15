@@ -18,7 +18,7 @@ using namespace std;
 Location::Location(Segment s, int o, const char *name) :
   variableName(strdup(name)), segment(s), offset(o), reg(Mips::zero) {}
 
-bool Location::IsEqualTo(Location *other) {
+bool Location::IsEqualTo(const Location *other) const {
     return (this == other ||
             (other
              && !strcmp(GetName(), other->GetName())
@@ -49,12 +49,12 @@ vector<Instruction*> Instruction::GetSucc(List<Instruction *> &instructions, int
     return successors;
 }
 
-vector<Location *> Instruction::GetKillSet() const {
-    return vector<Location *>();
+set<Location *> Instruction::GetKillSet() const {
+    return set<Location *>();
 }
 
-vector<Location *> Instruction::GetGenSet() const {
-    return vector<Location *>();
+set<Location *> Instruction::GetGenSet() const {
+    return set<Location *>();
 }
 
 
@@ -101,12 +101,12 @@ void Assign::EmitSpecific(Mips *mips) {
     mips->EmitCopy(dst, src);
 }
 
-vector<Location *> Assign::GetKillSet() const {
-    return vector<Location *>{dst};
+set<Location *> Assign::GetKillSet() const {
+    return set<Location *>{dst};
 }
 
-vector<Location *> Assign::GetGenSet() const {
-    return vector<Location *>{src};
+set<Location *> Assign::GetGenSet() const {
+    return set<Location *>{src};
 }
 
 
@@ -159,12 +159,12 @@ void BinaryOp::EmitSpecific(Mips *mips) {
     mips->EmitBinaryOp(code, dst, op1, op2);
 }
 
-vector<Location *> BinaryOp::GetKillSet() const {
-    return vector<Location *>{dst};
+set<Location *> BinaryOp::GetKillSet() const {
+    return set<Location *>{dst};
 }
 
-vector<Location *> BinaryOp::GetGenSet() const {
-    return vector<Location *>{op1, op2};
+set<Location *> BinaryOp::GetGenSet() const {
+    return set<Location *>{op1, op2};
 }
 
 
