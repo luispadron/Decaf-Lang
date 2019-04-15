@@ -18,7 +18,7 @@ default: $(PRODUCTS)
 
 # Set up the list of source and object files
 SRCS = ast.cc ast_decl.cc ast_expr.cc ast_stmt.cc ast_type.cc scope.cc \
-	codegen.cc tac.cc mips.cc errors.cc utility.cc main.cc ast_program.cc
+	codegen.cc tac.cc mips.cc errors.cc utility.cc main.cc ast_program.cc cfg.cc
 
 # OBJS can deal with either .cc or .c files listed in SRCS
 OBJS = lex.yy.o y.tab.o $(patsubst %.cc, %.o, $(filter %.cc,$(SRCS))) $(patsubst %.c, %.o, $(filter %.c, $(SRCS)))
@@ -93,7 +93,7 @@ strip : $(PRODUCTS)
 # file to the project or move the project between machines
 #
 depend:
-	gsed -i '/^# DO NOT DELETE$$/{q}' Makefile
+	sed -i '/^# DO NOT DELETE$$/{q}' Makefile
 	$(CC) -MM -MG $(SRCS) >> Makefile
 
 clean:
@@ -102,9 +102,9 @@ clean:
 # DO NOT DELETE
 ast.o: ast.cc ast.h location.h ast_type.h list.h utility.h scope.h \
  hashtable.h hashtable.cc ast_decl.h ast_stmt.h errors.h
-ast_decl.o: ast_decl.cc ast_decl.h ast.h location.h ast_type.h list.h \
- utility.h scope.h hashtable.h hashtable.cc ast_stmt.h errors.h scanner.h \
- codegen.h tac.h mips.h
+ast_decl.o: ast_decl.cc ast_program.h ast.h location.h list.h utility.h \
+ scope.h hashtable.h hashtable.cc ast_decl.h ast_type.h ast_stmt.h \
+ errors.h scanner.h codegen.h tac.h mips.h
 ast_expr.o: ast_expr.cc ast_expr.h ast.h location.h ast_stmt.h list.h \
  utility.h scope.h hashtable.h hashtable.cc ast_type.h ast_decl.h \
  errors.h codegen.h tac.h mips.h
@@ -118,9 +118,9 @@ scope.o: scope.cc scope.h hashtable.h hashtable.cc ast_decl.h ast.h \
  location.h ast_type.h list.h utility.h ast_stmt.h
 codegen.o: codegen.cc codegen.h list.h utility.h scope.h hashtable.h \
  hashtable.cc tac.h mips.h ast_decl.h ast.h location.h ast_type.h \
- ast_stmt.h errors.h
+ ast_stmt.h errors.h cfg.h
 tac.o: tac.cc tac.h list.h utility.h scope.h hashtable.h hashtable.cc \
- mips.h
+ mips.h cfg.h
 mips.o: mips.cc mips.h list.h utility.h scope.h hashtable.h hashtable.cc \
  tac.h
 errors.o: errors.cc errors.h location.h scanner.h ast_type.h ast.h list.h \
@@ -131,4 +131,7 @@ main.o: main.cc utility.h errors.h location.h parser.h scanner.h list.h \
  scope.h hashtable.h hashtable.cc ast.h ast_type.h ast_decl.h ast_stmt.h \
  ast_expr.h y.tab.h
 ast_program.o: ast_program.cc ast_program.h ast.h location.h list.h \
- utility.h scope.h hashtable.h hashtable.cc
+ utility.h scope.h hashtable.h hashtable.cc ast_decl.h ast_type.h \
+ ast_stmt.h codegen.h tac.h mips.h errors.h
+cfg.o: cfg.cc cfg.h tac.h list.h utility.h scope.h hashtable.h \
+ hashtable.cc mips.h
