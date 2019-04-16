@@ -59,39 +59,22 @@ void SuccessorTree::print() {
 }
 
 CFInstruction* SuccessorTree::generate(int pos, List<Instruction *> &instructions, CFInstruction *predecessor) {
-    if (pos >= code.size()) return nullptr;
-    auto cfi = code[pos];
+    for (int i = 0; i < code.size(); ++i) {
+        auto cfi = code[i];
+        auto successors = cfi->instruction->GetSuccSet(i, instructions);
 
-    if (predecessor) {
-        cfi->predecessors.insert(predecessor);
-        predecessor->successors.insert(cfi);
-    }
+        for (auto *si : successors) {
+            auto succ = find_if(code.begin(), code.end(), [&si](CFInstruction *instr) {
+               return si == instr->instruction;
+            });
+            Assert(succ != code.end());
 
-    auto ifz = dynamic_cast<IfZ*>(cfi->instruction);
-    auto goTo = dynamic_cast<Goto*>(cfi->instruction);
-
-    if (ifz) {
-        generate(pos + 1, instructions, cfi);
-        generate(get_pos_of_label(ifz->GetLabel(), instructions), instructions, cfi);
-    } else if (goTo) {
-        generate(get_pos_of_label(goTo->GetLabel(), instructions), instructions, cfi);
-    } else {
-        generate(pos + 1, instructions, cfi);
-    }
-
-    return cfi;
-}
-
-int SuccessorTree::get_pos_of_label(const char *label, List<Instruction *> &instructions) {
-    for (int i = 0; i < instructions.NumElements(); ++i) {
-        auto ilabel = dynamic_cast<Label*>(instructions.Nth(i));
-        if (ilabel && strcmp(ilabel->GetLabel(), label) == 0) {
-            return i;
+            cfi->successors.insert(*succ);
+            (*succ)->predecessors.insert(cfi);
         }
     }
 
-    Assert(false);
-    return -1;
+    return code[0];
 }
 
 void SuccessorTree::reset() {

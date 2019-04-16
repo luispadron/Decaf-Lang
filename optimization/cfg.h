@@ -60,7 +60,6 @@ private:
     std::vector<CFInstruction *> code;
 
     CFInstruction * generate(int pos, List<Instruction *> &instructions, CFInstruction *predecessor);
-    static int get_pos_of_label(const char *label, List<Instruction *> &instructions);
 
     void reset();
 };

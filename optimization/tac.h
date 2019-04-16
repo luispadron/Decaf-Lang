@@ -42,7 +42,7 @@ typedef enum {fpRelative, gpRelative} Segment;
 
 class Location {
 protected:
-    const char *variableName;
+    const char *variableName = "";
     Segment segment;
     int offset;
     Location *reference = nullptr;
@@ -85,9 +85,11 @@ public:
 	virtual void Print();
 	virtual void EmitSpecific(Mips *mips) = 0;
 	virtual void Emit(Mips *mips);
+    void SetOutSet(std::set<Location *> out) { outSet = std::move(out); }
     virtual std::set<Location *> GetKillSet() const;
     virtual std::set<Location *> GetGenSet() const;
-    void SetOutSet(std::set<Location *> out) { outSet = std::move(out); }
+    virtual std::set<Instruction *> GetSuccSet(int pos, const List<Instruction *> &instructions) const;
+    static int GetPosOfLabel(const char *label, const List<Instruction *> &instructions);
 };
 
   
@@ -210,7 +212,7 @@ class Goto: public Instruction {
 public:
     explicit Goto(const char *label);
     void EmitSpecific(Mips *mips) override;
-    const char *GetLabel() { return label; }
+    std::set<Instruction *> GetSuccSet(int pos, const List<Instruction *> &instructions) const override;
 };
 
 class IfZ: public Instruction {
@@ -220,8 +222,8 @@ class IfZ: public Instruction {
 public:
     IfZ(Location *test, const char *label);
     void EmitSpecific(Mips *mips) override;
-    const char *GetLabel() { return label; }
     std::set<Location *> GetGenSet() const override;
+    std::set<Instruction *> GetSuccSet(int pos, const List<Instruction *> &instructions) const override;
 };
 
 class BeginFunc: public Instruction {

@@ -54,6 +54,26 @@ set<Location *> Instruction::GetGenSet() const {
     return set<Location *>();
 }
 
+set<Instruction *> Instruction::GetSuccSet(int pos, const List<Instruction *> &instructions) const {
+    if (pos + 1 < instructions.NumElements()) {
+        return set<Instruction *>{instructions.Nth(pos + 1)};
+    } else {
+        return set<Instruction *>();
+    }
+}
+
+int Instruction::GetPosOfLabel(const char *label, const List<Instruction *> &instructions) {
+    for (int i = 0; i < instructions.NumElements(); ++i) {
+        auto lblInstruction = dynamic_cast<Label*>(instructions.Nth(i));
+        if (lblInstruction && strcmp(lblInstruction->GetLabel(), label) == 0) {
+            return i;
+        }
+    }
+
+    Assert(false);
+    return -1;
+}
+
 
 LoadConstant::LoadConstant(Location *d, int v) : dst(d), val(v) {
     Assert(dst != nullptr);
@@ -213,6 +233,11 @@ void Goto::EmitSpecific(Mips *mips) {
     mips->EmitGoto(label);
 }
 
+set<Instruction *> Goto::GetSuccSet(int pos, const List<Instruction *> &instructions) const {
+    auto lbl_pos = Instruction::GetPosOfLabel(label, instructions);
+    Assert(lbl_pos >= 0 && lbl_pos < instructions.NumElements());
+    return set<Instruction *>{instructions.Nth(lbl_pos)};
+}
 
 IfZ::IfZ(Location *te, const char *l) : test(te), label(strdup(l)) {
     Assert(test != nullptr && label != nullptr);
@@ -225,6 +250,15 @@ void IfZ::EmitSpecific(Mips *mips) {
 
 set<Location *> IfZ::GetGenSet() const {
     return set<Location *>{test};
+}
+
+set<Instruction *> IfZ::GetSuccSet(int pos, const List<Instruction *> &instructions) const {
+    auto lbl_pos = Instruction::GetPosOfLabel(label, instructions);
+
+    Assert(pos + 1 < instructions.NumElements());
+    Assert(lbl_pos >= 0 && lbl_pos < instructions.NumElements());
+
+    return set<Instruction *>{instructions.Nth(pos + 1), instructions.Nth(lbl_pos)};
 }
 
 
