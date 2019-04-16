@@ -18,7 +18,7 @@ default: $(PRODUCTS)
 
 # Set up the list of source and object files
 SRCS = ast.cc ast_decl.cc ast_expr.cc ast_stmt.cc ast_type.cc scope.cc \
-	codegen.cc tac.cc mips.cc errors.cc utility.cc main.cc ast_program.cc cfg.cc adj_list.cc
+	codegen.cc tac.cc mips.cc errors.cc utility.cc main.cc ast_program.cc adj_list.cc
 
 # OBJS can deal with either .cc or .c files listed in SRCS
 OBJS = lex.yy.o y.tab.o $(patsubst %.cc, %.o, $(filter %.cc,$(SRCS))) $(patsubst %.c, %.o, $(filter %.c, $(SRCS)))
@@ -118,9 +118,9 @@ scope.o: scope.cc scope.h hashtable.h hashtable.cc ast_decl.h ast.h \
  location.h ast_type.h list.h utility.h ast_stmt.h
 codegen.o: codegen.cc codegen.h adj_list.h list.h utility.h scope.h \
  hashtable.h hashtable.cc tac.h mips.h ast_decl.h ast.h location.h \
- ast_type.h ast_stmt.h errors.h cfg.h
+ ast_type.h ast_stmt.h errors.h
 tac.o: tac.cc tac.h list.h utility.h scope.h hashtable.h hashtable.cc \
- mips.h cfg.h
+ mips.h
 mips.o: mips.cc mips.h list.h utility.h scope.h hashtable.h hashtable.cc \
  tac.h
 errors.o: errors.cc errors.h location.h scanner.h ast_type.h ast.h list.h \
@@ -133,6 +133,4 @@ main.o: main.cc utility.h errors.h location.h parser.h scanner.h list.h \
 ast_program.o: ast_program.cc ast_program.h ast.h location.h list.h \
  utility.h scope.h hashtable.h hashtable.cc ast_decl.h ast_type.h \
  ast_stmt.h codegen.h adj_list.h tac.h mips.h errors.h
-cfg.o: cfg.cc cfg.h tac.h list.h utility.h scope.h hashtable.h \
- hashtable.cc mips.h
 adj_list.o: adj_list.cc adj_list.h

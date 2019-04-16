@@ -38,7 +38,6 @@ add_executable(opt
         main.cc
         ast_program.cc
         scope.cc
-        cfg.cc
         adj_list.cc
         )
 

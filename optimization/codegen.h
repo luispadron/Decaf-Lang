@@ -16,8 +16,7 @@
 #include <vector>
 
 class FnDecl;
-class SuccessorTree;
- 
+
 
               // These codes are used to identify the built-in functions
 typedef enum { Alloc, ReadLine, ReadInteger, StringEqual,
@@ -184,7 +183,8 @@ private:
     // private helper, not for public user
     Location *GenMethodCall(Location*rcvr, Location*meth, List<Location*> *args, bool hasReturnValue);
     void GenHaltWithMessage(const char *msg);
-    AdjacencyList<Location *> DoLiveAnalyses(SuccessorTree &tree);
+    void DoOptimizationSetup();
+    void DoRegisterAllocation();
     void PerformRegisterAllocOpt(AdjacencyList<Location *> list);
     int GetValidColor(Location *vertex, const AdjacencyList<Location *> &list, int colors);
 };

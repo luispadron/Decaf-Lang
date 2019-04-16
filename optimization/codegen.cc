@@ -10,7 +10,6 @@
 #include "mips.h"
 #include "ast_decl.h"
 #include "errors.h"
-#include "cfg.h"
 
 #include <algorithm>
 #include <functional>
@@ -337,33 +336,36 @@ void CodeGenerator::GenHaltWithMessage(const char *message)
 }
 
 void CodeGenerator::DoOptimization() {
-    SuccessorTree successor_tree(*code);
-    auto list = DoLiveAnalyses(successor_tree);
-    PerformRegisterAllocOpt(list);
+    DoOptimizationSetup();
+    DoRegisterAllocation();
 }
 
+void CodeGenerator::DoOptimizationSetup() {
+    // sets up the successor/predecessors for instructions
+    for (int i = 0; i < code->NumElements(); ++i) {
+        auto cfi = code->Nth(i);
+        cfi->GenSuccSet(i, *code);
 
-AdjacencyList<Location*> CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
-    struct LocComp { // comparator for location pointers
-        bool operator()(const Location *lhs, const Location *rhs) const {
-            if (lhs->IsEqualTo(rhs)) return false;
-            else return lhs < rhs;
+        for (auto *si : cfi->successors) {
+            si->predecessors.insert(cfi);
         }
-    };
+    }
+}
 
+void CodeGenerator::DoRegisterAllocation() {
     bool changed = true;
     while (changed) {
         changed = false;
 
-        // for each tac
-        tree.traverse([&](Instruction *curr) {
+        for (int i = 0; i < code->NumElements(); ++i) {
+            auto curr = code->Nth(i);
+
             // get the successors set, which is all the in sets of all the successors
             set<Location *> succ_set;
             for (auto *successor : curr->successors) {
                 set_union(succ_set.begin(), succ_set.end(),
                           successor->inSet.begin(), successor->inSet.end(),
-                          inserter(succ_set, succ_set.end()),
-                          LocComp());
+                          inserter(succ_set, succ_set.end()));
             }
 
             curr->outSet = succ_set;
@@ -376,27 +378,24 @@ AdjacencyList<Location*> CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
             set<Location *> new_in;
             set_difference(succ_set.begin(), succ_set.end(),
                            kill.begin(), kill.end(),
-                           inserter(new_in, new_in.begin()),
-                           LocComp());
+                           inserter(new_in, new_in.begin()));
 
             // finally add anything from gen set into diff_set
             set_union(new_in.begin(), new_in.end(),
                       gen.begin(), gen.end(),
-                      inserter(new_in, new_in.begin()),
-                      LocComp());
+                      inserter(new_in, new_in.begin()));
 
             // if the new set and current set are different there is a change, thus modify and continue
             set<Location *> diff;
             set_difference(new_in.begin(), new_in.end(),
                            curr->inSet.begin(), curr->inSet.end(),
-                           inserter(diff, diff.begin()),
-                           LocComp());
+                           inserter(diff, diff.begin()));
 
             if (!diff.empty()) {
                 curr->inSet = new_in;
                 changed = true;
             }
-        });
+        }
     }
 
     // now that we have all the in & out sets, lets create the adjacency list
@@ -404,7 +403,8 @@ AdjacencyList<Location*> CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
     // create adjacency list which basically will add an edge between everything
     // KILL(instr) U OUT(instr)
     AdjacencyList<Location *> list;
-    tree.traverse([&](Instruction *instr) {
+    for (int i = 0; i < code->NumElements(); ++i) {
+        auto instr = code->Nth(i);
         auto gen = instr->GetGenSet();
         auto kill = instr->GetKillSet();
 
@@ -416,13 +416,13 @@ AdjacencyList<Location*> CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
             list.add(k);
 
             for (auto *o : instr->outSet) {
-                if (k == o) return;
+                if (k == o) continue;
                 list.add_edge(k, o);
             }
         }
-    });
+    }
 
-    return list;
+    PerformRegisterAllocOpt(list);
 }
 
 void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list) {
