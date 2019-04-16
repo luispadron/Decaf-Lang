@@ -42,7 +42,7 @@ typedef enum {fpRelative, gpRelative} Segment;
 
 class Location {
 protected:
-    const char *variableName;
+    const char *variableName = "";
     Segment segment;
     int offset;
     Location *reference;
@@ -120,25 +120,31 @@ public:
 class LoadConstant: public Instruction {
     Location *dst;
     int val;
+
 public:
     LoadConstant(Location *dst, int val);
     void EmitSpecific(Mips *mips) override;
+    std::set<Location *> GetKillSet() const override;
 };
 
 class LoadStringConstant: public Instruction {
     Location *dst;
     char *str;
-  public:
+
+public:
     LoadStringConstant(Location *dst, const char *s);
     void EmitSpecific(Mips *mips) override;
+    std::set<Location *> GetKillSet() const override;
 };
     
 class LoadLabel: public Instruction {
     Location *dst;
     const char *label;
-  public:
+
+public:
     LoadLabel(Location *dst, const char *label);
     void EmitSpecific(Mips *mips) override;
+    std::set<Location *> GetKillSet() const override;
 };
 
 class Assign: public Instruction {
@@ -160,6 +166,8 @@ class Load: public Instruction {
 public:
     Load(Location *dst, Location *src, int offset = 0);
     void EmitSpecific(Mips *mips) override;
+    std::set<Location *> GetKillSet() const override;
+    std::set<Location *> GetGenSet() const override;
 };
 
 class Store: public Instruction {
@@ -169,6 +177,7 @@ class Store: public Instruction {
 public:
     Store(Location *d, Location *s, int offset = 0);
     void EmitSpecific(Mips *mips) override;
+    std::set<Location *> GetGenSet() const override;
 };
 
 class BinaryOp: public Instruction {
@@ -189,7 +198,7 @@ protected:
 
 class Label: public Instruction {
     const char *label;
-    
+
 public:
     explicit Label(const char *label);
     void Print() override;
@@ -214,6 +223,7 @@ public:
     IfZ(Location *test, const char *label);
     void EmitSpecific(Mips *mips) override;
     const char *GetLabel() { return label; }
+    std::set<Location *> GetGenSet() const override;
 };
 
 class BeginFunc: public Instruction {
@@ -238,6 +248,7 @@ class Return: public Instruction {
 public:
     explicit Return(Location *val);
     void EmitSpecific(Mips *mips) override;
+    std::set<Location *> GetGenSet() const override;
 };   
 
 class PushParam: public Instruction {
@@ -246,6 +257,7 @@ class PushParam: public Instruction {
 public:
     explicit PushParam(Location *param);
     void EmitSpecific(Mips *mips) override;
+    std::set<Location *> GetGenSet() const override;
 }; 
 
 class PopParams: public Instruction {

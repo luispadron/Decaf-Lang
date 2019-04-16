@@ -29,8 +29,9 @@ bool Location::IsEqualTo(const Location *other) const {
 void Instruction::Print() {
     printf("\t%s ;", printed);
     printf("\t# live-out = {");
-    for (auto *loc : outSet) {
-        printf("%s,", loc->GetName());
+    for (auto it = outSet.begin(); it != outSet.end(); ++it) {
+        if (it != outSet.begin()) printf(",");
+        printf("%s", (*it)->GetName());
     }
     printf("}");
     printf("\n");
@@ -63,28 +64,40 @@ void LoadConstant::EmitSpecific(Mips *mips) {
     mips->EmitLoadConstant(dst, val);
 }
 
-LoadStringConstant::LoadStringConstant(Location *d, const char *s)
-  : dst(d) {
-  Assert(dst != NULL && s != NULL);
-  const char *quote = (*s == '"') ? "" : "\"";
-  str = new char[strlen(s) + 2*strlen(quote) + 1];
-  sprintf(str, "%s%s%s", quote, s, quote);
-  quote = (strlen(str) > 50) ? "...\"" : "";
-  sprintf(printed, "%s = %.50s%s", dst->GetName(), str, quote);
-}
-void LoadStringConstant::EmitSpecific(Mips *mips) {
-  mips->EmitLoadStringConstant(dst, str);
+set<Location *> LoadConstant::GetKillSet() const {
+    return set<Location *>{dst};
 }
 
+
+LoadStringConstant::LoadStringConstant(Location *d, const char *s) : dst(d) {
+    Assert(dst != nullptr && s != nullptr);
+    const char *quote = (*s == '"') ? "" : "\"";
+    str = new char[strlen(s) + 2*strlen(quote) + 1];
+    sprintf(str, "%s%s%s", quote, s, quote);
+    quote = (strlen(str) > 50) ? "...\"" : "";
+    sprintf(printed, "%s = %.50s%s", dst->GetName(), str, quote);
+}
+
+void LoadStringConstant::EmitSpecific(Mips *mips) {
+    mips->EmitLoadStringConstant(dst, str);
+}
+
+set<Location *> LoadStringConstant::GetKillSet() const {
+    return set<Location *>{dst};
+}
      
 
-LoadLabel::LoadLabel(Location *d, const char *l)
-  : dst(d), label(strdup(l)) {
-  Assert(dst != NULL && label != NULL);
-  sprintf(printed, "%s = %s", dst->GetName(), label);
+LoadLabel::LoadLabel(Location *d, const char *l) : dst(d), label(strdup(l)) {
+    Assert(dst != nullptr && label != nullptr);
+    sprintf(printed, "%s = %s", dst->GetName(), label);
 }
+
 void LoadLabel::EmitSpecific(Mips *mips) {
-  mips->EmitLoadLabel(dst, label);
+    mips->EmitLoadLabel(dst, label);
+}
+
+set<Location *> LoadLabel::GetKillSet() const {
+    return set<Location *>{dst};
 }
 
 
@@ -115,7 +128,15 @@ Load::Load(Location *d, Location *s, int off) : dst(d), src(s), offset(off) {
 }
 
 void Load::EmitSpecific(Mips *mips) {
-  mips->EmitLoad(dst, src, offset);
+    mips->EmitLoad(dst, src, offset);
+}
+
+set<Location *> Load::GetKillSet() const {
+    return set<Location *>{dst};
+}
+
+set<Location *> Load::GetGenSet() const {
+    return set<Location *>{src};
 }
 
 
@@ -129,6 +150,11 @@ Store::Store(Location *d, Location *s, int off) : dst(d), src(s), offset(off) {
 
 void Store::EmitSpecific(Mips *mips) {
     mips->EmitStore(dst, src, offset);
+}
+
+
+set<Location *> Store::GetGenSet() const {
+    return set<Location *>{dst, src};
 }
 
 
@@ -197,6 +223,10 @@ void IfZ::EmitSpecific(Mips *mips) {
     mips->EmitIfZ(test, label);
 }
 
+set<Location *> IfZ::GetGenSet() const {
+    return set<Location *>{test};
+}
+
 
 BeginFunc::BeginFunc() {
   sprintf(printed,"BeginFunc (unassigned)");
@@ -228,39 +258,44 @@ void EndFunc::EmitSpecific(Mips *mips) {
 
  
 Return::Return(Location *v) : val(v) {
-  sprintf(printed, "Return %s", val? val->GetName() : "");
+    sprintf(printed, "Return %s", val? val->GetName() : "");
 }
+
 void Return::EmitSpecific(Mips *mips) {
-  mips->EmitReturn(val);
+    mips->EmitReturn(val);
+}
+
+set<Location *> Return::GetGenSet() const {
+    return set<Location *>{val};
 }
 
 
-
-PushParam::PushParam(Location *p)
-  :  param(p) {
-  Assert(param != NULL);
-  sprintf(printed, "PushParam %s", param->GetName());
+PushParam::PushParam(Location *p) :  param(p) {
+    Assert(param != nullptr);
+    sprintf(printed, "PushParam %s", param->GetName());
 }
+
 void PushParam::EmitSpecific(Mips *mips) {
-  mips->EmitParam(param);
-} 
-
-
-PopParams::PopParams(int nb)
-  :  numBytes(nb) {
-  sprintf(printed, "PopParams %d", numBytes);
+    mips->EmitParam(param);
 }
+
+set<Location *> PushParam::GetGenSet() const {
+    return set<Location *>{param};
+}
+
+
+PopParams::PopParams(int nb) : numBytes(nb) {
+    sprintf(printed, "PopParams %d", numBytes);
+}
+
 void PopParams::EmitSpecific(Mips *mips) {
-  mips->EmitPopParams(numBytes);
-} 
-
-
-
-
-LCall::LCall(const char *l, Location *d)
-  :  label(strdup(l)), dst(d) {
-  sprintf(printed, "%s%sLCall %s", dst? dst->GetName(): "", dst?" = ":"", label);
+    mips->EmitPopParams(numBytes);
 }
+
+LCall::LCall(const char *l, Location *d) : label(strdup(l)), dst(d) {
+    sprintf(printed, "%s%sLCall %s", dst? dst->GetName(): "", dst?" = ":"", label);
+}
+
 void LCall::EmitSpecific(Mips *mips) {
     // pp5 spill live out registers to memory
     for (auto *loc : outSet) {
@@ -275,12 +310,11 @@ void LCall::EmitSpecific(Mips *mips) {
 }
 
 
-ACall::ACall(Location *ma, Location *d)
-  : dst(d), methodAddr(ma) {
-  Assert(methodAddr != NULL);
-  sprintf(printed, "%s%sACall %s", dst? dst->GetName(): "", dst?" = ":"",
-	    methodAddr->GetName());
+ACall::ACall(Location *ma, Location *d) : dst(d), methodAddr(ma) {
+    Assert(methodAddr != NULL);
+    sprintf(printed, "%s%sACall %s", dst? dst->GetName(): "", dst?" = ":"", methodAddr->GetName());
 }
+
 void ACall::EmitSpecific(Mips *mips) {
     // pp5: need to spill and restore registers after function call
     for (auto *loc : outSet) {
