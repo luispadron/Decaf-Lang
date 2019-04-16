@@ -5,50 +5,16 @@
 #ifndef OPTIMIZATION_CFG_H
 #define OPTIMIZATION_CFG_H
 
-#include <algorithm>
-#include <utility>
-#include <set>
-#include <queue>
-#include <vector>
-#include <iostream>
+#include "list.h"
 
 class Instruction;
-class Location;
-template<typename T>
-class List;
-
-
-/**
- * CFInstruction
- */
-struct CFInstruction {
-
-    explicit CFInstruction(Instruction *instruction_);
-
-    /// prints out the content of this type
-    void print();
-
-    /// resets the in and out sets for use with traversal
-    void reset();
-
-    using Edges = std::set<CFInstruction*>;
-    using SetType = std::set<Location*>;
-
-    Instruction *instruction;
-    Edges successors;
-    Edges predecessors;
-
-    SetType in;
-    SetType out;
-};
-
 
 /**
  * SuccessorTree
  */
 class SuccessorTree {
 public:
-    explicit SuccessorTree(List<Instruction *> &instructions);
+    explicit SuccessorTree(List<Instruction *> &code);
 
     template<typename F>
     void traverse(F fn);
@@ -56,12 +22,10 @@ public:
     void print();
 
 private:
-    CFInstruction *root = nullptr;
-    std::vector<CFInstruction *> code;
+    Instruction *root = nullptr;
+    List<Instruction *> &code;
 
-    CFInstruction * generate(int pos, List<Instruction *> &instructions, CFInstruction *predecessor);
-
-    void reset();
+    Instruction * generate();
 };
 
 
@@ -69,7 +33,9 @@ private:
 
 template <typename F>
 void SuccessorTree::traverse(F fn) {
-    std::for_each(code.begin(), code.end(), fn);
+    for (int i = 0; i < code.NumElements(); ++i) {
+        fn(code.Nth(i));
+    }
 }
 
 #endif //OPTIMIZATION_CFG_H

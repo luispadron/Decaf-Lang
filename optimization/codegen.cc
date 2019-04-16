@@ -340,11 +340,6 @@ void CodeGenerator::DoOptimization() {
     SuccessorTree successor_tree(*code);
     auto list = DoLiveAnalyses(successor_tree);
     PerformRegisterAllocOpt(list);
-
-    // set the outSets for the instructions
-    successor_tree.traverse([&](CFInstruction *instr) {
-        instr->instruction->SetOutSet(instr->out);
-    });
 }
 
 
@@ -361,21 +356,21 @@ AdjacencyList<Location*> CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
         changed = false;
 
         // for each tac
-        tree.traverse([&](CFInstruction *curr) {
+        tree.traverse([&](Instruction *curr) {
             // get the successors set, which is all the in sets of all the successors
             set<Location *> succ_set;
             for (auto *successor : curr->successors) {
                 set_union(succ_set.begin(), succ_set.end(),
-                          successor->in.begin(), successor->in.end(),
+                          successor->inSet.begin(), successor->inSet.end(),
                           inserter(succ_set, succ_set.end()),
                           LocComp());
             }
 
-            curr->out = succ_set;
+            curr->outSet = succ_set;
 
             // get the KILL(curr) and GEN(curr) sets
-            auto kill = curr->instruction->GetKillSet();
-            auto gen = curr->instruction->GetGenSet();
+            auto kill = curr->GetKillSet();
+            auto gen = curr->GetGenSet();
 
             // remove anything from KILL(curr) from succ_set, this becomes new_in set
             set<Location *> new_in;
@@ -393,12 +388,12 @@ AdjacencyList<Location*> CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
             // if the new set and current set are different there is a change, thus modify and continue
             set<Location *> diff;
             set_difference(new_in.begin(), new_in.end(),
-                           curr->in.begin(), curr->in.end(),
+                           curr->inSet.begin(), curr->inSet.end(),
                            inserter(diff, diff.begin()),
                            LocComp());
 
             if (!diff.empty()) {
-                curr->in = new_in;
+                curr->inSet = new_in;
                 changed = true;
             }
         });
@@ -409,9 +404,9 @@ AdjacencyList<Location*> CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
     // create adjacency list which basically will add an edge between everything
     // KILL(instr) U OUT(instr)
     AdjacencyList<Location *> list;
-    tree.traverse([&](CFInstruction *instr) {
-        auto gen = instr->instruction->GetGenSet();
-        auto kill = instr->instruction->GetKillSet();
+    tree.traverse([&](Instruction *instr) {
+        auto gen = instr->GetGenSet();
+        auto kill = instr->GetKillSet();
 
         for (auto *g : gen) {
             list.add(g);
@@ -420,7 +415,7 @@ AdjacencyList<Location*> CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
         for (auto *k : kill) {
             list.add(k);
 
-            for (auto *o : instr->out) {
+            for (auto *o : instr->outSet) {
                 if (k == o) return;
                 list.add_edge(k, o);
             }

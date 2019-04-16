@@ -14,69 +14,21 @@
 
 using namespace std;
 
-CFInstruction::CFInstruction(Instruction *instruction_) : instruction{instruction_} { }
-
-void CFInstruction::print() {
-    cout << "instruction: ";
-    instruction->Print();
-    cout << endl;
-
-    cout << "IN: \n";
-    for (auto loc : in) {
-        cout << "\t" << loc->GetName();
-    }
-
-    cout << "\nOUT: \n";
-    for (auto loc : out) {
-        cout << "\t" << loc->GetName();
-    }
-
-    cout << "\n==================\n\n";
+SuccessorTree::SuccessorTree(List<Instruction *> &code_) : code{code_} {
+    this->root = SuccessorTree::generate();
 }
 
-void CFInstruction::reset() {
-    in.clear();
-    out.clear();
-}
+void SuccessorTree::print() { }
 
+Instruction* SuccessorTree::generate() {
+    for (int i = 0; i < code.NumElements(); ++i) {
+        auto cfi = code.Nth(i);
+        cfi->GenSuccSet(i, code);
 
-SuccessorTree::SuccessorTree(List<Instruction *> &instructions) {
-    this->code.reserve(instructions.NumElements());
-
-    for (int i = 0; i < instructions.NumElements(); ++i) {
-        this->code.push_back(new CFInstruction(instructions.Nth(i)));
-    }
-
-    this->root = SuccessorTree::generate(0, instructions, nullptr);
-}
-
-void SuccessorTree::print() {
-    cout << "Successor tree:" << endl;
-    for (auto *line : code) {
-        line->print();
-    }
-    cout << "\\===============/" << endl;
-}
-
-CFInstruction* SuccessorTree::generate(int pos, List<Instruction *> &instructions, CFInstruction *predecessor) {
-    for (int i = 0; i < code.size(); ++i) {
-        auto cfi = code[i];
-        auto successors = cfi->instruction->GetSuccSet(i, instructions);
-
-        for (auto *si : successors) {
-            auto succ = find_if(code.begin(), code.end(), [&si](CFInstruction *instr) {
-               return si == instr->instruction;
-            });
-            Assert(succ != code.end());
-
-            cfi->successors.insert(*succ);
-            (*succ)->predecessors.insert(cfi);
+        for (auto *si : cfi->successors) {
+            si->predecessors.insert(cfi);
         }
     }
 
-    return code[0];
-}
-
-void SuccessorTree::reset() {
-    for_each(code.begin(), code.end(), mem_fn(&CFInstruction::reset));
+    return code.Nth(0);
 }

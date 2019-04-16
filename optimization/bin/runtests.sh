@@ -15,7 +15,8 @@ echo ""
 echo "running tac tests"
 echo ""
 
-./bin/gentests.sh tac_tests/in tac_tests/ours dcc tac
+./bin/gentests.sh tac_tests/in tac_tests/correct solution/dcc-mac tac &> /dev/null
+./bin/gentests.sh tac_tests/in tac_tests/ours dcc tac &> /dev/null
 for file in tac_tests/correct/*.txt
 do
     filename="${file##*/}"

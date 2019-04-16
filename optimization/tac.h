@@ -79,16 +79,20 @@ public:
 class Instruction {
 protected:
     char printed[128];
-    std::set<Location *> outSet;
 	  
 public:
+    std::set<Location *> inSet;
+    std::set<Location *> outSet;
+    std::set<Instruction *> successors;
+    std::set<Instruction *> predecessors;
+
 	virtual void Print();
 	virtual void EmitSpecific(Mips *mips) = 0;
 	virtual void Emit(Mips *mips);
     void SetOutSet(std::set<Location *> out) { outSet = std::move(out); }
     virtual std::set<Location *> GetKillSet() const;
     virtual std::set<Location *> GetGenSet() const;
-    virtual std::set<Instruction *> GetSuccSet(int pos, const List<Instruction *> &instructions) const;
+    virtual void GenSuccSet(int pos, const List<Instruction *> &instructions);
     static int GetPosOfLabel(const char *label, const List<Instruction *> &instructions);
 };
 
@@ -212,7 +216,7 @@ class Goto: public Instruction {
 public:
     explicit Goto(const char *label);
     void EmitSpecific(Mips *mips) override;
-    std::set<Instruction *> GetSuccSet(int pos, const List<Instruction *> &instructions) const override;
+    void GenSuccSet(int pos, const List<Instruction *> &instructions) override;
 };
 
 class IfZ: public Instruction {
@@ -223,7 +227,7 @@ public:
     IfZ(Location *test, const char *label);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetGenSet() const override;
-    std::set<Instruction *> GetSuccSet(int pos, const List<Instruction *> &instructions) const override;
+    void GenSuccSet(int pos, const List<Instruction *> &instructions) override;
 };
 
 class BeginFunc: public Instruction {

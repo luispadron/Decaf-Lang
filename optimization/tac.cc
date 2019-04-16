@@ -54,11 +54,9 @@ set<Location *> Instruction::GetGenSet() const {
     return set<Location *>();
 }
 
-set<Instruction *> Instruction::GetSuccSet(int pos, const List<Instruction *> &instructions) const {
+void Instruction::GenSuccSet(int pos, const List<Instruction *> &instructions) {
     if (pos + 1 < instructions.NumElements()) {
-        return set<Instruction *>{instructions.Nth(pos + 1)};
-    } else {
-        return set<Instruction *>();
+        successors.insert(instructions.Nth(pos + 1));
     }
 }
 
@@ -233,10 +231,10 @@ void Goto::EmitSpecific(Mips *mips) {
     mips->EmitGoto(label);
 }
 
-set<Instruction *> Goto::GetSuccSet(int pos, const List<Instruction *> &instructions) const {
+void Goto::GenSuccSet(int pos, const List<Instruction *> &instructions) {
     auto lbl_pos = Instruction::GetPosOfLabel(label, instructions);
     Assert(lbl_pos >= 0 && lbl_pos < instructions.NumElements());
-    return set<Instruction *>{instructions.Nth(lbl_pos)};
+    successors.insert(instructions.Nth(lbl_pos));
 }
 
 IfZ::IfZ(Location *te, const char *l) : test(te), label(strdup(l)) {
@@ -252,13 +250,14 @@ set<Location *> IfZ::GetGenSet() const {
     return set<Location *>{test};
 }
 
-set<Instruction *> IfZ::GetSuccSet(int pos, const List<Instruction *> &instructions) const {
+void IfZ::GenSuccSet(int pos, const List<Instruction *> &instructions) {
     auto lbl_pos = Instruction::GetPosOfLabel(label, instructions);
 
     Assert(pos + 1 < instructions.NumElements());
     Assert(lbl_pos >= 0 && lbl_pos < instructions.NumElements());
 
-    return set<Instruction *>{instructions.Nth(pos + 1), instructions.Nth(lbl_pos)};
+    successors.insert(instructions.Nth(pos + 1));
+    successors.insert(instructions.Nth(lbl_pos));
 }
 
 
