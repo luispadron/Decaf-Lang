@@ -21,23 +21,28 @@
 
 using namespace std;
   
-CodeGenerator::CodeGenerator()
-{
-  code = new List<Instruction*>();
-  curGlobalOffset = 0;
+CodeGenerator::CodeGenerator() {
+    code = new List<Instruction*>();
+    curGlobalOffset = 0;
 }
 
-char *CodeGenerator::NewLabel()
-{
-  static int nextLabelNum = 0;
-  char temp[10];
-  sprintf(temp, "_L%d", nextLabelNum++);
-  return strdup(temp);
+void CodeGenerator::BeginLiveRange() {
+    liveRange.clear();
 }
 
+void CodeGenerator::AddInstruction(Instruction *line) {
+    code->Append(line);
+    liveRange.push_back(line);
+}
 
-Location *CodeGenerator::GenTempVariable()
-{
+char *CodeGenerator::NewLabel() {
+    static int nextLabelNum = 0;
+    char temp[10];
+    sprintf(temp, "_L%d", nextLabelNum++);
+    return strdup(temp);
+}
+
+Location *CodeGenerator::GenTempVariable() {
   static int nextTempNum;
   char temp[10];
   Location *result = NULL;
@@ -45,162 +50,135 @@ Location *CodeGenerator::GenTempVariable()
   return GenLocalVariable(temp);
 }
 
-  
-Location *CodeGenerator::GenLocalVariable(const char *varName)
-{            
+Location *CodeGenerator::GenLocalVariable(const char *varName) {
     curStackOffset -= VarSize;
-    Location *loc = new Location(fpRelative, curStackOffset+4, varName);
+    auto *loc = new Location(fpRelative, curStackOffset+4, varName);
     return loc;
 }
 
-Location *CodeGenerator::GenGlobalVariable(const char *varName)
-{
+Location *CodeGenerator::GenGlobalVariable(const char *varName) {
     curGlobalOffset += VarSize;
-    Location *loc = new Location(gpRelative, curGlobalOffset-4, varName);
+    auto *loc = new Location(gpRelative, curGlobalOffset-4, varName);
     return loc;
 }
 
-Location *CodeGenerator::GenParameter(int index, const char *varName)
-{
-    Location *loc = new Location(fpRelative, OffsetToFirstParam+index*VarSize, varName);
+Location *CodeGenerator::GenParameter(int index, const char *varName) {
+    auto *loc = new Location(fpRelative, OffsetToFirstParam+index*VarSize, varName);
     return loc;
 }
 
-Location *CodeGenerator::GenIndirect(Location* base, int offset)
-{
-    Location *loc = new Location(base, offset);
+Location *CodeGenerator::GenIndirect(Location* base, int offset) {
+    auto *loc = new Location(base, offset);
     return loc;
 }
 
-
-Location *CodeGenerator::GenLoadConstant(int value)
-{
-  Location *result = GenTempVariable();
-  code->Append(new LoadConstant(result, value));
-  return result;
+Location *CodeGenerator::GenLoadConstant(int value) {
+    auto *result = GenTempVariable();
+    AddInstruction(new LoadConstant(result, value));
+    return result;
 }
 
-Location *CodeGenerator::GenLoadConstant(const char *s)
-{
-  Location *result = GenTempVariable();
-  code->Append(new LoadStringConstant(result, s));
-  return result;
+Location *CodeGenerator::GenLoadConstant(const char *s) {
+    Location *result = GenTempVariable();
+    AddInstruction(new LoadStringConstant(result, s));
+    return result;
 } 
 
-Location *CodeGenerator::GenLoadLabel(const char *label)
-{
-  Location *result = GenTempVariable();
-  code->Append(new LoadLabel(result, label));
-  return result;
+Location *CodeGenerator::GenLoadLabel(const char *label) {
+    Location *result = GenTempVariable();
+    AddInstruction(new LoadLabel(result, label));
+    return result;
 } 
 
-
-void CodeGenerator::GenAssign(Location *dst, Location *src)
-{
-  code->Append(new Assign(dst, src));
+void CodeGenerator::GenAssign(Location *dst, Location *src) {
+    AddInstruction(new Assign(dst, src));
 }
 
-
-Location *CodeGenerator::GenLoad(Location *ref, int offset)
-{
-  Location *result = GenTempVariable();
-  code->Append(new Load(result, ref, offset));
-  return result;
+Location *CodeGenerator::GenLoad(Location *ref, int offset) {
+    Location *result = GenTempVariable();
+    AddInstruction(new Load(result, ref, offset));
+    return result;
 }
 
-void CodeGenerator::GenStore(Location *dst,Location *src, int offset)
-{
-  code->Append(new Store(dst, src, offset));
+void CodeGenerator::GenStore(Location *dst,Location *src, int offset) {
+    AddInstruction(new Store(dst, src, offset));
 }
 
-
-Location *CodeGenerator::GenBinaryOp(const char *opName, Location *op1,
-						     Location *op2)
-{
-  Location *result = GenTempVariable();
-  code->Append(new BinaryOp(BinaryOp::OpCodeForName(opName), result, op1, op2));
-  return result;
+Location *CodeGenerator::GenBinaryOp(const char *opName, Location *op1, Location *op2) {
+    Location *result = GenTempVariable();
+    AddInstruction(new BinaryOp(BinaryOp::OpCodeForName(opName), result, op1, op2));
+    return result;
 }
 
-
-void CodeGenerator::GenLabel(const char *label)
-{
-  code->Append(new Label(label));
+void CodeGenerator::GenLabel(const char *label) {
+    AddInstruction(new Label(label));
 }
 
-void CodeGenerator::GenIfZ(Location *test, const char *label)
-{
-  code->Append(new IfZ(test, label));
+void CodeGenerator::GenIfZ(Location *test, const char *label) {
+    AddInstruction(new IfZ(test, label));
 }
 
-void CodeGenerator::GenGoto(const char *label)
-{
-  code->Append(new Goto(label));
+void CodeGenerator::GenGoto(const char *label) {
+    AddInstruction(new Goto(label));
 }
 
-void CodeGenerator::GenReturn(Location *val)
-{
-  code->Append(new Return(val));
+void CodeGenerator::GenReturn(Location *val) {
+  AddInstruction(new Return(val));
 }
 
-
-BeginFunc *CodeGenerator::GenBeginFunc()
-{
-  BeginFunc *result = new BeginFunc;
-  code->Append(result);
+BeginFunc *CodeGenerator::GenBeginFunc() {
+  auto *result = new BeginFunc;
+  AddInstruction(result);
   insideFn = code->NumElements() - 1;
   curStackOffset = OffsetToFirstLocal;
   return result;
 }
 
-void CodeGenerator::GenEndFunc()
-{
-  code->Append(new EndFunc());
-  BeginFunc *beginFunc = dynamic_cast<BeginFunc*>(code->Nth(insideFn));
-  Assert(beginFunc != NULL);
-  beginFunc->SetFrameSize(OffsetToFirstLocal-curStackOffset);
+void CodeGenerator::GenEndFunc() {
+    AddInstruction(new EndFunc());
+    auto *beginFunc = dynamic_cast<BeginFunc*>(code->Nth(insideFn));
+    Assert(beginFunc != nullptr);
+    beginFunc->SetFrameSize(OffsetToFirstLocal-curStackOffset);
 }
 
-void CodeGenerator::GenPushParam(Location *param)
-{
-  code->Append(new PushParam(param));
+void CodeGenerator::GenPushParam(Location *param) {
+    AddInstruction(new PushParam(param));
 }
 
-void CodeGenerator::GenPopParams(int numBytesOfParams)
-{
-  Assert(numBytesOfParams >= 0 && numBytesOfParams % VarSize == 0); // sanity check
-  if (numBytesOfParams > 0)
-    code->Append(new PopParams(numBytesOfParams));
+void CodeGenerator::GenPopParams(int numBytesOfParams) {
+    Assert(numBytesOfParams >= 0 && numBytesOfParams % VarSize == 0); // sanity check
+    if (numBytesOfParams > 0)
+        AddInstruction(new PopParams(numBytesOfParams));
 }
 
-Location *CodeGenerator::GenLCall(const char *label, bool fnHasReturnValue)
-{
-  Location *result = fnHasReturnValue ? GenTempVariable() : NULL;
-  code->Append(new LCall(label, result));
-  return result;
+Location *CodeGenerator::GenLCall(const char *label, bool fnHasReturnValue) {
+    Location *result = fnHasReturnValue ? GenTempVariable() : nullptr;
+    AddInstruction(new LCall(label, result));
+    return result;
 }
   
-Location *CodeGenerator::GenFunctionCall(const char *fnLabel, List<Location*> *args, bool hasReturnValue)
-{
-  for (int i = args->NumElements()-1; i >= 0; i--) // push params right to left
-    GenPushParam(args->Nth(i));
-  Location *result = GenLCall(fnLabel, hasReturnValue);
-  GenPopParams(args->NumElements()*VarSize);
-  return result;
+Location *CodeGenerator::GenFunctionCall(const char *fnLabel, List<Location*> *args, bool hasReturnValue) {
+    for (int i = args->NumElements()-1; i >= 0; i--) { // push params right to left
+        GenPushParam(args->Nth(i));
+    }
+
+    auto *result = GenLCall(fnLabel, hasReturnValue);
+    GenPopParams(args->NumElements()*VarSize);
+    return result;
 }
 
-Location *CodeGenerator::GenACall(Location *fnAddr, bool fnHasReturnValue)
-{
-  Location *result = fnHasReturnValue ? GenTempVariable() : NULL;
-  code->Append(new ACall(fnAddr, result));
-  return result;
+Location *CodeGenerator::GenACall(Location *fnAddr, bool fnHasReturnValue) {
+    Location *result = fnHasReturnValue ? GenTempVariable() : nullptr;
+    AddInstruction(new ACall(fnAddr, result));
+    return result;
 }
   
 Location *CodeGenerator::GenMethodCall(Location *rcvr,
-			     Location *meth, List<Location*> *args, bool fnHasReturnValue)
-{
-  for (int i = args->NumElements()-1; i >= 0; i--)
-    GenPushParam(args->Nth(i));
+			     Location *meth, List<Location*> *args, bool fnHasReturnValue) {
+  for (int i = args->NumElements()-1; i >= 0; i--) {
+      GenPushParam(args->Nth(i));
+  }
+
   GenPushParam(rcvr);	// hidden "this" parameter
   Location *result= GenACall(meth, fnHasReturnValue);
   GenPopParams((args->NumElements()+1)*VarSize);
@@ -233,9 +211,9 @@ Location *CodeGenerator::GenBuiltInCall(BuiltIn bn,Location *arg1, Location *arg
   Assert((b->numArgs == 0 && !arg1 && !arg2)
 	|| (b->numArgs == 1 && arg1 && !arg2)
 	|| (b->numArgs == 2 && arg1 && arg2));
-  if (arg2) code->Append(new PushParam(arg2));
-  if (arg1) code->Append(new PushParam(arg1));
-  code->Append(new LCall(b->label, result));
+  if (arg2) AddInstruction(new PushParam(arg2));
+  if (arg1) AddInstruction(new PushParam(arg1));
+  AddInstruction(new LCall(b->label, result));
   GenPopParams(VarSize*b->numArgs);
   return result;
 }
@@ -243,7 +221,7 @@ Location *CodeGenerator::GenBuiltInCall(BuiltIn bn,Location *arg1, Location *arg
 
 void CodeGenerator::GenVTable(const char *className, List<const char *> *methodLabels)
 {
-  code->Append(new VTable(className, methodLabels));
+  AddInstruction(new VTable(className, methodLabels));
 }
 
 
@@ -335,19 +313,19 @@ void CodeGenerator::GenHaltWithMessage(const char *message)
    GenBuiltInCall(Halt, nullptr);
 }
 
-void CodeGenerator::DoOptimization() {
+void CodeGenerator::DoOptimizationOnLiveRange() {
     DoOptimizationSetup();
     DoRegisterAllocation();
 }
 
 void CodeGenerator::DoOptimizationSetup() {
     // sets up the successor/predecessors for instructions
-    for (int i = 0; i < code->NumElements(); ++i) {
-        auto cfi = code->Nth(i);
-        cfi->GenSuccSet(i, *code);
+    for (int i = 0; i < liveRange.size(); ++i) {
+        auto curr = liveRange[i];
+        curr->GenSuccSet(i, *code);
 
-        for (auto *si : cfi->successors) {
-            si->predecessors.insert(cfi);
+        for (auto *succ : curr->successors) {
+            succ->predecessors.insert(curr);
         }
     }
 }
@@ -357,9 +335,7 @@ void CodeGenerator::DoRegisterAllocation() {
     while (changed) {
         changed = false;
 
-        for (int i = 0; i < code->NumElements(); ++i) {
-            auto curr = code->Nth(i);
-
+        for (auto *curr : liveRange) {
             // get the successors set, which is all the in sets of all the successors
             set<Location *> succ_set;
             for (auto *successor : curr->successors) {
@@ -403,8 +379,7 @@ void CodeGenerator::DoRegisterAllocation() {
     // create adjacency list which basically will add an edge between everything
     // KILL(instr) U OUT(instr)
     AdjacencyList<Location *> list;
-    for (int i = 0; i < code->NumElements(); ++i) {
-        auto instr = code->Nth(i);
+    for (auto *instr : liveRange) {
         auto gen = instr->GetGenSet();
         auto kill = instr->GetKillSet();
 

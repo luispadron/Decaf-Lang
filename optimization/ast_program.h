@@ -19,9 +19,6 @@ public:
 
     void Check() override;
     void Emit(CodeGenerator *cg) override;
-
-private:
-    void RunOptimization(CodeGenerator *);
 };
 
 

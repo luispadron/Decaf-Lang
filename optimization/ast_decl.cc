@@ -278,18 +278,21 @@ bool FnDecl::MatchesPrototype(FnDecl *other) {
 }
 
 void FnDecl::Emit(CodeGenerator *cg) {
-    if (body) {
-        cg->GenLabel(GetFunctionLabel());
-        cg->GenBeginFunc();
-	int start = IsMethodDecl() ? 1 : 0;
-	for (int i = 0; i < formals->NumElements(); i++) {
-	    VarDecl *d = formals->Nth(i);
-	    d->rtLoc = cg->GenParameter(i + start, d->GetName());
-	}
-        body->Emit(cg);
-        cg->GenEndFunc();
-        
+    if (!body) return;
+
+    cg->BeginLiveRange();
+    cg->GenLabel(GetFunctionLabel());
+    cg->GenBeginFunc();
+    int start = IsMethodDecl() ? 1 : 0;
+
+    for (int i = 0; i < formals->NumElements(); i++) {
+        VarDecl *d = formals->Nth(i);
+        d->rtLoc = cg->GenParameter(i + start, d->GetName());
     }
+
+    body->Emit(cg);
+    cg->GenEndFunc();
+    cg->DoOptimizationOnLiveRange();
 }
 
 /* This synthesizes the appropriate label for function in such a way to

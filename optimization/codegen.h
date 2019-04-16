@@ -25,6 +25,7 @@ typedef enum { Alloc, ReadLine, ReadInteger, StringEqual,
 class CodeGenerator {
 private:
     List<Instruction*> *code;
+    std::vector<Instruction*> liveRange;
     int curStackOffset, curGlobalOffset;
     int insideFn;
 public:
@@ -44,6 +45,10 @@ public:
     static const int VarSize = 4;
 
     CodeGenerator();
+
+    void BeginLiveRange();
+
+    void AddInstruction(Instruction *line);
     
          // Assigns a new unique label name and returns it. Does not
          // generate any Tac instructions (see GenLabel below if needed)
@@ -161,7 +166,7 @@ public:
     void GenVTable(const char *className, List<const char*> *methodLabels);
 
 
-    void DoOptimization();
+    void DoOptimizationOnLiveRange();
 
 
          // Emits the final "object code" for the program by
