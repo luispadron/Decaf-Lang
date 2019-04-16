@@ -1,0 +1,17 @@
+// example from discussion
+
+void main() {
+    int a;
+    int b;
+    int c;
+    int d;
+    int e;
+    int g;
+
+    a = b + c;
+    c = d + b;
+    d = a;
+    e = b;
+    a = 7;
+    g = b;
+}

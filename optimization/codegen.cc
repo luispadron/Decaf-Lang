@@ -419,6 +419,8 @@ AdjacencyList<Location*> CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
         }
 
         for (auto *k : kill) {
+            list.add(k);
+
             for (auto *o : instr->out) {
                 if (k == o) return;
                 list.add_edge(k, o);
@@ -434,7 +436,7 @@ void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list) {
 
     constexpr int k = Mips::NumGeneralPurposeRegs; // for k-coloring
     bool has_less_k = true;
-    AdjacencyList<Location *> graph = list;
+    AdjacencyList<Location *> graph = list; // TODO: BUG here, since if the algo has to restart well lose an edge?
     stack<Location *> removed;
 
     // remove nodes with degree < k until there a no such nodes to remove
@@ -445,7 +447,12 @@ void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list) {
             if (list.get_degrees(it->first) < k) {
                 has_less_k = true;
                 removed.push(it->first);
+//                cout << "BEFORE: \n";
+//                list.print();
+//                cout << "REMOVING ITEM: " << it->first->GetName() << endl;
                 it = list.erase(it);
+//                cout << "AFTER: \n";
+//                list.print();
             } else {
                 ++it;
             }
@@ -493,12 +500,23 @@ int CodeGenerator::GetValidColor(Location *vertex, const AdjacencyList<Location 
         }
     }
 
-    for (int i = 1; i <= colors; ++i) {
-        if (assigned_colors.find(i) == assigned_colors.end()) {
-            return i;
-        }
-    }
+//    cout << "\n\nVERTEX: " << vertex->GetName();
+//    cout << "\nEDGES: ";
+//    for (const auto &edge : list.get_edges(vertex)) {
+//        cout << "\t" << edge->GetName();
+//    }
+//
+//    cout << "\nASSIGNED COLORS: ";
+//    for (auto i : assigned_colors) {
+//        cout << "\t" << i;
+//    }
 
-    Assert(false);
-    return -1;
+    auto max_color = max_element(assigned_colors.begin(), assigned_colors.end());
+    if (max_color == assigned_colors.end()) {
+//        cout << "\nASSIGNING COLOR: 1";
+        return 1;
+    } else {
+//        cout << "\nASSIGNING COLOR:" << *max_color + 1;
+        return *max_color + 1;
+    }
 }

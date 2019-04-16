@@ -5,6 +5,7 @@
 #ifndef OPTIMIZATION_ADJ_LIST_H
 #define OPTIMIZATION_ADJ_LIST_H
 
+#include <iostream>
 #include <iterator>
 #include <map>
 #include <unordered_set>
@@ -45,7 +46,7 @@ public:
     }
 
     /// returns whether there is an edge between `a` and `b`
-    bool has_edge(const T &a, const T &b) const noexcept {
+    bool has_edge(const T &a, const T &b) noexcept {
         return list[a].find(b) != list[a].end();
     }
 
@@ -85,6 +86,17 @@ public:
 
     typename List::iterator end() {
         return list.end();
+    }
+
+    void print() {
+        for (auto &kv : list) {
+            std::cout << "v: " << kv.first->GetName() << std::endl;
+            std::cout << "e:";
+            for (auto *loc : kv.second) {
+                std::cout << "\t" << loc->GetName();
+            }
+            std::cout << std::endl << std::endl;
+        }
     }
 
 private:
