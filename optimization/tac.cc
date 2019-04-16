@@ -282,7 +282,7 @@ void BeginFunc::EmitSpecific(Mips *mips) {
 
 
 EndFunc::EndFunc() : Instruction() {
-  sprintf(printed, "EndFunc");
+    sprintf(printed, "EndFunc");
 }
 
 void EndFunc::EmitSpecific(Mips *mips) {

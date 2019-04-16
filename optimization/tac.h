@@ -244,6 +244,7 @@ class EndFunc: public Instruction {
 public:
     EndFunc();
     void EmitSpecific(Mips *mips) override;
+    void GenSuccSet(int pos, const List<Instruction *> &instructions) override { }
 };
 
 class Return: public Instruction {
