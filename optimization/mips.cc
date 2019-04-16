@@ -273,19 +273,19 @@ void Mips::EmitParam(Location *arg)
  * register.  
  */
 void Mips::EmitCallInstr(Location *result, const char *fn, bool isLabel) {
-  Emit("%s %-15s\t# jump to function", isLabel? "jal": "jalr", fn);
-  if (result != NULL) {
-    Register reg = result->GetRegister() ? result->GetRegister() : rd;
-    Emit("move %s, %s\t\t# copy function return value from $v0",
-    regs[reg].name, regs[v0].name);
-    if (!result->GetRegister()) SpillRegister(result, reg);
-  }
+    Emit("%s %-15s\t# jump to function", isLabel? "jal": "jalr", fn);
+    if (result != nullptr) {
+        Register reg = result->GetRegister() ? result->GetRegister() : rd;
+        Emit("move %s, %s\t\t# copy function return value from $v0",
+        regs[reg].name, regs[v0].name);
+        if (!result->GetRegister()) SpillRegister(result, reg);
+    }
 }
 
 
 // Two covers for the above method for specific LCall/ACall variants
 void Mips::EmitLCall(Location *dst, const char *label) {
-  EmitCallInstr(dst, label, true);
+    EmitCallInstr(dst, label, true);
 }
 
 void Mips::EmitACall(Location *dst, Location *fn)

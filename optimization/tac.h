@@ -189,6 +189,7 @@ protected:
 
 class Label: public Instruction {
     const char *label;
+    
 public:
     explicit Label(const char *label);
     void Print() override;
@@ -198,6 +199,7 @@ public:
 
 class Goto: public Instruction {
     const char *label;
+
 public:
     explicit Goto(const char *label);
     void EmitSpecific(Mips *mips) override;
@@ -207,6 +209,7 @@ public:
 class IfZ: public Instruction {
     Location *test;
     const char *label;
+
 public:
     IfZ(Location *test, const char *label);
     void EmitSpecific(Mips *mips) override;
@@ -224,54 +227,60 @@ public:
 };
 
 class EndFunc: public Instruction {
-  public:
+public:
     EndFunc();
     void EmitSpecific(Mips *mips) override;
 };
 
 class Return: public Instruction {
     Location *val;
-  public:
+
+public:
     explicit Return(Location *val);
     void EmitSpecific(Mips *mips) override;
 };   
 
 class PushParam: public Instruction {
     Location *param;
-  public:
-    PushParam(Location *param);
-    void EmitSpecific(Mips *mips);
+
+public:
+    explicit PushParam(Location *param);
+    void EmitSpecific(Mips *mips) override;
 }; 
 
 class PopParams: public Instruction {
     int numBytes;
-  public:
-    PopParams(int numBytesOfParamsToRemove);
-    void EmitSpecific(Mips *mips);
+
+public:
+    explicit PopParams(int numBytesOfParamsToRemove);
+    void EmitSpecific(Mips *mips) override;
 }; 
 
 class LCall: public Instruction {
     const char *label;
     Location *dst;
-  public:
+
+public:
     LCall(const char *labe, Location *result);
-    void EmitSpecific(Mips *mips);
+    void EmitSpecific(Mips *mips) override;
 };
 
 class ACall: public Instruction {
     Location *dst, *methodAddr;
-  public:
+
+public:
     ACall(Location *meth, Location *result);
-    void EmitSpecific(Mips *mips);
+    void EmitSpecific(Mips *mips) override;
 };
 
 class VTable: public Instruction {
     List<const char *> *methodLabels;
     const char *label;
- public:
+
+public:
     VTable(const char *labelForTable, List<const char *> *methodLabels);
-    void Print();
-    void EmitSpecific(Mips *mips);
+    void Print() override;
+    void EmitSpecific(Mips *mips) override;
 };
 
 

@@ -262,10 +262,16 @@ LCall::LCall(const char *l, Location *d)
   sprintf(printed, "%s%sLCall %s", dst? dst->GetName(): "", dst?" = ":"", label);
 }
 void LCall::EmitSpecific(Mips *mips) {
-  /* pp5: need to save registers before a function call
-   * and restore them back after the call.
-   */
-  mips->EmitLCall(dst, label);
+    // pp5 spill live out registers to memory
+    for (auto *loc : outSet) {
+        mips->SpillRegister(loc, loc->GetRegister());
+    }
+
+    mips->EmitLCall(dst, label);
+
+    for (auto *loc : outSet) {
+        mips->FillRegister(loc, loc->GetRegister());
+    }
 }
 
 
@@ -276,10 +282,16 @@ ACall::ACall(Location *ma, Location *d)
 	    methodAddr->GetName());
 }
 void ACall::EmitSpecific(Mips *mips) {
-  /* pp5: need to save registers before a function call
-   * and restore them back after the call.
-   */
-  mips->EmitACall(dst, methodAddr);
+    // pp5: need to spill and restore registers after function call
+    for (auto *loc : outSet) {
+        mips->SpillRegister(loc, loc->GetRegister());
+    }
+
+    mips->EmitACall(dst, methodAddr);
+
+    for (auto *loc : outSet) {
+        mips->FillRegister(loc, loc->GetRegister());
+    }
 } 
 
 
