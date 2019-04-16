@@ -172,7 +172,7 @@ Mips::OpCode BinaryOp::OpCodeForName(const char *name) {
 }
 
 BinaryOp::BinaryOp(Mips::OpCode c, Location *d, Location *o1, Location *o2) : code(c), dst(d), op1(o1), op2(o2) {
-    Assert(dst != nullptr && op1 != nullptr && op2 != nullptr);
+    Assert(dst && op1 && op2);
     Assert(code >= 0 && code < Mips::NumOps);
     sprintf(printed, "%s = %s %s %s", dst->GetName(), op1->GetName(), opName[code], op2->GetName());
 }

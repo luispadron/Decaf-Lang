@@ -258,8 +258,7 @@ void CodeGenerator::DoFinalCodeGen() {
         mips.EmitPreamble();
 
         for (int i = 0; i < code->NumElements(); i++) {
-            auto line = code->Nth(i);
-            line->Emit(&mips);
+            code->Nth(i)->Emit(&mips);
         }
     }
 }

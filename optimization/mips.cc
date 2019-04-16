@@ -459,7 +459,7 @@ Mips::Mips() {
   regs[gp] = (RegContents){"$gp", false};
   regs[sp] = (RegContents){"$sp", false};
   regs[fp] = (RegContents){"$fp", false};
-  regs[ra] = (RegContents){"$ra", false};
+  regs[ra] = (RegContents){"$ra", true};
   regs[t0] = (RegContents){"$t0", true};
   regs[t1] = (RegContents){"$t1", true};
   regs[t2] = (RegContents){"$t2", true};

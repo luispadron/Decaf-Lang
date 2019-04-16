@@ -42,10 +42,10 @@ typedef enum {fpRelative, gpRelative} Segment;
 
 class Location {
 protected:
-    const char *variableName = "";
+    const char *variableName;
     Segment segment;
     int offset;
-    Location *reference;
+    Location *reference = nullptr;
     int refOffset;
 
     // The register allocated to this location.
@@ -153,8 +153,6 @@ class Assign: public Instruction {
 public:
     Assign(Location *dst, Location *src);
     void EmitSpecific(Mips *mips) override;
-    Location *GetDst() { return dst; }
-    Location *GetSrc() { return src; }
     std::set<Location *> GetKillSet() const override;
     std::set<Location *> GetGenSet() const override;
 };
@@ -273,8 +271,9 @@ class LCall: public Instruction {
     Location *dst;
 
 public:
-    LCall(const char *labe, Location *result);
+    LCall(const char *label, Location *result);
     void EmitSpecific(Mips *mips) override;
+    const char * GetLabel() const { return label; }
 };
 
 class ACall: public Instruction {
