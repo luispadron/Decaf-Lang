@@ -27,7 +27,6 @@
 #include "mips.h"
 
 #include <set>
-#include <vector>
 #include <utility>
 
 
@@ -80,14 +79,15 @@ public:
 class Instruction {
 protected:
     char printed[128];
+    std::set<Location *> outSet;
 	  
 public:
 	virtual void Print();
 	virtual void EmitSpecific(Mips *mips) = 0;
 	virtual void Emit(Mips *mips);
-    virtual std::vector<Instruction*> GetSucc(List<Instruction *> &instructions, int pos) const;
     virtual std::set<Location *> GetKillSet() const;
     virtual std::set<Location *> GetGenSet() const;
+    void SetOutSet(std::set<Location *> out) { outSet = std::move(out); }
 };
 
   
@@ -202,7 +202,6 @@ public:
     explicit Goto(const char *label);
     void EmitSpecific(Mips *mips) override;
     const char *GetLabel() { return label; }
-    std::vector<Instruction*> GetSucc(List<Instruction *> &instructions, int pos) const override;
 };
 
 class IfZ: public Instruction {
@@ -212,12 +211,12 @@ public:
     IfZ(Location *test, const char *label);
     void EmitSpecific(Mips *mips) override;
     const char *GetLabel() { return label; }
-    std::vector<Instruction*> GetSucc(List<Instruction *> &instructions, int pos) const override;
 };
 
 class BeginFunc: public Instruction {
     int frameSize;
-  public:
+
+public:
     BeginFunc();
     // used to backpatch the instruction with frame size once known
     void SetFrameSize(int numBytesForAllLocalsAndTemps);

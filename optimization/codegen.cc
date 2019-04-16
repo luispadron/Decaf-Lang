@@ -249,20 +249,17 @@ void CodeGenerator::GenVTable(const char *className, List<const char *> *methodL
 
 
 void CodeGenerator::DoFinalCodeGen() {
-
-    if (IsDebugOn("opt")) { // prints out code names
-        for (int i = 0; i < code->NumElements(); i++) {
-            cout << typeid(*code->Nth(i)).name() << endl;
-        }
-    } else if (IsDebugOn("tac")) { // if debug don't translate to mips, just print Tac
+    if (IsDebugOn("tac")) { // if debug don't translate to mips, just print Tac
         for (int i = 0; i < code->NumElements(); i++) {
             code->Nth(i)->Print();
         }
     } else {
         Mips mips;
         mips.EmitPreamble();
+
         for (int i = 0; i < code->NumElements(); i++) {
-            code->Nth(i)->Emit(&mips);
+            auto line = code->Nth(i);
+            line->Emit(&mips);
         }
     }
 }
@@ -344,6 +341,11 @@ void CodeGenerator::DoOptimization() {
     SuccessorTree successor_tree(*code);
     auto list = DoLiveAnalyses(successor_tree);
     PerformRegisterAllocOpt(list);
+
+    // set the outSets for the instructions
+    successor_tree.traverse([&](CFInstruction *instr) {
+        instr->instruction->SetOutSet(instr->out);
+    });
 }
 
 
@@ -409,7 +411,12 @@ AdjacencyList<Location*> CodeGenerator::DoLiveAnalyses(SuccessorTree &tree) {
     // KILL(instr) U OUT(instr)
     AdjacencyList<Location *> list;
     tree.traverse([&](CFInstruction *instr) {
+        auto gen = instr->instruction->GetGenSet();
         auto kill = instr->instruction->GetKillSet();
+
+        for (auto *g : gen) {
+            list.add(g);
+        }
 
         for (auto *k : kill) {
             for (auto *o : instr->out) {

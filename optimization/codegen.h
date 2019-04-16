@@ -28,7 +28,6 @@ private:
     List<Instruction*> *code;
     int curStackOffset, curGlobalOffset;
     int insideFn;
-
 public:
            // Here are some class constants to remind you of the offsets
            // used for globals, locals, and parameters. You will be

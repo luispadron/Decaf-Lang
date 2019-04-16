@@ -138,7 +138,8 @@ void Mips::EmitCopy(Location *dst, Location *src)
   if (!src->GetRegister()) FillRegister(src, reg);
   if (dst->GetRegister())
     Emit("move %s, %s\t# copy regs", regs[dst->GetRegister()].name, regs[reg].name);
-  else SpillRegister(dst, reg);
+  else
+      SpillRegister(dst, reg);
 }
 
 
@@ -414,17 +415,20 @@ const char *Mips::NameForTac(OpCode code)
 {
   Assert(code >=0 && code < NumOps);
   const char *name = mipsName[code];
-  Assert(name != NULL);
+  Assert(name != nullptr);
   return name;
 }
 
 /// returns a general purpose register for any position given in the range [1-18].
 Mips::Register Mips::GetGenPurposeReg(int pos) {
     Assert(pos >= 1 && pos <= 18);
-    static Register gen_purpose[18] = {t0, t1, t2, t3, t4, t5, t6, t7,
-                                       s0, s1, s2, s3, s4, s5, s6, s7,
-                                       t8, t9};
-    return gen_purpose[pos - 1];
+    static Mips::Register gen_purpose_regs[18] = {
+            t0, t1, t2, t3, t4, t5, t6, t7,
+            s0, s1, s2, s3, s4, s5, s6, s7,
+            t8, t9
+    };
+
+    return gen_purpose_regs[pos - 1];
 }
 
 /* Constructor
@@ -455,7 +459,7 @@ Mips::Mips() {
   regs[gp] = (RegContents){"$gp", false};
   regs[sp] = (RegContents){"$sp", false};
   regs[fp] = (RegContents){"$fp", false};
-  regs[ra] = (RegContents){"$ra", true};
+  regs[ra] = (RegContents){"$ra", false};
   regs[t0] = (RegContents){"$t0", true};
   regs[t1] = (RegContents){"$t1", true};
   regs[t2] = (RegContents){"$t2", true};

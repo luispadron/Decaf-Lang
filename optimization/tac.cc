@@ -27,27 +27,23 @@ bool Location::IsEqualTo(const Location *other) const {
 }
  
 void Instruction::Print() {
-  printf("\t%s ;", printed);
-  printf("\n");
+    printf("\t%s ;", printed);
+    printf("\t# live-out = {");
+    for (auto *loc : outSet) {
+        printf("%s,", loc->GetName());
+    }
+    printf("}");
+    printf("\n");
 }
 
 void Instruction::Emit(Mips *mips) {
-  if (*printed) {
-      mips->Emit("# %s", printed);   // emit TAC as comment into assembly
-  }
-
-  EmitSpecific(mips);
-}
-
-vector<Instruction*> Instruction::GetSucc(List<Instruction *> &instructions, int pos) const {
-    vector<Instruction*> successors;
-
-    if (pos + 1 < instructions.NumElements()) {
-        successors.push_back(instructions.Nth(pos + 1));
+    if (*printed) {
+        mips->Emit("# %s", printed);   // emit TAC as comment into assembly
     }
 
-    return successors;
+    EmitSpecific(mips);
 }
+
 
 set<Location *> Instruction::GetKillSet() const {
     return set<Location *>();
@@ -191,20 +187,6 @@ void Goto::EmitSpecific(Mips *mips) {
     mips->EmitGoto(label);
 }
 
-vector<Instruction*> Goto::GetSucc(List<Instruction *> &instructions, int pos) const {
-    vector<Instruction*> successors;
-    // find next instruction which is the label that this goto has
-    for (int i = pos; i < instructions.NumElements(); ++i) {
-        auto ilbl = dynamic_cast<Label*>(instructions.Nth(i));
-        if (ilbl && strcmp(ilbl->GetLabel(), label) == 0) {
-            successors.push_back(ilbl);
-        }
-    }
-
-    Assert(successors.size() == 1);
-    return successors;
-}
-
 
 IfZ::IfZ(Location *te, const char *l) : test(te), label(strdup(l)) {
     Assert(test != nullptr && label != nullptr);
@@ -213,22 +195,6 @@ IfZ::IfZ(Location *te, const char *l) : test(te), label(strdup(l)) {
 
 void IfZ::EmitSpecific(Mips *mips) {
     mips->EmitIfZ(test, label);
-}
-
-vector<Instruction*> IfZ::GetSucc(List<Instruction *> &instructions, int pos) const {
-    vector<Instruction *> successors;
-    successors.push_back(instructions.Nth(pos + 1));
-
-    // find exit label
-    for (int i = pos; i < instructions.NumElements(); ++i) {
-        auto ilbl = dynamic_cast<Label*>(instructions.Nth(i));
-        if (ilbl && strcmp(ilbl->GetLabel(), label) == 0) {
-            successors.push_back(ilbl);
-        }
-    }
-
-    Assert(successors.size() == 2);
-    return successors;
 }
 
 
@@ -243,9 +209,12 @@ void BeginFunc::SetFrameSize(int numBytesForAllLocalsAndTemps) {
 }
 
 void BeginFunc::EmitSpecific(Mips *mips) {
-  mips->EmitBeginFunction(frameSize);
-  /* pp5: need to load all parameters to the allocated registers.
-   */
+    mips->EmitBeginFunction(frameSize);
+    // pp5: need to load all parameters to the allocated registers.
+    for (auto *loc : outSet) {
+        auto reg = loc->GetRegister();
+        mips->FillRegister(loc, reg);
+    }
 }
 
 
@@ -261,7 +230,7 @@ void EndFunc::EmitSpecific(Mips *mips) {
 Return::Return(Location *v) : val(v) {
   sprintf(printed, "Return %s", val? val->GetName() : "");
 }
-void Return::EmitSpecific(Mips *mips) {	  
+void Return::EmitSpecific(Mips *mips) {
   mips->EmitReturn(val);
 }
 
