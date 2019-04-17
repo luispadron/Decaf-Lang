@@ -29,6 +29,7 @@ bool Location::IsEqualTo(const Location *other) const {
 void Instruction::Print() {
     printf("\t%s ;", printed);
     printf("\t# live-out = {");
+
     for (auto it = outSet.begin(); it != outSet.end(); ++it) {
         if (it != outSet.begin()) printf(",");
         printf("%s", (*it)->GetName());
@@ -351,15 +352,20 @@ LCall::LCall(const char *l, Location *d) : label(strdup(l)), dst(d) {
 }
 
 void LCall::EmitSpecific(Mips *mips) {
-    // pp5 spill live out registers to memory
+    // pp5 spill param registers to memory
     for (auto *loc : outSet) {
-        mips->SpillRegister(loc, loc->GetRegister());
+        if (loc->GetOffset() > 0) {
+            mips->SpillRegister(loc, loc->GetRegister());
+        }
     }
 
     mips->EmitLCall(dst, label);
 
+    // fill back the params
     for (auto *loc : outSet) {
-        mips->FillRegister(loc, loc->GetRegister());
+        if (loc->GetOffset() > 0) {
+            mips->FillRegister(loc, loc->GetRegister());
+        }
     }
 }
 
@@ -376,13 +382,13 @@ ACall::ACall(Location *ma, Location *d) : dst(d), methodAddr(ma) {
 void ACall::EmitSpecific(Mips *mips) {
     // pp5: need to spill and restore registers after function call
     for (auto *loc : outSet) {
-        mips->SpillRegister(loc, loc->GetRegister());
+        if (loc->GetOffset() > 0) mips->SpillRegister(loc, loc->GetRegister());
     }
 
     mips->EmitACall(dst, methodAddr);
 
     for (auto *loc : outSet) {
-        mips->FillRegister(loc, loc->GetRegister());
+        if (loc->GetOffset() > 0) mips->FillRegister(loc, loc->GetRegister());
     }
 }
 

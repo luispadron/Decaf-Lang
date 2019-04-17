@@ -163,7 +163,7 @@ Location *CodeGenerator::GenFunctionCall(const char *fnLabel, List<Location*> *a
     }
 
     auto *result = GenLCall(fnLabel, hasReturnValue);
-    GenPopParams(args->NumElements()*VarSize);
+    GenPopParams(args->NumElements() * VarSize);
     return result;
 }
 
@@ -200,22 +200,23 @@ static struct _builtin {
   {"_PrintBool", 1, false},
   {"_Halt", 0, false}};
 
-Location *CodeGenerator::GenBuiltInCall(BuiltIn bn,Location *arg1, Location *arg2)
-{
-  Assert(bn >= 0 && bn < NumBuiltIns);
-  struct _builtin *b = &builtins[bn];
-  Location *result = NULL;
+Location *CodeGenerator::GenBuiltInCall(BuiltIn bn, Location *arg1, Location *arg2) {
+    Assert(bn >= 0 && bn < NumBuiltIns);
+    struct _builtin *b = &builtins[bn];
+    Location *result = nullptr;
 
-  if (b->hasReturn) result = GenTempVariable();
-                // verify appropriate number of non-NULL arguments given
-  Assert((b->numArgs == 0 && !arg1 && !arg2)
-	|| (b->numArgs == 1 && arg1 && !arg2)
-	|| (b->numArgs == 2 && arg1 && arg2));
-  if (arg2) AddInstruction(new PushParam(arg2));
-  if (arg1) AddInstruction(new PushParam(arg1));
-  AddInstruction(new LCall(b->label, result));
-  GenPopParams(VarSize*b->numArgs);
-  return result;
+    if (b->hasReturn) result = GenTempVariable();
+
+    // verify appropriate number of non-NULL arguments given
+    Assert((b->numArgs == 0 && !arg1 && !arg2) || (b->numArgs == 1 && arg1 && !arg2) || (b->numArgs == 2 && arg1 && arg2));
+    if (arg2) AddInstruction(new PushParam(arg2));
+    if (arg1) AddInstruction(new PushParam(arg1));
+
+    AddInstruction(new LCall(b->label, result));
+
+    GenPopParams(VarSize * b->numArgs);
+
+    return result;
 }
 
 
@@ -340,7 +341,9 @@ void CodeGenerator::DoRegisterAllocation() {
     while (changed) {
         changed = false;
 
-        for (auto *tac : liveRange) {
+        for (auto it = liveRange.rbegin(); it != liveRange.rend(); ++it) {
+            auto *tac = *it;
+
             set<Location *> out_tac; // OUT[tac]
             // for every successor set OUT[tac] = UNION(IN[succ])
             for (auto *succ : tac->successors) {
@@ -380,26 +383,22 @@ void CodeGenerator::DoRegisterAllocation() {
     // KILL(instr) U OUT(instr)
     AdjacencyList<Location *> list;
     for (auto *instr : liveRange) {
-        auto gen = instr->GetGenSet();
-        auto kill = instr->GetKillSet();
-
-        for (auto *k : kill) {
+        for (auto *i : instr->inSet) {
             for (auto *o : instr->outSet) {
-                if (k == o) continue;
-                list.add_edge(k, o);
+                list.add(o);
+                if (i == o) continue;
+                list.add_edge(i, o);
             }
         }
     }
 
-    PerformRegisterAllocOpt(list);
+    PerformRegisterAllocOpt(list, list);
 }
 
-void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list) {
+void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list, AdjacencyList<Location *> graph) {
     using Edges = AdjacencyList<Location *>::Edges;
-
     constexpr int k = Mips::NumGeneralPurposeRegs; // for k-coloring
     bool has_less_k = true;
-    AdjacencyList<Location *> graph = list; // TODO: BUG here, since if the algo has to restart well lose an edge?
     stack<Location *> removed;
 
     // remove nodes with degree < k until there a no such nodes to remove
@@ -410,12 +409,7 @@ void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list) {
             if (list.get_degrees(it->first) < k) {
                 has_less_k = true;
                 removed.push(it->first);
-//                cout << "BEFORE: \n";
-//                list.print();
-//                cout << "REMOVING ITEM: " << it->first->GetName() << endl;
                 it = list.erase(it);
-//                cout << "AFTER: \n";
-//                list.print();
             } else {
                 ++it;
             }
@@ -439,7 +433,7 @@ void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list) {
         for (auto it = graph.begin(); it != graph.end(); ++it) {
             auto reg = graph.get_color(it->first);
             it->first->SetRegister(Mips::GetGenPurposeReg(reg));
-        };
+        }
     } else { // find location to spill, and rerun this algorithm
         // for this case we will simply remove the node with highest degree
         auto max_vertex = list.begin();
@@ -450,7 +444,7 @@ void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list) {
         }
 
         list.erase(max_vertex);
-        PerformRegisterAllocOpt(list);
+        PerformRegisterAllocOpt(list, graph);
     }
 }
 
@@ -463,23 +457,10 @@ int CodeGenerator::GetValidColor(Location *vertex, const AdjacencyList<Location 
         }
     }
 
-//    cout << "\n\nVERTEX: " << vertex->GetName();
-//    cout << "\nEDGES: ";
-//    for (const auto &edge : list.get_edges(vertex)) {
-//        cout << "\t" << edge->GetName();
-//    }
-//
-//    cout << "\nASSIGNED COLORS: ";
-//    for (auto i : assigned_colors) {
-//        cout << "\t" << i;
-//    }
-
     auto max_color = max_element(assigned_colors.begin(), assigned_colors.end());
     if (max_color == assigned_colors.end()) {
-//        cout << "\nASSIGNING COLOR: 1";
         return 1;
     } else {
-//        cout << "\nASSIGNING COLOR:" << *max_color + 1;
         return *max_color + 1;
     }
 }

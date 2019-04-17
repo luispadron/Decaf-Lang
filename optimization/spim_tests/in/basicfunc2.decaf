@@ -1,0 +1,14 @@
+int add(int x, int y) {
+    return x + y;
+}
+
+void main() {
+    int a;
+    int b;
+    int k;
+
+    a = 60;
+    b = 9;
+    k = add(a, b);
+    Print(k);
+}

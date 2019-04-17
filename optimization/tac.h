@@ -284,7 +284,6 @@ class LCall: public Instruction {
 public:
     LCall(const char *label, Location *result);
     void EmitSpecific(Mips *mips) override;
-    const char * GetLabel() const { return label; }
     std::set<Location *> GetKillSet() const override;
 };
 

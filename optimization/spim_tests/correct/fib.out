@@ -1,0 +1,5 @@
+Loaded: /usr/local/Cellar/spim/9.1.19/share/exceptions.s
+
+This program computes Fibonacci numbers (slowly.. but correctly!)
+
+Enter the fibonacci number you want: (-1 to quit) 

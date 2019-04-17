@@ -1,12 +1,12 @@
-int factorial(int n)
+int factorial(int n, int x)
 {
   if (n <=1 ) return 1;
-  return n*factorial(n-1);
+  return n*factorial(n-1, 0);
 }
 
 void main()
 {
    int n;
    for (n = 1; n <= 15; n = n + 1)
-      Print("Factorial(", n , ") = ", factorial(n), "\n");
+      Print("Factorial(", n , ") = ", factorial(n, 0), "\n");
 }

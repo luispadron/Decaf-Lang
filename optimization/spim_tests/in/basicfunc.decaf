@@ -1,0 +1,26 @@
+void main() {
+    int a;
+    int b;
+    int c;
+    int d;
+    int e;
+    int f;
+    int g;
+
+    a = 1;
+    b = 2;
+    c = 5;
+    g = 10;
+
+    e = d + a;
+    f = b + c;
+    f = f + b;
+    d = e + f;
+    d = e - d;
+    g = d;
+
+    Print(g);
+    Print(d);
+    Print(e);
+    Print(f);
+}

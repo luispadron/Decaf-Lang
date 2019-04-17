@@ -1,0 +1,30 @@
+// example from discussion
+
+void main() {
+    int a;
+    int b;
+    int c;
+    int d;
+    int e;
+    int f;
+    int g;
+
+    a = 10;
+    b = 20;
+    c = 30;
+    d = 40;
+    e = 50;
+    f = 60;
+
+    e = d + a;
+    f = b + c;
+    f = f + b;
+
+    if (true) {
+        d = e + f;
+    } else {
+        d = e - d;
+    }
+
+    g = d;
+}

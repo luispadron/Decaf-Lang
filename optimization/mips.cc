@@ -189,17 +189,14 @@ void Mips::EmitStore(Location *reference, Location *value, int offset)
  * emits the appropriate instruction by looking up the mips name
  * for the particular op code.
  */
-void Mips::EmitBinaryOp(OpCode code, Location *dst, 
-			Location *op1, Location *op2)
-{
-  Register reg = dst->GetRegister() ? dst->GetRegister() : rd;
-  Register reg1 = op1->GetRegister() ? op1->GetRegister() : rs;
-  Register reg2 = op2->GetRegister() ? op2->GetRegister() : rt;
-  if (!op1->GetRegister()) FillRegister(op1, reg1);
-  if (!op2->GetRegister()) FillRegister(op2, reg2);
-  Emit("%s %s, %s, %s\t", NameForTac(code), regs[reg].name,
-	 regs[reg1].name, regs[reg2].name);
-  if (!dst->GetRegister()) SpillRegister(dst, reg);
+void Mips::EmitBinaryOp(OpCode code, Location *dst, Location *op1, Location *op2) {
+    Register reg = dst->GetRegister() ? dst->GetRegister() : rd;
+    Register reg1 = op1->GetRegister() ? op1->GetRegister() : rs;
+    Register reg2 = op2->GetRegister() ? op2->GetRegister() : rt;
+    if (!op1->GetRegister()) FillRegister(op1, reg1);
+    if (!op2->GetRegister()) FillRegister(op2, reg2);
+    Emit("%s %s, %s, %s\t", NameForTac(code), regs[reg].name, regs[reg1].name, regs[reg2].name);
+    if (!dst->GetRegister()) SpillRegister(dst, reg);
 }
 
 
@@ -252,12 +249,11 @@ void Mips::EmitIfZ(Location *test, const char *label)
  * register and then stores contents to location just made at end of
  * stack.
  */
-void Mips::EmitParam(Location *arg)
-{
-  Register reg = arg->GetRegister() ? arg->GetRegister() : rs;
-  Emit("subu $sp, $sp, 4\t# decrement sp to make space for param");
-  if (!arg->GetRegister()) FillRegister(arg, reg);
-  Emit("sw %s, 4($sp)\t# copy param value to stack", regs[reg].name);
+void Mips::EmitParam(Location *arg) {
+    Register reg = arg->GetRegister() ? arg->GetRegister() : rs;
+    Emit("subu $sp, $sp, 4\t# decrement sp to make space for param");
+    if (!arg->GetRegister()) FillRegister(arg, reg);
+    Emit("sw %s, 4($sp)\t# copy param value to stack", regs[reg].name);
 }
 
 

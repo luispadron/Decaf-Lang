@@ -190,7 +190,7 @@ private:
     void GenHaltWithMessage(const char *msg);
     void DoOptimizationSetup();
     void DoRegisterAllocation();
-    void PerformRegisterAllocOpt(AdjacencyList<Location *> list);
+    void PerformRegisterAllocOpt(AdjacencyList<Location *> list, AdjacencyList<Location *> graph);
     int GetValidColor(Location *vertex, const AdjacencyList<Location *> &list, int colors);
 };
 

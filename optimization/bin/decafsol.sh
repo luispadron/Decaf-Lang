@@ -9,6 +9,6 @@ FILE=$1
 
 make > /dev/null
 
-./dcc-mac < $FILE > $FILE.asm
+./solution/dcc-mac < $FILE > $FILE.asm
 spim -file $FILE.asm
 rm $FILE.asm
