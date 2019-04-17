@@ -92,8 +92,8 @@ public:
     void SetOutSet(std::set<Location *> out) { outSet = std::move(out); }
     virtual std::set<Location *> GetKillSet() const;
     virtual std::set<Location *> GetGenSet() const;
-    virtual void GenSuccSet(int pos, const List<Instruction *> &instructions);
-    static int GetPosOfLabel(const char *label, const List<Instruction *> &instructions);
+    virtual void GenSuccSet(int pos, const std::vector<Instruction *> &instructions);
+    static int GetPosOfLabel(const char *label, const std::vector<Instruction *> &instructions);
 };
 
   
@@ -216,7 +216,7 @@ class Goto: public Instruction {
 public:
     explicit Goto(const char *label);
     void EmitSpecific(Mips *mips) override;
-    void GenSuccSet(int pos, const List<Instruction *> &instructions) override;
+    void GenSuccSet(int pos, const std::vector<Instruction *> &instructions) override;
 };
 
 class IfZ: public Instruction {
@@ -227,7 +227,7 @@ public:
     IfZ(Location *test, const char *label);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetGenSet() const override;
-    void GenSuccSet(int pos, const List<Instruction *> &instructions) override;
+    void GenSuccSet(int pos, const std::vector<Instruction *> &instructions) override;
 };
 
 class BeginFunc: public Instruction {
@@ -244,7 +244,7 @@ class EndFunc: public Instruction {
 public:
     EndFunc();
     void EmitSpecific(Mips *mips) override;
-    void GenSuccSet(int pos, const List<Instruction *> &instructions) override { }
+    void GenSuccSet(int pos, const std::vector<Instruction *> &instructions) override { }
 };
 
 class Return: public Instruction {
@@ -281,6 +281,7 @@ public:
     LCall(const char *label, Location *result);
     void EmitSpecific(Mips *mips) override;
     const char * GetLabel() const { return label; }
+    std::set<Location *> GetKillSet() const override;
 };
 
 class ACall: public Instruction {
@@ -289,6 +290,7 @@ class ACall: public Instruction {
 public:
     ACall(Location *meth, Location *result);
     void EmitSpecific(Mips *mips) override;
+    std::set<Location *> GetKillSet() const override;
 };
 
 class VTable: public Instruction {

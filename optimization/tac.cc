@@ -16,7 +16,7 @@
 using namespace std;
 
 Location::Location(Segment s, int o, const char *name) :
-  variableName(strdup(name)), segment(s), offset(o), reg(Mips::zero) {}
+    variableName(strdup(name)), segment(s), offset(o), reg(Mips::zero) {}
 
 bool Location::IsEqualTo(const Location *other) const {
     return (this == other ||
@@ -54,15 +54,15 @@ set<Location *> Instruction::GetGenSet() const {
     return set<Location *>();
 }
 
-void Instruction::GenSuccSet(int pos, const List<Instruction *> &instructions) {
-    if (pos + 1 < instructions.NumElements()) {
-        successors.insert(instructions.Nth(pos + 1));
+void Instruction::GenSuccSet(int pos, const vector<Instruction *> &instructions) {
+    if (pos + 1 < instructions.size()) {
+        successors.insert(instructions[pos + 1]);
     }
 }
 
-int Instruction::GetPosOfLabel(const char *label, const List<Instruction *> &instructions) {
-    for (int i = 0; i < instructions.NumElements(); ++i) {
-        auto lblInstruction = dynamic_cast<Label*>(instructions.Nth(i));
+int Instruction::GetPosOfLabel(const char *label, const std::vector<Instruction *> &instructions) {
+    for (int i = 0; i < instructions.size(); ++i) {
+        auto lblInstruction = dynamic_cast<Label*>(instructions[i]);
         if (lblInstruction && strcmp(lblInstruction->GetLabel(), label) == 0) {
             return i;
         }
@@ -231,10 +231,10 @@ void Goto::EmitSpecific(Mips *mips) {
     mips->EmitGoto(label);
 }
 
-void Goto::GenSuccSet(int pos, const List<Instruction *> &instructions) {
+void Goto::GenSuccSet(int pos, const vector<Instruction *> &instructions) {
     auto lbl_pos = Instruction::GetPosOfLabel(label, instructions);
-    Assert(lbl_pos >= 0 && lbl_pos < instructions.NumElements());
-    successors.insert(instructions.Nth(lbl_pos));
+    Assert(lbl_pos >= 0 && lbl_pos < instructions.size());
+    successors.insert(instructions[lbl_pos]);
 }
 
 IfZ::IfZ(Location *te, const char *l) : test(te), label(strdup(l)) {
@@ -250,14 +250,14 @@ set<Location *> IfZ::GetGenSet() const {
     return set<Location *>{test};
 }
 
-void IfZ::GenSuccSet(int pos, const List<Instruction *> &instructions) {
+void IfZ::GenSuccSet(int pos, const vector<Instruction *> &instructions) {
     auto lbl_pos = Instruction::GetPosOfLabel(label, instructions);
 
-    Assert(pos + 1 < instructions.NumElements());
-    Assert(lbl_pos >= 0 && lbl_pos < instructions.NumElements());
+    Assert(pos + 1 < instructions.size());
+    Assert(lbl_pos >= 0 && lbl_pos < instructions.size());
 
-    successors.insert(instructions.Nth(pos + 1));
-    successors.insert(instructions.Nth(lbl_pos));
+    successors.insert(instructions[pos + 1]);
+    successors.insert(instructions[lbl_pos]);
 }
 
 
@@ -342,9 +342,13 @@ void LCall::EmitSpecific(Mips *mips) {
     }
 }
 
+set<Location *> LCall::GetKillSet() const {
+    return dst ? set<Location *>{dst} : set<Location *>();
+}
+
 
 ACall::ACall(Location *ma, Location *d) : dst(d), methodAddr(ma) {
-    Assert(methodAddr != NULL);
+    Assert(methodAddr != nullptr);
     sprintf(printed, "%s%sACall %s", dst? dst->GetName(): "", dst?" = ":"", methodAddr->GetName());
 }
 
@@ -359,8 +363,11 @@ void ACall::EmitSpecific(Mips *mips) {
     for (auto *loc : outSet) {
         mips->FillRegister(loc, loc->GetRegister());
     }
-} 
+}
 
+set<Location *> ACall::GetKillSet() const {
+    return dst ? set<Location *>{dst} : set<Location *>();
+}
 
 
 VTable::VTable(const char *l, List<const char *> *m)

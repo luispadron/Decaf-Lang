@@ -322,7 +322,7 @@ void CodeGenerator::DoOptimizationSetup() {
     // sets up the successor/predecessors for instructions
     for (int i = 0; i < liveRange.size(); ++i) {
         auto curr = liveRange[i];
-        curr->GenSuccSet(i, *code);
+        curr->GenSuccSet(i, liveRange);
 
         for (auto *succ : curr->successors) {
             succ->predecessors.insert(curr);
@@ -341,7 +341,7 @@ void CodeGenerator::DoRegisterAllocation() {
             for (auto *successor : curr->successors) {
                 set_union(succ_set.begin(), succ_set.end(),
                           successor->inSet.begin(), successor->inSet.end(),
-                          inserter(succ_set, succ_set.end()));
+                          inserter(succ_set, succ_set.begin()));
             }
 
             curr->outSet = succ_set;
@@ -383,13 +383,7 @@ void CodeGenerator::DoRegisterAllocation() {
         auto gen = instr->GetGenSet();
         auto kill = instr->GetKillSet();
 
-        for (auto *g : gen) {
-            list.add(g);
-        }
-
         for (auto *k : kill) {
-            list.add(k);
-
             for (auto *o : instr->outSet) {
                 if (k == o) continue;
                 list.add_edge(k, o);
