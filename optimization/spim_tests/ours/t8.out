@@ -3,7 +3,7 @@ mmm... veggies!
 Exception occurred at PC=0x004000bc
   Unaligned address in store: 0x00000009
   Exception 5  [Address error in store]  occurred and ignored
-Yum! Exception occurred at PC=0x004000e8
+Yum! Exception occurred at PC=0x004000f8
   Unaligned address in inst/data fetch: 0x00000009
   Exception 4  [Address error in inst/data fetch]  occurred and ignored
 0

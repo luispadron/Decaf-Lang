@@ -351,20 +351,28 @@ LCall::LCall(const char *l, Location *d) : label(strdup(l)), dst(d) {
     sprintf(printed, "%s%sLCall %s", dst? dst->GetName(): "", dst?" = ":"", label);
 }
 
+#include <iostream>
+using namespace std;
+
 void LCall::EmitSpecific(Mips *mips) {
-    // pp5 spill param registers to memory
-    for (auto *loc : outSet) {
-        if (loc->GetOffset() > 0) {
-            mips->SpillRegister(loc, loc->GetRegister());
+
+    // spill any registers alive after call
+    for (auto *i : inSet) {
+        for (auto *o : outSet) {
+            if (i == o) {
+                mips->SpillRegister(i, i->GetRegister());
+            }
         }
     }
 
     mips->EmitLCall(dst, label);
 
-    // fill back the params
-    for (auto *loc : outSet) {
-        if (loc->GetOffset() > 0) {
-            mips->FillRegister(loc, loc->GetRegister());
+    // spill any registers alive after call
+    for (auto *i : inSet) {
+        for (auto *o : outSet) {
+            if (i == o) {
+                mips->FillRegister(i, i->GetRegister());
+            }
         }
     }
 }
