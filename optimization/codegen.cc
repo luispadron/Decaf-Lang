@@ -385,7 +385,6 @@ void CodeGenerator::DoRegisterAllocation() {
     for (auto *instr : liveRange) {
         for (auto *i : instr->inSet) {
             for (auto *o : instr->outSet) {
-                list.add(o);
                 if (i == o) continue;
                 list.add_edge(i, o);
             }
@@ -424,14 +423,18 @@ void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list, Adja
         while (!removed.empty()) {
             auto *vertex = removed.top();
             removed.pop();
-
-            auto color = GetValidColor(vertex, graph, k);
-            graph.set_color(vertex, color);
+            if (vertex->GetSegment() == gpRelative) {
+                graph.set_color(vertex, 0);
+            } else {
+                auto color = GetValidColor(vertex, graph, k);
+                graph.set_color(vertex, color);
+            }
         }
 
         // assign registers based on color
         for (auto it = graph.begin(); it != graph.end(); ++it) {
             auto reg = graph.get_color(it->first);
+            if (reg == 0) continue;
             it->first->SetRegister(Mips::GetGenPurposeReg(reg));
         }
     } else { // find location to spill, and rerun this algorithm

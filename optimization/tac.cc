@@ -120,6 +120,9 @@ set<Location *> LoadLabel::GetKillSet() const {
 }
 
 
+
+#include <iostream>
+using namespace std;
 Assign::Assign(Location *d, Location *s) : dst(d), src(s) {
     Assert(dst != nullptr && src != nullptr);
     sprintf(printed, "%s = %s", dst->GetName(), src->GetName());
@@ -280,8 +283,11 @@ void BeginFunc::EmitSpecific(Mips *mips) {
     mips->EmitBeginFunction(frameSize);
     // pp5: need to load all parameters to the allocated registers.
     for (auto *loc : outSet) {
-        auto reg = loc->GetRegister();
-        mips->FillRegister(loc, reg);
+        if (loc->GetSegment() == fpRelative) {
+            auto reg = loc->GetRegister();
+            Assert(reg != Mips::Register::zero);
+            mips->FillRegister(loc, reg);
+        }
     }
 }
 
@@ -351,15 +357,12 @@ LCall::LCall(const char *l, Location *d) : label(strdup(l)), dst(d) {
     sprintf(printed, "%s%sLCall %s", dst? dst->GetName(): "", dst?" = ":"", label);
 }
 
-#include <iostream>
-using namespace std;
-
 void LCall::EmitSpecific(Mips *mips) {
 
     // spill any registers alive after call
     for (auto *i : inSet) {
         for (auto *o : outSet) {
-            if (i == o) {
+            if (i == o && i->GetSegment() == fpRelative) {
                 mips->SpillRegister(i, i->GetRegister());
             }
         }
@@ -370,7 +373,7 @@ void LCall::EmitSpecific(Mips *mips) {
     // spill any registers alive after call
     for (auto *i : inSet) {
         for (auto *o : outSet) {
-            if (i == o) {
+            if (i == o && i->GetSegment() == fpRelative) {
                 mips->FillRegister(i, i->GetRegister());
             }
         }
