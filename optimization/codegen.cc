@@ -330,46 +330,46 @@ void CodeGenerator::DoOptimizationSetup() {
     }
 }
 
+/// performs live analysis algorithm from spec
 void CodeGenerator::DoRegisterAllocation() {
+    // init IN[tac] = {}
+    for_each(liveRange.begin(), liveRange.end(), [](Instruction *i) { i->inSet.clear(); });
+
+    // loop until there is no change in the outSet of an instruction
     bool changed = true;
     while (changed) {
         changed = false;
 
-        for (auto *curr : liveRange) {
-            // get the successors set, which is all the in sets of all the successors
-            set<Location *> succ_set;
-            for (auto *successor : curr->successors) {
-                set_union(succ_set.begin(), succ_set.end(),
-                          successor->inSet.begin(), successor->inSet.end(),
-                          inserter(succ_set, succ_set.begin()));
+        for (auto *tac : liveRange) {
+            set<Location *> out_tac; // OUT[tac]
+            // for every successor set OUT[tac] = UNION(IN[succ])
+            for (auto *succ : tac->successors) {
+                set_union(out_tac.begin(), out_tac.end(),
+                        succ->inSet.begin(), succ->inSet.end(),
+                        inserter(out_tac, out_tac.begin()));
             }
 
-            curr->outSet = succ_set;
+            tac->outSet = out_tac;
 
-            // get the KILL(curr) and GEN(curr) sets
-            auto kill = curr->GetKillSet();
-            auto gen = curr->GetGenSet();
-
-            // remove anything from KILL(curr) from succ_set, this becomes new_in set
+            // calculate IN'[tac]
             set<Location *> new_in;
-            set_difference(succ_set.begin(), succ_set.end(),
-                           kill.begin(), kill.end(),
-                           inserter(new_in, new_in.begin()));
 
-            // finally add anything from gen set into diff_set
+            auto kill = tac->GetKillSet();
+            auto gen = tac->GetGenSet();
+
+            // this is OUT[tac] - KILL(tac)
+            set_difference(out_tac.begin(), out_tac.end(),
+                    kill.begin(), kill.end(),
+                    inserter(new_in, new_in.begin()));
+
+            // this IN'[tac] = OUT[tac] - KILL(tac) + GEN(tac)
             set_union(new_in.begin(), new_in.end(),
-                      gen.begin(), gen.end(),
-                      inserter(new_in, new_in.begin()));
+                    gen.begin(), gen.end(),
+                    inserter(new_in, new_in.begin()));
 
-            // if the new set and current set are different there is a change, thus modify and continue
-            set<Location *> diff;
-            set_difference(new_in.begin(), new_in.end(),
-                           curr->inSet.begin(), curr->inSet.end(),
-                           inserter(diff, diff.begin()));
-
-            if (!diff.empty()) {
-                curr->inSet = new_in;
+            if (new_in != tac->inSet) {
                 changed = true;
+                tac->inSet = new_in;
             }
         }
     }

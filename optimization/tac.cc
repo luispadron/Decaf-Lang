@@ -175,6 +175,10 @@ set<Location *> Store::GetGenSet() const {
     return set<Location *>{dst, src};
 }
 
+set<Location *> Store::GetKillSet() const {
+    return set<Location *>{src};
+}
+
 
 const char * const BinaryOp::opName[Mips::NumOps]  = {"+", "-", "*", "/", "%", "==", "<", "&&", "||"};;
 
@@ -289,6 +293,10 @@ void EndFunc::EmitSpecific(Mips *mips) {
   mips->EmitEndFunction();
 }
 
+void EndFunc::GenSuccSet(int pos, const std::vector<Instruction *> &instructions) {
+    Assert(successors.empty());
+}
+
  
 Return::Return(Location *v) : val(v) {
     sprintf(printed, "Return %s", val? val->GetName() : "");
@@ -299,7 +307,15 @@ void Return::EmitSpecific(Mips *mips) {
 }
 
 set<Location *> Return::GetGenSet() const {
-    return set<Location *>{val};
+    return val ? set<Location *>{val} : set<Location *>{};
+}
+
+std::set<Location *> Return::GetKillSet() const {
+    return val ? set<Location *>{val} : set<Location *>{};
+}
+
+void Return::GenSuccSet(int pos, const std::vector<Instruction *> &instructions) {
+    Assert(successors.empty());
 }
 
 
@@ -316,6 +332,10 @@ set<Location *> PushParam::GetGenSet() const {
     return set<Location *>{param};
 }
 
+set<Location *> PushParam::GetKillSet() const {
+    return set<Location *>{param};
+}
+
 
 PopParams::PopParams(int nb) : numBytes(nb) {
     sprintf(printed, "PopParams %d", numBytes);
@@ -324,6 +344,7 @@ PopParams::PopParams(int nb) : numBytes(nb) {
 void PopParams::EmitSpecific(Mips *mips) {
     mips->EmitPopParams(numBytes);
 }
+
 
 LCall::LCall(const char *l, Location *d) : label(strdup(l)), dst(d) {
     sprintf(printed, "%s%sLCall %s", dst? dst->GetName(): "", dst?" = ":"", label);
@@ -367,6 +388,10 @@ void ACall::EmitSpecific(Mips *mips) {
 
 set<Location *> ACall::GetKillSet() const {
     return dst ? set<Location *>{dst} : set<Location *>();
+}
+
+set<Location *> ACall::GetGenSet() const {
+    return set<Location *>{methodAddr};
 }
 
 

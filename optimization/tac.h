@@ -182,6 +182,7 @@ public:
     Store(Location *d, Location *s, int offset = 0);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetGenSet() const override;
+    std::set<Location *> GetKillSet() const override;
 };
 
 class BinaryOp: public Instruction {
@@ -244,25 +245,28 @@ class EndFunc: public Instruction {
 public:
     EndFunc();
     void EmitSpecific(Mips *mips) override;
-    void GenSuccSet(int pos, const std::vector<Instruction *> &instructions) override { }
+    void GenSuccSet(int pos, const std::vector<Instruction *> &instructions) override;
 };
 
 class Return: public Instruction {
-    Location *val;
+    Location *val = nullptr;
 
 public:
     explicit Return(Location *val);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetGenSet() const override;
+    std::set<Location *> GetKillSet() const override;
+    void GenSuccSet(int pos, const std::vector<Instruction *> &instructions) override;
 };   
 
 class PushParam: public Instruction {
-    Location *param;
+    Location *param = nullptr;
 
 public:
     explicit PushParam(Location *param);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetGenSet() const override;
+    std::set<Location *> GetKillSet() const override;
 }; 
 
 class PopParams: public Instruction {
@@ -291,6 +295,7 @@ public:
     ACall(Location *meth, Location *result);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetKillSet() const override;
+    std::set<Location *> GetGenSet() const override;
 };
 
 class VTable: public Instruction {
