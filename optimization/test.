@@ -1,7 +1,0 @@
-< 	_tmp51 = _tmp47 < _tmp50 ;	# live-out = {b,d,_tmp47,_tmp48,_tmp49,_tmp51}
-< 	_tmp52 = _tmp51 == _tmp48 ;	# live-out = {b,d,_tmp47,_tmp49,_tmp52}
-< 	_tmp53 = _tmp49 || _tmp52 ;	# live-out = {b,d,_tmp47,_tmp53}
----
-> 	_tmp51 = _tmp47 < _tmp50 ;	# live-out = {b,_tmp51,d,_tmp47,_tmp48,_tmp49}
-> 	_tmp52 = _tmp51 == _tmp48 ;	# live-out = {b,_tmp52,d,_tmp47,_tmp49}
-> 	_tmp53 = _tmp49 || _tmp52 ;	# live-out = {b,_tmp53,d,_tmp47}

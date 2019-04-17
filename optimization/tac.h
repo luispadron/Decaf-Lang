@@ -182,7 +182,6 @@ public:
     Store(Location *d, Location *s, int offset = 0);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetGenSet() const override;
-    std::set<Location *> GetKillSet() const override;
 };
 
 class BinaryOp: public Instruction {
@@ -266,7 +265,6 @@ public:
     explicit PushParam(Location *param);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetGenSet() const override;
-    std::set<Location *> GetKillSet() const override;
 }; 
 
 class PopParams: public Instruction {

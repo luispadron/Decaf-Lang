@@ -385,8 +385,10 @@ void CodeGenerator::DoRegisterAllocation() {
     for (auto *instr : liveRange) {
         for (auto *i : instr->inSet) {
             for (auto *o : instr->outSet) {
-                if (i == o) continue;
-                list.add_edge(i, o);
+                list.add(o);
+                if (i != o) {
+                    list.add_edge(i, o);
+                }
             }
         }
     }

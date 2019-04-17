@@ -120,9 +120,6 @@ set<Location *> LoadLabel::GetKillSet() const {
 }
 
 
-
-#include <iostream>
-using namespace std;
 Assign::Assign(Location *d, Location *s) : dst(d), src(s) {
     Assert(dst != nullptr && src != nullptr);
     sprintf(printed, "%s = %s", dst->GetName(), src->GetName());
@@ -177,10 +174,6 @@ void Store::EmitSpecific(Mips *mips) {
 
 set<Location *> Store::GetGenSet() const {
     return set<Location *>{dst, src};
-}
-
-set<Location *> Store::GetKillSet() const {
-    return set<Location *>{src};
 }
 
 
@@ -339,10 +332,6 @@ set<Location *> PushParam::GetGenSet() const {
     return set<Location *>{param};
 }
 
-set<Location *> PushParam::GetKillSet() const {
-    return set<Location *>{param};
-}
-
 
 PopParams::PopParams(int nb) : numBytes(nb) {
     sprintf(printed, "PopParams %d", numBytes);
@@ -358,6 +347,7 @@ LCall::LCall(const char *l, Location *d) : label(strdup(l)), dst(d) {
 }
 
 void LCall::EmitSpecific(Mips *mips) {
+    // pp5: fill/spill parameters that are needed
 
     // spill any registers alive after call
     for (auto *i : inSet) {
@@ -370,7 +360,7 @@ void LCall::EmitSpecific(Mips *mips) {
 
     mips->EmitLCall(dst, label);
 
-    // spill any registers alive after call
+    // fill any registers alive after call
     for (auto *i : inSet) {
         for (auto *o : outSet) {
             if (i == o && i->GetSegment() == fpRelative) {
@@ -392,19 +382,26 @@ ACall::ACall(Location *ma, Location *d) : dst(d), methodAddr(ma) {
 
 void ACall::EmitSpecific(Mips *mips) {
     // pp5: need to spill and restore registers after function call
-    for (auto *loc : outSet) {
-        if (loc->GetOffset() > 0) mips->SpillRegister(loc, loc->GetRegister());
+    for (auto *i : inSet) {
+        for (auto *o : outSet) {
+            if (i == o && i->GetSegment() == fpRelative) {
+                mips->SpillRegister(i, i->GetRegister());
+            }
+        }
     }
-
     mips->EmitACall(dst, methodAddr);
 
-    for (auto *loc : outSet) {
-        if (loc->GetOffset() > 0) mips->FillRegister(loc, loc->GetRegister());
+    for (auto *i : inSet) {
+        for (auto *o : outSet) {
+            if (i == o && i->GetSegment() == fpRelative) {
+                mips->FillRegister(i, i->GetRegister());
+            }
+        }
     }
 }
 
 set<Location *> ACall::GetKillSet() const {
-    return dst ? set<Location *>{dst} : set<Location *>();
+    return dst ? set<Location *>{dst} : set<Location *>{};
 }
 
 set<Location *> ACall::GetGenSet() const {
@@ -412,20 +409,23 @@ set<Location *> ACall::GetGenSet() const {
 }
 
 
-VTable::VTable(const char *l, List<const char *> *m)
-  : methodLabels(m), label(strdup(l)) {
-  Assert(methodLabels != NULL && label != NULL);
-  sprintf(printed, "VTable for class %s", l);
+VTable::VTable(const char *l, List<const char *> *m) : methodLabels(m), label(strdup(l)) {
+    Assert(methodLabels != nullptr && label != nullptr);
+    sprintf(printed, "VTable for class %s", l);
 }
 
 void VTable::Print() {
-  printf("VTable %s =\n", label);
-  for (int i = 0; i < methodLabels->NumElements(); i++) 
-    printf("\t%s,\n", methodLabels->Nth(i));
-  printf("; \n"); 
+    printf("VTable %s =\n", label);
+
+    for (int i = 0; i < methodLabels->NumElements(); i++) {
+        printf("\t%s,\n", methodLabels->Nth(i));
+    }
+
+    printf("; \n");
 }
+
 void VTable::EmitSpecific(Mips *mips) {
-  mips->EmitVTable(label, methodLabels);
+    mips->EmitVTable(label, methodLabels);
 }
 
 
