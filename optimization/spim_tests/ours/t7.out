@@ -1,8 +1,2 @@
 Loaded: /usr/local/Cellar/spim/9.1.19/share/exceptions.s
-Exception occurred at PC=0x00400040
-  Unaligned address in store: 0x00000009
-  Exception 5  [Address error in store]  occurred and ignored
-Exception occurred at PC=0x00400044
-  Unaligned address in store: 0x0000000d
-  Exception 5  [Address error in store]  occurred and ignored
-spots: true    height: 0
+spots: true    height: 5

@@ -265,6 +265,7 @@ public:
     explicit PushParam(Location *param);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetGenSet() const override;
+    std::set<Location *> GetKillSet() const override;
 }; 
 
 class PopParams: public Instruction {

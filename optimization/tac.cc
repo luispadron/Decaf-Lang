@@ -278,7 +278,6 @@ void BeginFunc::EmitSpecific(Mips *mips) {
     for (auto *loc : outSet) {
         if (loc->GetSegment() == fpRelative) {
             auto reg = loc->GetRegister();
-            Assert(reg != Mips::Register::zero);
             mips->FillRegister(loc, reg);
         }
     }
@@ -329,6 +328,10 @@ void PushParam::EmitSpecific(Mips *mips) {
 }
 
 set<Location *> PushParam::GetGenSet() const {
+    return set<Location *>{param};
+}
+
+std::set<Location *> PushParam::GetKillSet() const {
     return set<Location *>{param};
 }
 

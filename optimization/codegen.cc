@@ -383,11 +383,11 @@ void CodeGenerator::DoRegisterAllocation() {
     // KILL(instr) U OUT(instr)
     AdjacencyList<Location *> list;
     for (auto *instr : liveRange) {
-        for (auto *i : instr->inSet) {
+        for (auto *k : instr->GetKillSet()) {
+            list.add(k);
             for (auto *o : instr->outSet) {
-                list.add(o);
-                if (i != o) {
-                    list.add_edge(i, o);
+                if (k != o) {
+                    list.add_edge(k, o);
                 }
             }
         }
