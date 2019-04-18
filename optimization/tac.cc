@@ -336,11 +336,29 @@ void BeginFunc::SetFrameSize(int numBytesForAllLocalsAndTemps) {
 
 void BeginFunc::EmitSpecific(Mips *mips) {
     mips->EmitBeginFunction(frameSize);
-    // pp5: need to load all parameters to the allocated registers.
-    set<Location *, Location::LocSortFunc> fills;
-    set_union(fills.begin(), fills.end(),
-            outSet.begin(), outSet.end(),
-            inserter(fills, fills.begin()));
+    // pp5: need to load all parameters/globals.
+
+    for (auto *o : outSet) {
+        set<Mips::Register> used_regs;
+        for (auto *o2 : outSet) {
+            if (o != o2) used_regs.insert(o2->GetRegister());
+        }
+
+        if (o->GetRegister() != 0 && used_regs.find(o->GetRegister()) == used_regs.end()) {
+            continue;
+        }
+
+        for (int c = 1; c <= 18; ++c) {
+            auto reg = Mips::GetGenPurposeReg(c);
+            if (used_regs.find(reg) == used_regs.end()) {
+                o->SetRegister(reg);
+                break;
+            }
+        }
+    }
+
+
+    set<Location *, Location::LocSortFunc> fills(outSet.begin(), outSet.end());
 
     for (auto *f : fills) {
         auto reg = f->GetRegister();
@@ -374,7 +392,6 @@ std::set<Location *> Return::GetGenSet() const {
     return val ? set<Location *>{val} : set<Location *>{};
 }
 
-
 std::set<Location *> Return::GetLocations() const {
     return val ? set<Location *>{val} : set<Location *>{};
 }
@@ -382,7 +399,6 @@ std::set<Location *> Return::GetLocations() const {
 void Return::GenSuccSet(int pos, const std::vector<Instruction *> &instructions) {
     Assert(successors.empty());
 }
-
 
 PushParam::PushParam(Location *p) :  param(p) {
     Assert(param != nullptr);
@@ -396,7 +412,6 @@ void PushParam::EmitSpecific(Mips *mips) {
 std::set<Location *> PushParam::GetGenSet() const {
     return set<Location *>{param};
 }
-
 
 std::set<Location *> PushParam::GetLocations() const {
     return set<Location *>{param};

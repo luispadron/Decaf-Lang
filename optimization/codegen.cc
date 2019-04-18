@@ -135,8 +135,8 @@ BeginFunc *CodeGenerator::GenBeginFunc() {
 }
 
 void CodeGenerator::GenEndFunc() {
-    AddInstruction(new EndFunc());
     auto *beginFunc = dynamic_cast<BeginFunc*>(code->Nth(insideFn));
+    AddInstruction(new EndFunc());
     Assert(beginFunc != nullptr);
     beginFunc->SetFrameSize(OffsetToFirstLocal-curStackOffset);
 }
@@ -331,15 +331,6 @@ void CodeGenerator::DoOptimizationSetup() {
     }
 }
 
-ostream& operator<<(ostream &os, const set<Location *> &set) {
-    os << endl;
-    for (auto *loc : set) {
-        os << "\t" << loc->GetName();
-    }
-    os << endl;
-    return os;
-}
-
 /// performs live analysis algorithm from spec
 void CodeGenerator::DoRegisterAllocation() {
     // init IN[tac] = {}
@@ -352,10 +343,6 @@ void CodeGenerator::DoRegisterAllocation() {
 
         for (auto it = liveRange.rbegin(); it != liveRange.rend(); ++it) {
             auto *tac = *it;
-
-            if (dynamic_cast<BeginFunc*>(tac)) {
-
-            }
 
             set<Location *> out_tac; // OUT[tac]
             // for every successor set OUT[tac] = UNION(IN[succ])
@@ -370,19 +357,17 @@ void CodeGenerator::DoRegisterAllocation() {
             // calculate IN'[tac]
             set<Location *> new_in;
 
-            auto kill = tac->GetKillSet();
-            auto gen = tac->GetGenSet();
-
             // this is OUT[tac] - KILL(tac)
+            auto kill = tac->GetKillSet();
             set_difference(out_tac.begin(), out_tac.end(),
                     kill.begin(), kill.end(),
                     inserter(new_in, new_in.begin()));
 
             // this IN'[tac] = OUT[tac] - KILL(tac) + GEN(tac)
+            auto gen = tac->GetGenSet();
             set_union(new_in.begin(), new_in.end(),
                     gen.begin(), gen.end(),
                     inserter(new_in, new_in.begin()));
-
 
             if (new_in != tac->inSet) {
                 changed = true;
@@ -451,12 +436,8 @@ void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list, Adja
         while (!removed.empty()) {
             auto *vertex = removed.top();
             removed.pop();
-            if (vertex->GetSegment() == gpRelative) {
-                graph.set_color(vertex, 0);
-            } else {
-                auto color = GetValidColor(vertex, graph, k);
-                graph.set_color(vertex, color);
-            }
+            auto color = GetValidColor(vertex, graph, k);
+            graph.set_color(vertex, color);
         }
 
         // assign registers based on color
@@ -488,10 +469,12 @@ int CodeGenerator::GetValidColor(Location *vertex, const AdjacencyList<Location 
         }
     }
 
-    auto max_color = max_element(assigned_colors.begin(), assigned_colors.end());
-    if (max_color == assigned_colors.end()) {
-        return 1;
-    } else {
-        return *max_color + 1;
+    for (int c = 1; c <= colors; ++c) {
+        if (assigned_colors.find(c) == assigned_colors.end()) {
+            return c;
+        }
     }
+
+    Assert(false);
+    return -1;
 }

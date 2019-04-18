@@ -249,12 +249,13 @@ class BeginFunc: public Instruction {
 
 public:
     BeginFunc();
-    // used to backpatch the instruction with frame size once known
+    /// used to backpatch the instruction with frame size once known
     void SetFrameSize(int numBytesForAllLocalsAndTemps);
     void EmitSpecific(Mips *mips) override;
 };
 
 class EndFunc: public Instruction {
+
 public:
     EndFunc();
     void EmitSpecific(Mips *mips) override;
@@ -268,8 +269,8 @@ public:
     explicit Return(Location *val);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetGenSet() const override;
-    void GenSuccSet(int pos, const std::vector<Instruction *> &instructions) override;
     std::set<Location *> GetLocations() const override;
+    void GenSuccSet(int, const std::vector<Instruction *> &) override;
 };   
 
 class PushParam: public Instruction {
