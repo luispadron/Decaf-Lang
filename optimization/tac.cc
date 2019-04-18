@@ -15,6 +15,24 @@
 
 using namespace std;
 
+bool Location::LocSortFunc::operator()(const Location *lhs, const Location *rhs) const {
+    if (lhs->segment > rhs->segment) return false;
+
+    if (lhs->offset <= 0) {
+        if (rhs->offset <= 0)
+            return lhs->offset > rhs->offset;
+        else
+            return false;
+    } else {
+        if (rhs->offset <= 0) {
+            return true;
+        } else {
+            return lhs->offset < rhs->offset;
+        }
+    }
+
+}
+
 Location::Location(Segment s, int o, const char *name) :
     variableName(strdup(name)), segment(s), offset(o), reg(Mips::zero) {}
 
@@ -30,9 +48,15 @@ void Instruction::Print() {
     printf("\t%s ;", printed);
     printf("\t# live-out = {");
 
-    for (auto it = outSet.begin(); it != outSet.end(); ++it) {
-        if (it != outSet.begin()) printf(",");
-        printf("%s", (*it)->GetName());
+    set<Location *, Location::LocSortFunc> out_set;
+    for (auto *loc : outSet) {
+        out_set.insert(loc);
+    }
+
+    for (auto it = out_set.begin(); it != out_set.end(); ++it) {
+        auto *loc = *it;
+        if (it != out_set.begin()) printf(",");
+        printf("%s", loc->GetName());
     }
     printf("}");
     printf("\n");
@@ -47,11 +71,15 @@ void Instruction::Emit(Mips *mips) {
 }
 
 
-set<Location *> Instruction::GetKillSet() const {
+std::set<Location *> Instruction::GetKillSet() const {
     return set<Location *>();
 }
 
-set<Location *> Instruction::GetGenSet() const {
+std::set<Location *> Instruction::GetGenSet() const {
+    return set<Location *>();
+}
+
+set<Location *> Instruction::GetLocations() const {
     return set<Location *>();
 }
 
@@ -83,7 +111,11 @@ void LoadConstant::EmitSpecific(Mips *mips) {
     mips->EmitLoadConstant(dst, val);
 }
 
-set<Location *> LoadConstant::GetKillSet() const {
+std::set<Location *> LoadConstant::GetKillSet() const {
+    return set<Location *>{dst};
+}
+
+set<Location *> LoadConstant::GetLocations() const {
     return set<Location *>{dst};
 }
 
@@ -101,7 +133,11 @@ void LoadStringConstant::EmitSpecific(Mips *mips) {
     mips->EmitLoadStringConstant(dst, str);
 }
 
-set<Location *> LoadStringConstant::GetKillSet() const {
+std::set<Location *> LoadStringConstant::GetKillSet() const {
+    return set<Location *>{dst};
+}
+
+std::set<Location *> LoadStringConstant::GetLocations() const {
     return set<Location *>{dst};
 }
      
@@ -115,7 +151,11 @@ void LoadLabel::EmitSpecific(Mips *mips) {
     mips->EmitLoadLabel(dst, label);
 }
 
-set<Location *> LoadLabel::GetKillSet() const {
+std::set<Location *> LoadLabel::GetKillSet() const {
+    return set<Location *>{dst};
+}
+
+std::set<Location *> LoadLabel::GetLocations() const {
     return set<Location *>{dst};
 }
 
@@ -129,12 +169,16 @@ void Assign::EmitSpecific(Mips *mips) {
     mips->EmitCopy(dst, src);
 }
 
-set<Location *> Assign::GetKillSet() const {
+std::set<Location *> Assign::GetKillSet() const {
     return set<Location *>{dst};
 }
 
-set<Location *> Assign::GetGenSet() const {
+std::set<Location *> Assign::GetGenSet() const {
     return set<Location *>{src};
+}
+
+std::set<Location *> Assign::GetLocations() const {
+    return set<Location *>{dst, src};
 }
 
 
@@ -150,12 +194,16 @@ void Load::EmitSpecific(Mips *mips) {
     mips->EmitLoad(dst, src, offset);
 }
 
-set<Location *> Load::GetKillSet() const {
+std::set<Location *> Load::GetKillSet() const {
     return set<Location *>{dst};
 }
 
-set<Location *> Load::GetGenSet() const {
+std::set<Location *> Load::GetGenSet() const {
     return set<Location *>{src};
+}
+
+std::set<Location *> Load::GetLocations() const {
+    return set<Location *>{dst, src};
 }
 
 
@@ -172,7 +220,11 @@ void Store::EmitSpecific(Mips *mips) {
 }
 
 
-set<Location *> Store::GetGenSet() const {
+std::set<Location *> Store::GetGenSet() const {
+    return set<Location *>{dst, src};
+}
+
+std::set<Location *> Store::GetLocations() const {
     return set<Location *>{dst, src};
 }
 
@@ -196,15 +248,19 @@ BinaryOp::BinaryOp(Mips::OpCode c, Location *d, Location *o1, Location *o2) : co
     sprintf(printed, "%s = %s %s %s", dst->GetName(), op1->GetName(), opName[code], op2->GetName());
 }
 
+std::set<Location *> BinaryOp::GetLocations() const {
+    return set<Location *>{dst, op1, op2};
+}
+
 void BinaryOp::EmitSpecific(Mips *mips) {
     mips->EmitBinaryOp(code, dst, op1, op2);
 }
 
-set<Location *> BinaryOp::GetKillSet() const {
+std::set<Location *> BinaryOp::GetKillSet() const {
     return set<Location *>{dst};
 }
 
-set<Location *> BinaryOp::GetGenSet() const {
+std::set<Location *> BinaryOp::GetGenSet() const {
     return set<Location *>{op1, op2};
 }
 
@@ -247,7 +303,11 @@ void IfZ::EmitSpecific(Mips *mips) {
     mips->EmitIfZ(test, label);
 }
 
-set<Location *> IfZ::GetGenSet() const {
+std::set<Location *> IfZ::GetGenSet() const {
+    return set<Location *>{test};
+}
+
+std::set<Location *> IfZ::GetLocations() const {
     return set<Location *>{test};
 }
 
@@ -275,11 +335,14 @@ void BeginFunc::SetFrameSize(int numBytesForAllLocalsAndTemps) {
 void BeginFunc::EmitSpecific(Mips *mips) {
     mips->EmitBeginFunction(frameSize);
     // pp5: need to load all parameters to the allocated registers.
-    for (auto *loc : outSet) {
-        if (loc->GetSegment() == fpRelative) {
-            auto reg = loc->GetRegister();
-            mips->FillRegister(loc, reg);
-        }
+    set<Location *, Location::LocSortFunc> fills;
+    set_union(fills.begin(), fills.end(),
+            outSet.begin(), outSet.end(),
+            inserter(fills, fills.begin()));
+
+    for (auto *f : fills) {
+        auto reg = f->GetRegister();
+        mips->FillRegister(f, reg);
     }
 }
 
@@ -305,11 +368,12 @@ void Return::EmitSpecific(Mips *mips) {
     mips->EmitReturn(val);
 }
 
-set<Location *> Return::GetGenSet() const {
+std::set<Location *> Return::GetGenSet() const {
     return val ? set<Location *>{val} : set<Location *>{};
 }
 
-std::set<Location *> Return::GetKillSet() const {
+
+std::set<Location *> Return::GetLocations() const {
     return val ? set<Location *>{val} : set<Location *>{};
 }
 
@@ -327,11 +391,12 @@ void PushParam::EmitSpecific(Mips *mips) {
     mips->EmitParam(param);
 }
 
-set<Location *> PushParam::GetGenSet() const {
+std::set<Location *> PushParam::GetGenSet() const {
     return set<Location *>{param};
 }
 
-std::set<Location *> PushParam::GetKillSet() const {
+
+std::set<Location *> PushParam::GetLocations() const {
     return set<Location *>{param};
 }
 
@@ -373,7 +438,11 @@ void LCall::EmitSpecific(Mips *mips) {
     }
 }
 
-set<Location *> LCall::GetKillSet() const {
+std::set<Location *> LCall::GetKillSet() const {
+    return dst ? set<Location *>{dst} : set<Location *>();
+}
+
+std::set<Location *> LCall::GetLocations() const {
     return dst ? set<Location *>{dst} : set<Location *>();
 }
 
@@ -403,12 +472,16 @@ void ACall::EmitSpecific(Mips *mips) {
     }
 }
 
-set<Location *> ACall::GetKillSet() const {
+std::set<Location *> ACall::GetKillSet() const {
     return dst ? set<Location *>{dst} : set<Location *>{};
 }
 
-set<Location *> ACall::GetGenSet() const {
+std::set<Location *> ACall::GetGenSet() const {
     return set<Location *>{methodAddr};
+}
+
+std::set<Location *> ACall::GetLocations() const {
+    return dst ? set<Location *>{dst, methodAddr} : set<Location *>{methodAddr};
 }
 
 

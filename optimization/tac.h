@@ -38,9 +38,14 @@
     // variable in a function would be assigned a Location object
     // with name "num", segment fpRelative, and offset -8. 
  
-typedef enum {fpRelative, gpRelative} Segment;
+typedef enum {gpRelative, fpRelative} Segment;
 
 class Location {
+public:
+    struct LocSortFunc { // Functor for sorting locations based on their segment and offset
+        bool operator()(const Location *lhs, const Location *rhs) const;
+    };
+
 protected:
     const char *variableName = "";
     Segment segment;
@@ -92,6 +97,7 @@ public:
     void SetOutSet(std::set<Location *> out) { outSet = std::move(out); }
     virtual std::set<Location *> GetKillSet() const;
     virtual std::set<Location *> GetGenSet() const;
+    virtual std::set<Location *> GetLocations() const;
     virtual void GenSuccSet(int pos, const std::vector<Instruction *> &instructions);
     static int GetPosOfLabel(const char *label, const std::vector<Instruction *> &instructions);
 };
@@ -131,6 +137,7 @@ public:
     LoadConstant(Location *dst, int val);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetKillSet() const override;
+    std::set<Location *> GetLocations() const override;
 };
 
 class LoadStringConstant: public Instruction {
@@ -141,6 +148,7 @@ public:
     LoadStringConstant(Location *dst, const char *s);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetKillSet() const override;
+    std::set<Location *> GetLocations() const override;
 };
     
 class LoadLabel: public Instruction {
@@ -151,6 +159,7 @@ public:
     LoadLabel(Location *dst, const char *label);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetKillSet() const override;
+    std::set<Location *> GetLocations() const override;
 };
 
 class Assign: public Instruction {
@@ -161,6 +170,7 @@ public:
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetKillSet() const override;
     std::set<Location *> GetGenSet() const override;
+    std::set<Location *> GetLocations() const override;
 };
 
 class Load: public Instruction {
@@ -172,6 +182,7 @@ public:
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetKillSet() const override;
     std::set<Location *> GetGenSet() const override;
+    std::set<Location *> GetLocations() const override;
 };
 
 class Store: public Instruction {
@@ -182,6 +193,7 @@ public:
     Store(Location *d, Location *s, int offset = 0);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetGenSet() const override;
+    std::set<Location *> GetLocations() const override;
 };
 
 class BinaryOp: public Instruction {
@@ -194,6 +206,7 @@ public:
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetKillSet() const override;
     std::set<Location *> GetGenSet() const override;
+    std::set<Location *> GetLocations() const override;
 
 protected:
     Mips::OpCode code;
@@ -228,6 +241,7 @@ public:
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetGenSet() const override;
     void GenSuccSet(int pos, const std::vector<Instruction *> &instructions) override;
+    std::set<Location *> GetLocations() const override;
 };
 
 class BeginFunc: public Instruction {
@@ -254,8 +268,8 @@ public:
     explicit Return(Location *val);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetGenSet() const override;
-    std::set<Location *> GetKillSet() const override;
     void GenSuccSet(int pos, const std::vector<Instruction *> &instructions) override;
+    std::set<Location *> GetLocations() const override;
 };   
 
 class PushParam: public Instruction {
@@ -265,7 +279,7 @@ public:
     explicit PushParam(Location *param);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetGenSet() const override;
-    std::set<Location *> GetKillSet() const override;
+    std::set<Location *> GetLocations() const override;
 }; 
 
 class PopParams: public Instruction {
@@ -284,6 +298,7 @@ public:
     LCall(const char *label, Location *result);
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetKillSet() const override;
+    std::set<Location *> GetLocations() const override;
 };
 
 class ACall: public Instruction {
@@ -294,6 +309,7 @@ public:
     void EmitSpecific(Mips *mips) override;
     std::set<Location *> GetKillSet() const override;
     std::set<Location *> GetGenSet() const override;
+    std::set<Location *> GetLocations() const override;
 };
 
 class VTable: public Instruction {

@@ -379,12 +379,24 @@ void CodeGenerator::DoRegisterAllocation() {
 
     // now that we have all the in & out sets, lets create the adjacency list
 
-    // create adjacency list which basically will add an edge between everything
-    // KILL(instr) U OUT(instr)
     AdjacencyList<Location *> list;
+
+    // create list by adding every known location as a node
+    set<Location *> locations;
+    for (auto *instr : liveRange) {
+        auto locs = instr->GetLocations();
+        set_union(locations.begin(), locations.end(),
+                locs.begin(), locs.end(),
+                inserter(locations, locations.begin()));
+    }
+
+    for (auto *loc : locations) {
+        list.add(loc);
+    }
+
+    // add edge for every KILL(instr) in OUT(instr)
     for (auto *instr : liveRange) {
         for (auto *k : instr->GetKillSet()) {
-            list.add(k);
             for (auto *o : instr->outSet) {
                 if (k != o) {
                     list.add_edge(k, o);
