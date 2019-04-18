@@ -16,7 +16,9 @@
 using namespace std;
 
 bool Location::LocSortFunc::operator()(const Location *lhs, const Location *rhs) const {
-    if (lhs->segment > rhs->segment) return false;
+    if (lhs->segment != rhs->segment) {
+        return lhs->segment < rhs->segment;
+    }
 
     if (lhs->offset <= 0) {
         if (rhs->offset <= 0)

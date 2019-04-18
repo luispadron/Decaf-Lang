@@ -331,6 +331,15 @@ void CodeGenerator::DoOptimizationSetup() {
     }
 }
 
+ostream& operator<<(ostream &os, const set<Location *> &set) {
+    os << endl;
+    for (auto *loc : set) {
+        os << "\t" << loc->GetName();
+    }
+    os << endl;
+    return os;
+}
+
 /// performs live analysis algorithm from spec
 void CodeGenerator::DoRegisterAllocation() {
     // init IN[tac] = {}
@@ -343,6 +352,10 @@ void CodeGenerator::DoRegisterAllocation() {
 
         for (auto it = liveRange.rbegin(); it != liveRange.rend(); ++it) {
             auto *tac = *it;
+
+            if (dynamic_cast<BeginFunc*>(tac)) {
+
+            }
 
             set<Location *> out_tac; // OUT[tac]
             // for every successor set OUT[tac] = UNION(IN[succ])
@@ -369,6 +382,7 @@ void CodeGenerator::DoRegisterAllocation() {
             set_union(new_in.begin(), new_in.end(),
                     gen.begin(), gen.end(),
                     inserter(new_in, new_in.begin()));
+
 
             if (new_in != tac->inSet) {
                 changed = true;
