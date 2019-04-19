@@ -338,29 +338,11 @@ void BeginFunc::EmitSpecific(Mips *mips) {
     mips->EmitBeginFunction(frameSize);
     // pp5: need to load all parameters/globals.
 
-//    for (auto *o : outSet) {
-//        set<Mips::Register> used_regs;
-//        for (auto *o2 : outSet) {
-//            if (o != o2) used_regs.insert(o2->GetRegister());
-//        }
-//
-//        if (o->GetRegister() != 0 &&
-//            used_regs.find(o->GetRegister()) == used_regs.end()) continue;
-//
-//        for (int c = 1; c <= 18; ++c) {
-//            auto reg = Mips::GetGenPurposeReg(c);
-//            if (used_regs.find(reg) == used_regs.end()) {
-//                o->SetRegister(reg);
-//                break;
-//            }
-//        }
-//    }
-
-
     set<Location *, Location::LocSortFunc> fills(outSet.begin(), outSet.end());
 
     for (auto *f : fills) {
         auto reg = f->GetRegister();
+        Assert(reg != Mips::Register::zero);
         mips->FillRegister(f, reg);
     }
 }

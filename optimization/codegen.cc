@@ -426,6 +426,8 @@ void CodeGenerator::AssignRegisters(stack<Location *> &locations, RegGraph &grap
         auto loc = locations.top();
         locations.pop();
 
+        if (loc->GetRegister() != Mips::Register::zero) { continue; } // don't reassign a register
+
         auto reg = Mips::GetValidRegister(graph.get_edges(loc));
         loc->SetRegister(reg);
     }
