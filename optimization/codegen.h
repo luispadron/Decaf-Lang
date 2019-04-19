@@ -13,6 +13,7 @@
 #include "list.h"
 #include "tac.h"
 
+#include <stack>
 #include <vector>
 
 class FnDecl;
@@ -185,13 +186,16 @@ public:
     Location *GenFunctionCall(const char *fnLabel, List<Location*> *args, bool hasReturnValue);
 
 private:
+    using RegGraph = AdjacencyList<Location *>;
+
     // private helper, not for public user
     Location *GenMethodCall(Location*rcvr, Location*meth, List<Location*> *args, bool hasReturnValue);
     void GenHaltWithMessage(const char *msg);
     void DoOptimizationSetup();
     void DoRegisterAllocation();
-    void PerformRegisterAllocOpt(AdjacencyList<Location *> list, AdjacencyList<Location *> graph);
-    int GetValidColor(Location *vertex, const AdjacencyList<Location *> &list, int colors);
+    void PerformChaitinsAlgo(RegGraph graph, RegGraph backup);
+    void AssignRegisters(std::stack<Location *> &locations, RegGraph &graph);
+    RegGraph CreateRegGraph();
 };
 
 #endif

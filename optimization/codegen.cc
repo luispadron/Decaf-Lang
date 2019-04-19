@@ -376,52 +376,12 @@ void CodeGenerator::DoRegisterAllocation() {
         }
     }
 
-    // now that we have all the in & out sets, lets create the adjacency list
-
-    AdjacencyList<Location *> list;
-
-    // create list by adding every known location as a node
-    set<Location *> locations;
-    for (auto *instr : liveRange) {
-        auto locs = instr->GetLocations();
-        set_union(locations.begin(), locations.end(),
-                locs.begin(), locs.end(),
-                inserter(locations, locations.begin()));
-    }
-
-    for (auto *loc : locations) {
-        list.add(loc);
-    }
-
-    // add edge for every KILL(instr) in OUT(instr)
-    for (auto *instr : liveRange) {
-        // add edge for every pair in KILL(instr)
-        for (auto *k : instr->GetKillSet()) {
-            for (auto *k2 : instr->GetKillSet()) {
-                if (k != k2) list.add_edge(k, k2);
-            }
-        }
-
-        // add edge for every pair in OUT(instr)
-        for (auto *o : instr->outSet) {
-            for (auto *o2 : instr->outSet) {
-                if (o != o2) list.add_edge(o, o2);
-            }
-        }
-
-        // add edge for every pair in KILL(instr) & OUT(instr)
-        for (auto *k :instr->GetKillSet()) {
-            for (auto *o : instr->outSet) {
-                if (k != o) list.add_edge(k, o);
-            }
-        }
-    }
-
-    PerformRegisterAllocOpt(list, list);
+    // since we have all our in/out sets, we can create the graph and do register alloc
+    auto graph = CreateRegGraph();
+    PerformChaitinsAlgo(graph, graph);
 }
 
-void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list, AdjacencyList<Location *> graph) {
-    using Edges = AdjacencyList<Location *>::Edges;
+void CodeGenerator::PerformChaitinsAlgo(RegGraph graph, RegGraph backup) {
     constexpr int k = Mips::NumGeneralPurposeRegs; // for k-coloring
     bool has_less_k = true;
     stack<Location *> removed;
@@ -430,11 +390,11 @@ void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list, Adja
     while (has_less_k) {
         has_less_k = false;
 
-        for (auto it = list.begin(); it != list.end();) {
-            if (list.get_degrees(it->first) < k) {
+        for (auto it = graph.begin(); it != graph.end();) {
+            if (graph.get_degrees(it->first) < k) {
                 has_less_k = true;
                 removed.push(it->first);
-                it = list.erase(it);
+                it = graph.erase(it);
             } else {
                 ++it;
             }
@@ -445,49 +405,71 @@ void CodeGenerator::PerformRegisterAllocOpt(AdjacencyList<Location *> list, Adja
     // otherwise we need to find a node to remove and leave it out of the grap
     // and rerun this algorithm
 
-    if (list.empty()) { // perform coloring
-        while (!removed.empty()) {
-            auto *vertex = removed.top();
-            removed.pop();
-            auto color = GetValidColor(vertex, graph, k);
-            graph.set_color(vertex, color);
-        }
-
-        // assign registers based on color
-        for (auto it = graph.begin(); it != graph.end(); ++it) {
-            auto reg = graph.get_color(it->first);
-            if (reg == 0) continue;
-            it->first->SetRegister(Mips::GetGenPurposeReg(reg));
-        }
-    } else { // find location to spill, and rerun this algorithm
+    if (graph.empty()) { // perform register assignment
+        AssignRegisters(removed, backup);
+    } else {
         // for this case we will simply remove the node with highest degree
-        auto max_vertex = list.begin();
-        for (auto it = list.begin(); it != list.end(); ++it) {
-            if (list.get_degrees(max_vertex->first) < list.get_degrees(it->first)) {
+        auto max_vertex = graph.begin();
+        for (auto it = graph.begin(); it != graph.end(); ++it) {
+            if (graph.get_degrees(max_vertex->first) < graph.get_degrees(it->first)) {
                 max_vertex = it;
             }
         }
 
-        list.erase(max_vertex);
-        PerformRegisterAllocOpt(list, graph);
+        graph.erase(max_vertex);
+        PerformChaitinsAlgo(graph, backup);
     }
 }
 
-int CodeGenerator::GetValidColor(Location *vertex, const AdjacencyList<Location *> &list, int colors) {
-    set<int> assigned_colors;
-    for (const auto &edge : list.get_edges(vertex)) {
-        auto color = list.get_color(edge);
-        if (color != 0) {
-            assigned_colors.insert(color);
+void CodeGenerator::AssignRegisters(stack<Location *> &locations, RegGraph &graph) {
+    while (!locations.empty()) {
+        auto loc = locations.top();
+        locations.pop();
+
+        auto reg = Mips::GetValidRegister(graph.get_edges(loc));
+        loc->SetRegister(reg);
+    }
+}
+
+CodeGenerator::RegGraph CodeGenerator::CreateRegGraph() {
+    RegGraph graph;
+
+    // create list by adding every known location as a node
+    set<Location *> locations;
+    for (auto *instr : liveRange) {
+        auto locs = instr->GetLocations();
+        set_union(locations.begin(), locations.end(),
+                  locs.begin(), locs.end(),
+                  inserter(locations, locations.begin()));
+    }
+
+    for (auto *loc : locations) {
+        graph.add(loc);
+    }
+
+    // add edge for every KILL(instr) in OUT(instr)
+    for (auto *instr : liveRange) {
+        // add edge for every pair in KILL(instr)
+        for (auto *k : instr->GetKillSet()) {
+            for (auto *k2 : instr->GetKillSet()) {
+                if (k != k2) graph.add_edge(k, k2);
+            }
+        }
+
+        // add edge for every pair in OUT(instr)
+        for (auto *o : instr->outSet) {
+            for (auto *o2 : instr->outSet) {
+                if (o != o2) graph.add_edge(o, o2);
+            }
+        }
+
+        // add edge for every pair in KILL(instr) & OUT(instr)
+        for (auto *k :instr->GetKillSet()) {
+            for (auto *o : instr->outSet) {
+                if (k != o) graph.add_edge(k, o);
+            }
         }
     }
 
-    for (int c = 1; c <= colors; ++c) {
-        if (assigned_colors.find(c) == assigned_colors.end()) {
-            return c;
-        }
-    }
-
-    Assert(false);
-    return -1;
+    return graph;
 }

@@ -20,6 +20,8 @@
 
 #include "list.h"
 
+#include <unordered_set>
+
 class Location;
 
 
@@ -37,11 +39,14 @@ public:
     struct RegContents {
 	    const char *name;
 	    bool isGeneralPurpose;
-    }
+    } regs[NumRegs];
 
-    regs[NumRegs];
+    static Register genPurposeRegs[NumGeneralPurposeRegs];
 
-    static Register GetGenPurposeReg(int pos);
+    /**
+      * @return Mips::Register, attempts to return a unique register not already in the edges list.
+     */
+    static Mips::Register GetValidRegister(const std::unordered_set<Location *> &edges);
 
 private:
     Register rs, rt, rd;

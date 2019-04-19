@@ -16,7 +16,6 @@ public:
 
     using Edges = std::unordered_set<T>;
     using List = std::map<T, Edges>;
-    using Colors = std::map<T, int>;
 
     /// adds vertex `a` into the graph
     void add(const T &a) {
@@ -64,17 +63,6 @@ public:
         return it->second.size();
     }
 
-    /// returns the color that vertex `a` has
-    int get_color(const T &a) const {
-        auto it = colors.find(a);
-        if (it == colors.end()) return 0;
-        return it->second;
-    }
-
-    void set_color(const T &a, int color) {
-        colors[a] = color;
-    }
-
     /// returns whether or not the current graph is empty, that is, no vertices
     bool empty() const {
         return list.empty();
@@ -101,7 +89,6 @@ public:
 
 private:
     List list;
-    Colors colors;
 };
 
 #endif //OPTIMIZATION_ADJ_LIST_H

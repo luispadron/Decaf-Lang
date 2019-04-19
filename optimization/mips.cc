@@ -22,8 +22,42 @@
 
 #include "mips.h"
 #include "tac.h"
-#include <stdarg.h>
-#include <string.h>
+
+#include <cstdarg>
+#include <cstring>
+#include <set>
+
+using namespace std;
+
+// init static gen purpose registers array
+Mips::Register Mips::genPurposeRegs[18] =  {
+        Mips::t0, Mips::t1, Mips::t2, Mips::t3, Mips::t4, Mips::t5, Mips::t6,
+        Mips::t7, Mips::t8, Mips::t9, Mips::s0, Mips::s1, Mips::s2, Mips::s3,
+        Mips::s4, Mips::s5, Mips::s6, Mips::s7
+};
+
+/// returns a valid register that is unique within the edges set
+Mips::Register Mips::GetValidRegister(const std::unordered_set<Location *> &edges) {
+    set<Register> used;
+
+    // add all used registers
+    for (const auto &edge : edges) {
+        auto reg = edge->GetRegister();
+        if (reg != zero) {
+            used.insert(reg);
+        }
+    }
+
+    // find first unused register
+    for (auto reg : genPurposeRegs) {
+        if (used.find(reg) == used.end()) {
+            return reg;
+        }
+    }
+
+    Assert(false);
+    return zero;
+}
 
 
 /* Method: SpillRegister
@@ -422,65 +456,55 @@ const char *Mips::NameForTac(OpCode code)
   return name;
 }
 
-/// returns a general purpose register for any position given in the range [1-18].
-Mips::Register Mips::GetGenPurposeReg(int pos) {
-    Assert(pos >= 1 && pos <= 18);
-    static Mips::Register gen_purpose_regs[18] = {
-            t0, t1, t2, t3, t4, t5, t6, t7,
-            s0, s1, s2, s3, s4, s5, s6, s7,
-            t8, t9
-    };
-
-    return gen_purpose_regs[pos - 1];
-}
-
 /* Constructor
  * ----------
  * Constructor sets up the mips names and register descriptors to
  * the initial starting state.
  */
 Mips::Mips() {
-  mipsName[Add] = "add";
-  mipsName[Sub] = "sub";
-  mipsName[Mul] = "mul";
-  mipsName[Div] = "div";
-  mipsName[Mod] = "rem";
-  mipsName[Eq] = "seq";
-  mipsName[Less] = "slt";
-  mipsName[And] = "and";
-  mipsName[Or] = "or";
-  regs[zero] = (RegContents){"$zero", false};
-  regs[at] = (RegContents){"$at", false};
-  regs[v0] = (RegContents){"$v0", false};
-  regs[v1] = (RegContents){"$v1", false};
-  regs[a0] = (RegContents){"$a0", false};
-  regs[a1] = (RegContents){"$a1", false};
-  regs[a2] = (RegContents){"$a2", false};
-  regs[a3] = (RegContents){"$a3", false};
-  regs[k0] = (RegContents){"$k0", false};
-  regs[k1] = (RegContents){"$k1", false};
-  regs[gp] = (RegContents){"$gp", false};
-  regs[sp] = (RegContents){"$sp", false};
-  regs[fp] = (RegContents){"$fp", false};
-  regs[ra] = (RegContents){"$ra", false};
-  regs[t0] = (RegContents){"$t0", true};
-  regs[t1] = (RegContents){"$t1", true};
-  regs[t2] = (RegContents){"$t2", true};
-  regs[t3] = (RegContents){"$t3", true};
-  regs[t4] = (RegContents){"$t4", true};
-  regs[t5] = (RegContents){"$t5", true};
-  regs[t6] = (RegContents){"$t6", true};
-  regs[t7] = (RegContents){"$t7", true};
-  regs[t8] = (RegContents){"$t8", true};
-  regs[t9] = (RegContents){"$t9", true};
-  regs[s0] = (RegContents){"$s0", true};
-  regs[s1] = (RegContents){"$s1", true};
-  regs[s2] = (RegContents){"$s2", true};
-  regs[s3] = (RegContents){"$s3", true};
-  regs[s4] = (RegContents){"$s4", true};
-  regs[s5] = (RegContents){"$s5", true};
-  regs[s6] = (RegContents){"$s6", true};
-  regs[s7] = (RegContents){"$s7", true};
+    mipsName[Add] = "add";
+    mipsName[Sub] = "sub";
+    mipsName[Mul] = "mul";
+    mipsName[Div] = "div";
+    mipsName[Mod] = "rem";
+    mipsName[Eq] = "seq";
+    mipsName[Less] = "slt";
+    mipsName[And] = "and";
+    mipsName[Or] = "or";
+
+    regs[zero] = (RegContents){"$zero", false};
+    regs[at] = (RegContents){"$at", false};
+    regs[v0] = (RegContents){"$v0", false};
+    regs[v1] = (RegContents){"$v1", false};
+    regs[a0] = (RegContents){"$a0", false};
+    regs[a1] = (RegContents){"$a1", false};
+    regs[a2] = (RegContents){"$a2", false};
+    regs[a3] = (RegContents){"$a3", false};
+    regs[k0] = (RegContents){"$k0", false};
+    regs[k1] = (RegContents){"$k1", false};
+    regs[gp] = (RegContents){"$gp", false};
+    regs[sp] = (RegContents){"$sp", false};
+    regs[fp] = (RegContents){"$fp", false};
+    regs[ra] = (RegContents){"$ra", false};
+    regs[t0] = (RegContents){"$t0", true};
+    regs[t1] = (RegContents){"$t1", true};
+    regs[t2] = (RegContents){"$t2", true};
+    regs[t3] = (RegContents){"$t3", true};
+    regs[t4] = (RegContents){"$t4", true};
+    regs[t5] = (RegContents){"$t5", true};
+    regs[t6] = (RegContents){"$t6", true};
+    regs[t7] = (RegContents){"$t7", true};
+    regs[t8] = (RegContents){"$t8", true};
+    regs[t9] = (RegContents){"$t9", true};
+    regs[s0] = (RegContents){"$s0", true};
+    regs[s1] = (RegContents){"$s1", true};
+    regs[s2] = (RegContents){"$s2", true};
+    regs[s3] = (RegContents){"$s3", true};
+    regs[s4] = (RegContents){"$s4", true};
+    regs[s5] = (RegContents){"$s5", true};
+    regs[s6] = (RegContents){"$s6", true};
+    regs[s7] = (RegContents){"$s7", true};
+
   rs = v0; rt = v1; rd = v0;
 }
 const char *Mips::mipsName[NumOps];
