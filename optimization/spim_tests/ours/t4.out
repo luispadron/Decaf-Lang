@@ -1,5 +1,2 @@
 Loaded: /usr/local/Cellar/spim/9.1.19/share/exceptions.s
-5 Exception occurred at PC=0x00400134
-  Bad address in data/stack read: 0x00000028
-  Exception 7  [Bad data address]  occurred and ignored
-0
+5 110

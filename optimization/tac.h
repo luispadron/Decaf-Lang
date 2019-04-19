@@ -271,7 +271,7 @@ public:
     std::set<Location *> GetGenSet() const override;
     std::set<Location *> GetLocations() const override;
     void GenSuccSet(int, const std::vector<Instruction *> &) override;
-};   
+};
 
 class PushParam: public Instruction {
     Location *param = nullptr;

@@ -395,11 +395,24 @@ void CodeGenerator::DoRegisterAllocation() {
 
     // add edge for every KILL(instr) in OUT(instr)
     for (auto *instr : liveRange) {
+        // add edge for every pair in KILL(instr)
         for (auto *k : instr->GetKillSet()) {
+            for (auto *k2 : instr->GetKillSet()) {
+                if (k != k2) list.add_edge(k, k2);
+            }
+        }
+
+        // add edge for every pair in OUT(instr)
+        for (auto *o : instr->outSet) {
+            for (auto *o2 : instr->outSet) {
+                if (o != o2) list.add_edge(o, o2);
+            }
+        }
+
+        // add edge for every pair in KILL(instr) & OUT(instr)
+        for (auto *k :instr->GetKillSet()) {
             for (auto *o : instr->outSet) {
-                if (k != o) {
-                    list.add_edge(k, o);
-                }
+                if (k != o) list.add_edge(k, o);
             }
         }
     }
